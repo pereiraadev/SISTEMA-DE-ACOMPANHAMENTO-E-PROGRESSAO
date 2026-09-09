@@ -24,7 +24,7 @@ Esse comportamento corresponde exatamente à operação de uma Pilha: cada novo 
 
 Diferentemente dos recordes pessoais, o histórico de sessões de treino não pode ser resolvido apenas com acesso à última posição: o sistema precisa permitir a consulta e reordenação da coleção completa por múltiplos critérios, conforme exigido pelo enunciado ("permitir ordenar o histórico de determinado exercício por data, carga, repetições ou volume"). Uma Pilha, embora ofereça acesso rápido ao elemento mais recente, não atende a esse requisito, pois não permite reorganizar nem percorrer livremente toda a coleção segundo critérios variáveis.
 
-Por esse motivo, optou-se pelo ArrayList, que permite iteração completa e ordenação flexível utilizando `Collections.sort()` com diferentes implementações de `Comparator` (por data, carga, repetições ou volume), aplicada sob demanda, apenas quando o usuário solicita uma visualização específica — não havendo necessidade de manter a coleção permanentemente ordenada. Como as sessões são inseridas sempre em ordem cronológica ao final da lista, a obtenção do "treino anterior" (exigida para servir de referência ao iniciar um novo treino) corresponde ao acesso ao último elemento da lista, em tempo O(1).
+Por esse motivo, optou-se pelo ArrayList, que permite interação completa e ordenação flexível utilizando `Collections.sort()` com diferentes implementações de `Comparator` (por data, carga, repetições ou volume), aplicada sob demanda, apenas quando o usuário solicita uma visualização específica — não havendo necessidade de manter a coleção permanentemente ordenada. Como as sessões são inseridas sempre em ordem cronológica ao final da lista, a obtenção do "treino anterior" (exigida para servir de referência ao iniciar um novo treino) corresponde ao acesso ao último elemento da lista, em tempo O(1).
 
 -Consulta de treinos por exercício realizado
 
@@ -45,7 +45,7 @@ Como a reordenação exige o acesso direto a posições específicas da coleçã
 -Síntese das escolhas
 
 | Coleção | Estrutura | Justificativa central |
-|---|---|---|
+|---------|-----------|-----------------------|
 | Séries dentro de ItemTreino | ArrayList | Inserção só no fim, nunca reordena, `size()` em O(1) |
 | Recordes Pessoais (progressão) | Pilha (Stack) | Inserção e leitura apenas no topo (push/peek), O(1) |
 | Sessões de Treino (histórico) | ArrayList + Comparator | Reordenação sob demanda por múltiplos critérios |
