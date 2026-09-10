@@ -1,53 +1,32 @@
--Identificacao das identidades
+-> Identificação das Entidades
 
-Praticante (usuário do sistema)
-id, nome, email, senha, data_cadastro
+Este documento reflete a versão final, após alinhamento entre os integrantes do grupo. Principais mudanças em relação à primeira versão: (1) Treino e ItemTreinoModelo foram unificados — não existem mais como entidades separadas de "modelo" e "execução"; uma única entidade Treino cumpre os dois papéis, diferenciada pelo atributo isModelo; (2) a entidade RecordePessoal foi removida (ver justificativa na Etapa 3, seção 3.2); (3) GrupoMuscular deixou de ser entidade própria e passou a ser um Enum (GrupoMuscularEnum).
 
-//Nota de segurança a incluir no relatório: senha deve ser armazenada com hash (ex: bcrypt), nunca em texto puro.
+- Lista de Entidades e Atributos
 
-GrupoMuscular
-id, nome
+ Praticante (usuário do sistema) id, nome, email, senha, criado_em
 
-Atende: consulta de desempenho histórico por grupo muscular.
+Exercicio id, praticante_id (opcional — exercícios customizados), nome, grupo_muscular (Enum: PEITO, COSTAS, PERNAS, OMBROS, BRACOS), descricao, ativo, recorde_carga, recorde_reps_para_carga, recorde_volume_sessao, total_vezes_realizado
 
-Exercicio
-id, praticante_id (opcional — exercícios customizados), grupo_muscular_id, nome, descricao, equipamento, ativo (booleano)
+Os campos de recorde são sobrescritos a cada nova marca superada (ver limitação assumida na Etapa 3).
 
-O campo ativo permite que um exercício saia da ficha atual sem apagar seu histórico.
+ Treino (unifica ficha/modelo e execução) id, praticante_id, treino_origem_id (opcional — aponta para o modelo, quando for uma execução), identificacao, is_modelo (booleano), data_treino (opcional — só preenchido em execuções), status, iniciado_em, finalizado_em
 
-Treino (modelo/ficha, ex: "Treino A")
-id, praticante_id, nome, descricao, ativo
+Quando is_modelo = true: representa a ficha reutilizável (ex.: "Treino A"), sem data de execução. Quando is_modelo = false: representa uma execução específica, clonada a partir de um modelo (treino_origem_id), com seus próprios ItemTreino também clonados — garantindo que edições futuras na ficha não afetem o histórico já registrado.
 
-Representa a intenção/rotina planejada, não a execução.
+ ItemTreino id, treino_id, exercicio_id, ordem, series_previstas, reps_previstas, carga_prevista, concluido
 
-ItemTreinoModelo (entidade associativa Treino–Exercício)
-id, treino_id, exercicio_id, ordem_execucao, series_planejadas, repeticoes_alvo, tempo_descanso_segundos, observacao_tecnica
-
-Resolve a relação N:N entre Treino e Exercício.
-
-SessaoTreino (execução real, em uma data)
-id, praticante_id, treino_id (opcional), data_hora_inicio, data_hora_fim, observacoes, status (EM_ANDAMENTO, CONCLUIDO)
-
-Representa o histórico — imutável após concluído.
-
-ItemTreino (exercício efetivamente executado dentro de uma sessão)
-id, sessao_treino_id, exercicio_id, ordem_execucao, volume_total_exercicio (calculado)
-
-SerieRealizada
-id, item_treino_id, numero_serie, carga, repeticoes, volume_serie (calculado: carga × repeticoes), concluida (booleano), data_hora_execucao
-
-RecordePessoal
-id, praticante_id, exercicio_id, serie_realizada_id, tipo_recorde (MAIOR_CARGA, MAIS_REPETICOES_POR_CARGA, MAIOR_VOLUME), valor_carga, repeticoes, data_conquista
+Existe tanto vinculado a um Treino modelo (planejamento) quanto a um Treino de execução (cópia gerada no momento em que o treino é iniciado).
+ 
+ SerieExecutada id, item_treino_id, numero_serie, carga_utilizada, repeticoes_realizadas, horario_conclusao, volume_calculado (gerado: carga × repetições)
 
 - Relações entre Entidades
+Praticante possui muitos Treinos (fichas e execuções)
+Praticante possui muitos Exercícios customizados
+Treino (execução) referencia um Treino (modelo) de origem — auto-relacionamento opcional
+Treino possui muitos ItensTreino
+Exercício possui muitos ItensTreino (ao longo de diferentes treinos/execuções)
+ItemTreino possui muitas SériesExecutadas
 
-Praticante possui muitos Treinos (fichas)
-Praticante possui muitas SessõesTreino (histórico de execuções)
-Praticante possui muitos RecordesPessoais
-GrupoMuscular possui muitos Exercícios
-Treino possui muitos ItensTreinoModelo
-Exercício possui muitos ItensTreinoModelo (resolve o antigo N:N Treino–Exercício)
-SessaoTreino possui muitos ItensTreino
-Exercício possui muitos ItensTreino (ao longo de diferentes sessões, ao longo do tempo)
-ItemTreino possui muitas SériesRealizadas
-SerieRealizada pode originar um RecordePessoal (1:1 opcional)
+- Limitações assumidas conscientemente pelo grupo
+Sem histórico detalhado de recordes pessoais: o sistema mantém apenas o valor mais recente de recorde por exercício, sem registrar data ou progressão ao longo do tempo (detalhado na Etapa 3, seção 3.2).
