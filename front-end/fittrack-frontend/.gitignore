@@ -1,0 +1,62 @@
+
+# COMPILAÇÃO & ARQUIVOS GERADOS PELO MAVEN
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.log
+
+# CONFIGURAÇÕES DE IDEs & EDITORES
+# VS Code
+.vscode/
+*.code-workspace
+
+# Eclipse / Spring Tool Suite (STS)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+# SISTEMA OPERACIONAL (Arquivos Temporários Locais)
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs.generated.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+
+# SEGURANÇA & DADOS SENSÍVEIS (Credenciais e Configurações Locais)
+*.env
+*.env.local
+*.properties.local
+application-local.properties
+application-local.yml
