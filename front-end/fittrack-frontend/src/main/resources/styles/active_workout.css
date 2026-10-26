@@ -1,0 +1,149 @@
+.root {
+    -fx-background-color: #121212;
+    -fx-font-family: 'System', 'Segoe UI', sans-serif;
+}
+
+/* Forçar fundo escuro no ScrollPane */
+.scroll-pane {
+    -fx-background-color: #121212;
+    -fx-background: #121212;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: #121212;
+}
+
+/* Botões do Topo */
+.btn-icon-back {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 50%;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-finish-workout {
+    -fx-background-color: #3A1414;
+    -fx-text-fill: #FF4D4D;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12px;
+    -fx-padding: 6px 14px;
+    -fx-cursor: hand;
+}
+
+/* Timer */
+.timer-label {
+    -fx-text-fill: #888888;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.timer-value {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 38px;
+    -fx-font-weight: bold;
+}
+
+/* Banner de Treino Anterior */
+.info-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 14px;
+    -fx-padding: 10px 16px;
+}
+
+/* Badge de Progresso */
+.badge-progress {
+    -fx-background-color: #1A3812;
+    -fx-background-radius: 12px;
+    -fx-padding: 4px 10px;
+}
+
+.badge-text {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Tabela de Séries */
+.table-header {
+    -fx-text-fill: #888888;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.set-row {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 12px;
+    -fx-padding: 8px 14px;
+}
+
+.set-row-active {
+    -fx-background-color: #252525;
+    -fx-border-color: #43D61B;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-padding: 8px 14px;
+}
+
+.set-number {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* Inputs da Série Ativa */
+.input-set {
+    -fx-background-color: #2A2A2A;
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #666666;
+    -fx-background-radius: 8px;
+    -fx-alignment: CENTER;
+    -fx-font-weight: bold;
+}
+
+/* Card de Volume */
+.volume-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 14px;
+    -fx-padding: 14px 18px;
+}
+
+.volume-label {
+    -fx-text-fill: #888888;
+    -fx-font-size: 13px;
+}
+
+.volume-value {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* Botão Verde Principal */
+.btn-primary-action {
+    -fx-background-color: #43D61B;
+    -fx-text-fill: #000000;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER;
+}
+
+.btn-primary-action:hover {
+    -fx-background-color: #3bc217;
+}
+
+/* Banner de Notificação Flutuante (Aviso na Tela) */
+.toast-notification {
+    -fx-background-color: #1E1E1E;
+    -fx-border-color: #43D61B;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px 16px;
+}

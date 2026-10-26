@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@/styles/active_workout.css" 
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.fittrack.fittrack_frontend.controller.ActiveWorkoutController">
+
+    <!-- CABEÇALHO -->
+    <top>
+        <VBox spacing="14.0" style="-fx-background-color: #121212;">
+            <padding>
+                <Insets top="20.0" right="20.0" left="20.0" bottom="10.0"/>
+            </padding>
+            
+            <HBox alignment="CENTER_LEFT">
+                <Button text="‹" styleClass="btn-icon-back" onAction="#handleVoltar" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label text="Treino A - Peito e Tríceps" style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button text="Finalizar" styleClass="btn-finish-workout" onAction="#handleFinalizarTreino" />
+            </HBox>
+
+            <!-- Cronômetro -->
+            <VBox alignment="CENTER" spacing="2.0">
+                <Label text="TEMPO DECORRIDO" styleClass="timer-label" />
+                <Label fx:id="txtCronometro" text="12:34" styleClass="timer-value" />
+            </VBox>
+
+            <!-- Banner Informativo -->
+            <HBox styleClass="info-card" alignment="CENTER_LEFT" spacing="10.0">
+                <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
+                    <Image url="@/icons/info.png" />
+                </ImageView>
+                <Label text="Treino Anterior:  " style="-fx-text-fill: #888888; -fx-font-size: 13px;" />
+                <Label text="4×10 - 80kg" style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold;" />
+            </HBox>
+
+            <!-- BANNER DE ALERTA VISUAL NA TELA -->
+            <HBox fx:id="boxNotificacao" styleClass="toast-notification" alignment="CENTER" visible="false" managed="false">
+                <Label fx:id="lblNotificacaoTexto" text="Série confirmada com sucesso!" style="-fx-text-fill: #43D61B; -fx-font-weight: bold; -fx-font-size: 13px;" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" vbarPolicy="NEVER">
+            <content>
+                <VBox spacing="16.0" style="-fx-background-color: #121212;">
+                    <padding>
+                        <Insets top="10.0" right="20.0" bottom="20.0" left="20.0"/>
+                    </padding>
+
+                    <!-- Titulo Exercício e Badge de Progresso -->
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox spacing="2.0">
+                            <Label text="Supino Reto" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                            <Label text="Peito" style="-fx-text-fill: #888888; -fx-font-size: 13px;" />
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox styleClass="badge-progress" alignment="CENTER">
+                            <Label fx:id="txtProgressoSeries" text="2 de 4 séries" styleClass="badge-text" />
+                        </HBox>
+                    </HBox>
+
+                    <!-- Cabeçalho da Tabela (GridPane com colunas idênticas às séries) -->
+                    <GridPane alignment="CENTER_LEFT">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="12.0" />
+                            <ColumnConstraints percentWidth="43.0" />
+                            <ColumnConstraints percentWidth="25.0" />
+                            <ColumnConstraints percentWidth="20.0" halignment="RIGHT" />
+                        </columnConstraints>
+                        <children>
+                            <Label text="#" styleClass="table-header" GridPane.columnIndex="0" />
+                            <Label text="Carga (kg)" styleClass="table-header" GridPane.columnIndex="1" />
+                            <Label text="Reps" styleClass="table-header" GridPane.columnIndex="2" />
+                            <Label text="Log" styleClass="table-header" GridPane.columnIndex="3" />
+                        </children>
+                    </GridPane>
+
+                    <!-- Container gerado dinamicamente pelo Controller -->
+                    <VBox fx:id="containerSeries" spacing="10.0" />
+
+                    <!-- Resumo dos Volumes -->
+                    <VBox styleClass="volume-card" spacing="10.0">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Volume da série" styleClass="volume-label" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label fx:id="txtVolumeSerie" text="0 kg" styleClass="volume-value" />
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Volume do exercício" styleClass="volume-label" />
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Label fx:id="txtVolumeExercício" text="1.460 kg" styleClass="volume-value" />
+                        </HBox>
+                    </VBox>
+
+                    <!-- Botão Confirmar Série -->
+                    <Button text="Confirmar Série" styleClass="btn-primary-action" maxWidth="Infinity" 
+                            prefHeight="50.0" onAction="#handleConfirmarSerie" />
+
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
