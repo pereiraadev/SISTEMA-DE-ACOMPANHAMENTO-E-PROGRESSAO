@@ -1,13 +1,14 @@
 package com.fittrack.fittrack_frontend;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import javafx.application.Application;
 
 @SpringBootApplication
 public class FittrackFrontendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FittrackFrontendApplication.class, args);
+		Application.launch(JavaFxApplication.class, args);
 		System.err.println("Programa inicializado com sucesso.");
 	}
 
