@@ -1,0 +1,142 @@
+.root {
+    -fx-background-color: #121212;
+    -fx-font-family: 'System', 'Segoe UI', sans-serif;
+}
+
+.scroll-pane {
+    -fx-background-color: #121212;
+    -fx-background: #121212;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: #121212;
+}
+
+/* Botões do Topo */
+.btn-icon-back {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 50%;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-icon-badge {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 50%;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-alignment: CENTER;
+}
+
+/* Filtros por Categoria (Pills) */
+.filter-pill {
+    -fx-background-color: #1E1E1E;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20px;
+    -fx-padding: 8px 18px;
+    -fx-cursor: hand;
+}
+
+.filter-pill-active {
+    -fx-background-color: #43D61B;
+    -fx-text-fill: #000000;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20px;
+    -fx-padding: 8px 18px;
+    -fx-cursor: hand;
+}
+
+/* Card Hero de Destaque */
+.hero-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 16px;
+    -fx-border-color: #43D61B;
+    -fx-border-width: 0 0 0 4px; /* Borda verde apenas na esquerda */
+    -fx-border-radius: 16px 0 0 16px;
+    -fx-padding: 18px;
+}
+
+.hero-subtitle {
+    -fx-text-fill: #888888;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.hero-value {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 38px;
+    -fx-font-weight: bold;
+}
+
+/* Grid Cards Secundários */
+.metric-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 16px;
+    -fx-padding: 14px;
+}
+
+.metric-value {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.metric-label {
+    -fx-text-fill: #888888;
+    -fx-font-size: 11px;
+}
+
+.badge-pr-tag {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+/* Lista de PRs por Exercício */
+.exercise-pr-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 16px;
+    -fx-padding: 12px 16px;
+}
+
+.exercise-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.exercise-date {
+    -fx-text-fill: #888888;
+    -fx-font-size: 12px;
+}
+
+.pill-pr-value {
+    -fx-background-color: #1A3812;
+    -fx-background-radius: 12px;
+    -fx-padding: 4px 12px;
+}
+
+.pill-pr-text {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.badge-evolution {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.section-link {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
