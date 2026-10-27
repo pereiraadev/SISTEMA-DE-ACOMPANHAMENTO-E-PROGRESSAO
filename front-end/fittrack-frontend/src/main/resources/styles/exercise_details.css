@@ -1,0 +1,244 @@
+.root {
+    -fx-background-color: #121212;
+    -fx-font-family: 'System', 'Segoe UI', sans-serif;
+}
+
+.scroll-pane {
+    -fx-background-color: #121212;
+    -fx-background: #121212;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: #121212;
+}
+
+.btn-icon-back {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 50%;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.badge-active {
+    -fx-background-color: #1A3812;
+    -fx-background-radius: 12px;
+    -fx-padding: 4px 12px;
+}
+
+.badge-active-text {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* PRs e Charts */
+.pr-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 16px;
+    -fx-padding: 16px;
+}
+
+.pr-title {
+    -fx-text-fill: #888888;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.pr-value {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.pr-subtitle {
+    -fx-text-fill: #777777;
+    -fx-font-size: 11px;
+}
+
+.chart-container {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 16px;
+    -fx-padding: 12px;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: #2A2A2A;
+    -fx-stroke-dash-array: 3 3;
+}
+
+.chart-line-symbol {
+    -fx-background-color: #43D61B, #121212;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #43D61B;
+    -fx-stroke-width: 2.5px;
+}
+
+.axis {
+    -fx-tick-label-fill: #777777;
+    -fx-font-size: 10px;
+}
+
+/* Histórico Cards */
+.history-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 14px;
+    -fx-padding: 14px 16px;
+}
+
+.history-date {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.history-desc {
+    -fx-text-fill: #888888;
+    -fx-font-size: 12px;
+}
+
+.tag-aumento {
+    -fx-background-color: #1A3812;
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px 8px;
+}
+
+.tag-reps {
+    -fx-background-color: #1A3812;
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px 8px;
+}
+
+.tag-manutencao {
+    -fx-background-color: #273A16;
+    -fx-text-fill: #79B838;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px 8px;
+}
+
+.tag-reducao {
+    -fx-background-color: #3A1414;
+    -fx-text-fill: #FF4D4D;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px 8px;
+}
+
+/* Botão de Filtro Selector */
+.btn-filter-selector {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 8px;
+    -fx-padding: 6px 10px;
+    -fx-cursor: hand;
+}
+
+.btn-filter-text {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Bottom Sheet e Overlay */
+.modal-backdrop {
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+}
+
+.bottom-sheet {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 20px 20px 0 0;
+    -fx-padding: 12px 20px 24px 20px;
+}
+
+.sheet-handle {
+    -fx-background-color: #333333;
+    -fx-min-width: 40px;
+    -fx-max-width: 40px;
+    -fx-min-height: 4px;
+    -fx-max-height: 4px;
+    -fx-background-radius: 2px;
+}
+
+.sheet-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.btn-close-modal {
+    -fx-background-color: #2A2A2A;
+    -fx-text-fill: #888888;
+    -fx-font-size: 14px;
+    -fx-background-radius: 50%;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    -fx-cursor: hand;
+}
+
+.filter-category-label {
+    -fx-text-fill: #777777;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* Customização dos RadioButtons do Filtro */
+.filter-option-radio {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 14px;
+    -fx-background-radius: 10px;
+    -fx-cursor: hand;
+}
+
+.filter-option-radio:selected {
+    -fx-background-color: #252525;
+    -fx-border-color: #43D61B;
+    -fx-border-width: 0 0 0 3px;
+    -fx-border-radius: 10px;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.filter-option-radio .radio {
+    -fx-background-color: #2A2A2A;
+    -fx-border-color: #555555;
+    -fx-border-radius: 50%;
+}
+
+.filter-option-radio:selected .radio {
+    -fx-background-color: #121212;
+    -fx-border-color: #43D61B;
+}
+
+.filter-option-radio:selected .radio .dot {
+    -fx-background-color: #43D61B;
+}
+
+/* Botão Verde Principal */
+.btn-primary-action {
+    -fx-background-color: #43D61B;
+    -fx-text-fill: #000000;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER;
+}
