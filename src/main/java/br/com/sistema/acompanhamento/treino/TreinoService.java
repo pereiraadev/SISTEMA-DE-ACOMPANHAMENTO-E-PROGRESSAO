@@ -1,5 +1,6 @@
 package br.com.sistema.acompanhamento.treino;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,28 @@ public class TreinoService {
             execucao.adicionarItem(copia);
         }
         return repository.save(execucao);
+    }
+
+    // Totaliza treinos concluidos, series executadas e volume (carga x repeticoes) de um praticante.
+    // Fichas modelo e treinos ainda em andamento ficam de fora, como no historico fechado.
+    @Transactional(readOnly = true)
+    public EstatisticasGeraisDTO consultarEstatisticasGerais(Long praticanteId) {
+        long totalTreinos = 0;
+        long totalSeries = 0;
+        BigDecimal volumeTotal = BigDecimal.ZERO;
+
+        for (Treino treino : repository.findByPraticanteIdOrderByIdDesc(praticanteId)) {
+            if (treino.isModelo() || !"CONCLUIDO".equals(treino.getStatus())) continue;
+            totalTreinos++;
+            for (ItemTreino item : treino.getItens()) {
+                for (SerieExecutada serie : item.getSeries()) {
+                    totalSeries++;
+                    volumeTotal = volumeTotal.add(
+                            serie.getCargaUtilizada().multiply(BigDecimal.valueOf(serie.getRepeticoesRealizadas())));
+                }
+            }
+        }
+        return new EstatisticasGeraisDTO(totalTreinos, totalSeries, volumeTotal);
     }
 
     @Transactional

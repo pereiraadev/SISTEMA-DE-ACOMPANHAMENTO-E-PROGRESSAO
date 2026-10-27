@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,6 +55,48 @@ class TreinoServiceTest {
         assertThatThrownBy(() -> service.iniciarTreinoDeModelo(execucao))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Apenas modelos podem ser clonados");
+    }
+
+    @Test
+    void deveTotalizarTreinosSeriesEVolumeApenasDeExecucoesConcluidas() {
+        Treino concluido = execucao("CONCLUIDO", false, "50.00", 10, "50.00", 8);
+        Treino emAndamento = execucao("EM_ANDAMENTO", false, "100.00", 10);
+        Treino modelo = execucao("CONCLUIDO", true, "100.00", 10);
+        when(repository.findByPraticanteIdOrderByIdDesc(1L)).thenReturn(List.of(concluido, emAndamento, modelo));
+
+        EstatisticasGeraisDTO stats = service.consultarEstatisticasGerais(1L);
+
+        assertThat(stats.totalTreinos()).isEqualTo(1);
+        assertThat(stats.totalSeries()).isEqualTo(2);
+        assertThat(stats.volumeTotal()).isEqualByComparingTo("900.00");
+    }
+
+    @Test
+    void deveRetornarZerosQuandoNaoHaTreinos() {
+        when(repository.findByPraticanteIdOrderByIdDesc(1L)).thenReturn(List.of());
+
+        EstatisticasGeraisDTO stats = service.consultarEstatisticasGerais(1L);
+
+        assertThat(stats.totalTreinos()).isZero();
+        assertThat(stats.totalSeries()).isZero();
+        assertThat(stats.volumeTotal()).isEqualByComparingTo("0");
+    }
+
+    // pares (carga, repeticoes) viram series de um unico item
+    private Treino execucao(String status, boolean modelo, Object... cargaEReps) {
+        Treino t = new Treino();
+        t.setStatus(status);
+        t.setModelo(modelo);
+        ItemTreino item = new ItemTreino();
+        t.adicionarItem(item);
+        for (int i = 0; i < cargaEReps.length; i += 2) {
+            SerieExecutada s = new SerieExecutada();
+            s.setNumeroSerie(i / 2 + 1);
+            s.setCargaUtilizada(new BigDecimal((String) cargaEReps[i]));
+            s.setRepeticoesRealizadas((Integer) cargaEReps[i + 1]);
+            item.adicionarSerie(s);
+        }
+        return t;
     }
 
     private Treino modeloComItem() {
