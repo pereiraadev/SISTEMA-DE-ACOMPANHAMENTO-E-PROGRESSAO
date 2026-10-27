@@ -1,0 +1,124 @@
+.root {
+    -fx-background-color: #121212;
+    -fx-font-family: 'System', 'Segoe UI', sans-serif;
+}
+
+/* ScrollPane Transparente */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Cabeçalho de Perfil */
+.profile-avatar {
+    -fx-border-color: #43D61B;
+    -fx-border-width: 2px;
+    -fx-border-radius: 50%;
+}
+
+.user-greeting {
+    -fx-fill: #FFFFFF;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.user-subtitle {
+    -fx-fill: #A0A0A0;
+    -fx-font-size: 13px;
+}
+
+/* Cards de Métricas (2x2 Grid) */
+.metric-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 16px;
+    -fx-padding: 18px 16px; /* Aumentado o padding vertical */
+    -fx-alignment: CENTER_LEFT;
+}
+
+.metric-title {
+    -fx-text-fill: #A0A0A0;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.metric-value {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Seção de Exercícios */
+.section-title {
+    -fx-fill: #FFFFFF;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.section-link {
+    -fx-fill: #43D61B;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+/* Card de Exercício */
+.exercise-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 16px;
+    -fx-min-width: 150px;
+    -fx-max-width: 150px;
+    -fx-cursor: hand;
+}
+
+.exercise-title {
+    -fx-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.exercise-subtitle {
+    -fx-fill: #888888;
+    -fx-font-size: 12px;
+}
+
+/* Botão Principal Treino */
+.btn-start-workout {
+    -fx-background-color: #43D61B;
+    -fx-text-fill: #000000;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 30px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER;
+}
+
+.btn-start-workout:hover {
+    -fx-background-color: #3bc217;
+}
+
+/* Bottom Navigation Bar */
+.bottom-nav {
+    -fx-background-color: #181818;
+    -fx-border-color: #262626 transparent transparent transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 10px 0px;
+}
+
+.nav-item-active {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.nav-item-inactive {
+    -fx-text-fill: #777777;
+    -fx-font-size: 11px;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
