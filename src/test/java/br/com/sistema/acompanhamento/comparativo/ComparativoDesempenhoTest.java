@@ -85,4 +85,22 @@ public class ComparativoDesempenhoTest {
         assertEquals("AUMENTO_REPETICOES", resultado);
     }
 
+    // Testa quando o aluno ainda nao tem series anteriores.
+    @Test
+    void testarSemHistoricoAnterior() {
+
+        // Lista vazia porque nao existe treino anterior.
+        ArrayList<DadosSerie> anteriores = new ArrayList<>();
+
+        // Series realizadas no treino atual.
+        ArrayList<DadosSerie> atuais = new ArrayList<>();
+        atuais.add(new DadosSerie(40, 10));
+
+        String resultado = comparativo.compararExercicios(
+                anteriores, atuais);
+
+        // Sem dados anteriores, nao e possivel comparar.
+        assertEquals("SEM_DADOS", resultado);
+    }
+
 }
