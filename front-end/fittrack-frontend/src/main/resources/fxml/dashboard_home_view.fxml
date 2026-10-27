@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.Region?>
+
+<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@../styles/dashboard.css" 
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.fittrack.fittrack_frontend.controller.DashboardHomeController">
+
+    <!-- CONTEÚDO PRINCIPAL COM SCROLL -->
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" vbarPolicy="NEVER">
+            <content>
+                <VBox spacing="20.0">
+                    <padding>
+                        <Insets top="24.0" right="20.0" bottom="24.0" left="20.0"/>
+                    </padding>
+
+                    <!-- Cabeçalho de Perfil -->
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                        <VBox alignment="CENTER_LEFT" spacing="2.0">
+                            <Text text="Olá, Rafael 👋" styleClass="user-greeting" />
+                            <Text text="Vamos treinar hoje?" styleClass="user-subtitle" />
+                        </VBox>
+                    </HBox>
+
+                    <!-- Grid de Métricas (2x2) -->
+                    <GridPane hgap="12.0" vgap="12.0" alignment="CENTER" maxWidth="Infinity">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                        </columnConstraints>
+                        
+                        <!-- Total Treinos -->
+                        <VBox styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="0" maxWidth="Infinity">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="TOTAL TREINOS" styleClass="metric-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
+                                    <Image url="@/icons/trending-up.png" />
+                                </ImageView>
+                            </HBox>
+                            <Label text="47" styleClass="metric-value">
+                                <VBox.margin><Insets top="8.0" /></VBox.margin>
+                            </Label>
+                        </VBox>
+
+                        <!-- Exercícios -->
+                        <VBox styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="0" maxWidth="Infinity">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="EXERCÍCIOS" styleClass="metric-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
+                                    <Image url="@/icons/dumbbell.png" />
+                                </ImageView>
+                            </HBox>
+                            <Label text="312" styleClass="metric-value">
+                                <VBox.margin><Insets top="8.0" /></VBox.margin>
+                            </Label>
+                        </VBox>
+
+                        <!-- Séries -->
+                        <VBox styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="1" maxWidth="Infinity">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="SÉRIES" styleClass="metric-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
+                                    <Image url="@/icons/repeat-1.png" />
+                                </ImageView>
+                            </HBox>
+                            <Label text="1.248" styleClass="metric-value">
+                                <VBox.margin><Insets top="8.0" /></VBox.margin>
+                            </Label>
+                        </VBox>
+
+                        <!-- Volume Total -->
+                        <VBox styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="1" maxWidth="Infinity">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="VOLUME TOTAL" styleClass="metric-title" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
+                                    <Image url="@/icons/trending-up.png" />
+                                </ImageView>
+                            </HBox>
+                            <Label text="45.720 kg" styleClass="metric-value">
+                                <VBox.margin><Insets top="8.0" /></VBox.margin>
+                            </Label>
+                        </VBox>
+                    </GridPane>
+
+                    <!-- Seção: Exercícios mais realizados -->
+                    <VBox spacing="12.0">
+                        <HBox alignment="CENTER_LEFT">
+                            <Text text="Exercícios mais realizados" styleClass="section-title" />
+                            <!-- espaçador flexível que empurra o link para a extrema direita -->
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Text text="Ver todos" styleClass="section-link" onMouseClicked="#handleVerTodosExercicios" />
+                        </HBox>
+
+                        <ScrollPane fitToHeight="true" hbarPolicy="NEVER" styleClass="scroll-pane" vbarPolicy="NEVER">
+                            <content>
+                                <HBox spacing="12.0">
+                                    <!-- Exercício 1: Supino Reto -->
+                                    <VBox styleClass="exercise-card">
+                                        <ImageView fitHeight="100.0" fitWidth="150.0" preserveRatio="false">
+                                            <clip>
+                                                <Rectangle width="150.0" height="100.0" arcWidth="16.0" arcHeight="16.0" />
+                                            </clip>
+                                            <Image url="@../images/Rectangle.png" />
+                                        </ImageView>
+                                        <VBox spacing="2.0">
+                                            <padding><Insets top="8.0" right="10.0" bottom="10.0" left="10.0"/></padding>
+                                            <Text text="Supino Reto" styleClass="exercise-title" />
+                                            <Text text="4 séries x 10 reps" styleClass="exercise-subtitle" />
+                                        </VBox>
+                                    </VBox>
+
+                                    <!-- Exercício 2: Agachamento -->
+                                    <VBox styleClass="exercise-card">
+                                        <ImageView fitHeight="100.0" fitWidth="150.0" preserveRatio="false">
+                                            <clip>
+                                                <Rectangle width="150.0" height="100.0" arcWidth="16.0" arcHeight="16.0" />
+                                            </clip>
+                                            <Image url="@../images/Rectangle (1).png" />
+                                        </ImageView>
+                                        <VBox spacing="2.0">
+                                            <padding><Insets top="8.0" right="10.0" bottom="10.0" left="10.0"/></padding>
+                                            <Text text="Agachamento" styleClass="exercise-title" />
+                                            <Text text="4 séries x 8 reps" styleClass="exercise-subtitle" />
+                                        </VBox>
+                                    </VBox>
+
+                                    <!-- Exercício 3: Rosca Direta -->
+                                    <VBox styleClass="exercise-card">
+                                        <ImageView fitHeight="100.0" fitWidth="150.0" preserveRatio="false">
+                                            <clip>
+                                                <Rectangle width="150.0" height="100.0" arcWidth="16.0" arcHeight="16.0" />
+                                            </clip>
+                                            <Image url="@../images/Rectangle (2).png" />
+                                        </ImageView>
+                                        <VBox spacing="2.0">
+                                            <padding><Insets top="8.0" right="10.0" bottom="10.0" left="10.0"/></padding>
+                                            <Text text="Rosca Direta" styleClass="exercise-title" />
+                                            <Text text="3 séries x 12 reps" styleClass="exercise-subtitle" />
+                                        </VBox>
+                                    </VBox>
+                                </HBox>
+                            </content>
+                        </ScrollPane>
+                    </VBox>
+
+                    <!-- Botão Principal: Iniciar Treino do Dia -->
+                    <Button styleClass="btn-start-workout" maxWidth="Infinity" prefHeight="52.0" onAction="#handleIniciarTreinoDoDia">
+                        <graphic>
+                            <HBox alignment="CENTER" spacing="8.0">
+                                <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
+                                    <Image url="@../icons/play.png" />
+                                </ImageView>
+                                <Label text="Iniciar Treino do Dia" style="-fx-text-fill: #000000; -fx-font-weight: bold; -fx-font-size: 16px;" />
+                            </HBox>
+                        </graphic>
+                        <VBox.margin>
+                            <Insets top="8.0" />
+                        </VBox.margin>
+                    </Button>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <!-- NAVEGAÇÃO INFERIOR FIXA -->
+    <bottom>
+        <HBox styleClass="bottom-nav" alignment="CENTER">
+            <!-- Aba Início -->
+            <Button styleClass="nav-button" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#handleNavInicio">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4.0">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
+                            <Image url="@../icons/home.png" />
+                        </ImageView>
+                        <Label text="Início" styleClass="nav-item-active" />
+                    </VBox>
+                </graphic>
+            </Button>
+
+            <!-- Aba Treinos -->
+            <Button styleClass="nav-button" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#handleNavTreinos">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4.0">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
+                            <Image url="@../icons/dumbbell (1).png" />
+                        </ImageView>
+                        <Label text="Treinos" styleClass="nav-item-inactive" />
+                    </VBox>
+                </graphic>
+            </Button>
+
+            <!-- Aba Métricas -->
+            <Button styleClass="nav-button" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#handleNavMetricas">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4.0">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
+                            <Image url="@../icons/Vector.png" />
+                        </ImageView>
+                        <Label text="Métricas" styleClass="nav-item-inactive" />
+                    </VBox>
+                </graphic>
+            </Button>
+        </HBox>
+    </bottom>
+
+</BorderPane>
