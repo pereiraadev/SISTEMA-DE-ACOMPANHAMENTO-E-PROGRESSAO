@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="720.0" prefWidth="380.0" stylesheets="@/styles/exercise_details.css" 
+           xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+           fx:controller="com.fittrack.fittrack_frontend.controller.ExerciseDetailsController">
+
+    <!-- CAMADA BASE: DETALHES DO EXERCÍCIO -->
+    <BorderPane prefHeight="720.0" prefWidth="380.0">
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #121212;">
+                <padding>
+                    <Insets top="20.0" right="20.0" left="20.0" bottom="10.0"/>
+                </padding>
+                <Button text="‹" styleClass="btn-icon-back" onAction="#handleVoltar" />
+                <VBox spacing="2.0">
+                    <Label fx:id="lblNomeExercício" text="Supino Reto" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                    <Label fx:id="lblGrupoMuscular" text="Peito (Peitoral Maior)" style="-fx-text-fill: #888888; -fx-font-size: 12px;" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox styleClass="badge-active" alignment="CENTER">
+                    <Label fx:id="lblStatus" text="Ativo" styleClass="badge-active-text" />
+                </HBox>
+            </HBox>
+        </top>
+
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" vbarPolicy="NEVER">
+                <content>
+                    <VBox spacing="20.0" style="-fx-background-color: #121212;">
+                        <padding>
+                            <Insets top="10.0" right="20.0" bottom="24.0" left="20.0"/>
+                        </padding>
+
+                        <!-- RECORDES PESSOAIS -->
+                        <VBox spacing="10.0">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
+                                    <Image url="@/icons/trophy.png" />
+                                </ImageView>
+                                <Label text="RECORDES PESSOAIS (PR)" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                            </HBox>
+
+                            <GridPane hgap="12.0">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="50.0" />
+                                    <ColumnConstraints percentWidth="50.0" />
+                                </columnConstraints>
+                                <children>
+                                    <VBox styleClass="pr-card" spacing="4.0" GridPane.columnIndex="0">
+                                        <Label text="Maior Carga" styleClass="pr-title" />
+                                        <Label fx:id="lblMaiorCarga" text="100 kg" styleClass="pr-value" />
+                                        <Label fx:id="lblMaiorCargaDet" text="10 reps • 15 Mar 2025" styleClass="pr-subtitle" />
+                                    </VBox>
+
+                                    <VBox styleClass="pr-card" spacing="4.0" GridPane.columnIndex="1">
+                                        <Label text="Maior Reps por Carga" styleClass="pr-title" />
+                                        <Label fx:id="lblMaiorReps" text="12 reps" styleClass="pr-value" />
+                                        <Label fx:id="lblMaiorRepsDet" text="80 kg • 22 Fev 2025" styleClass="pr-subtitle" />
+                                    </VBox>
+                                </children>
+                            </GridPane>
+                        </VBox>
+
+                        <!-- EVOLUÇÃO -->
+                        <VBox spacing="10.0">
+                            <Label text="EVOLUÇÃO" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                            <VBox styleClass="chart-container">
+                                <LineChart fx:id="chartEvolucao" legendVisible="false" prefHeight="180.0" animated="false">
+                                    <xAxis><CategoryAxis side="BOTTOM" /></xAxis>
+                                    <yAxis><NumberAxis side="LEFT" lowerBound="50" upperBound="110" tickUnit="20" /></yAxis>
+                                </LineChart>
+                            </VBox>
+                        </VBox>
+
+                        <!-- HISTÓRICO E BOTÃO DE FILTRO DE ORDENAÇÃO -->
+                        <VBox spacing="12.0">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="HISTÓRICO" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <HBox alignment="CENTER" spacing="4.0" styleClass="btn-filter-selector" onMouseClicked="#handleAbrirFiltro">
+                                    <Label fx:id="lblFiltroAtual" text="Data ⤓" styleClass="btn-filter-text" />
+                                    <ImageView fitHeight="12.0" fitWidth="12.0" preserveRatio="true">
+                                        <Image url="@/icons/chevron-down.png" />
+                                    </ImageView>
+                                </HBox>
+                            </HBox>
+
+                            <VBox fx:id="containerHistorico" spacing="10.0" />
+                        </VBox>
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </center>
+    </BorderPane>
+
+    <!-- CAMADA SUPERIOR: MODAL BOTTOM SHEET (ORDENAR HISTÓRICO POR) -->
+    <StackPane fx:id="modalOverlay" styleClass="modal-backdrop" visible="false" managed="false">
+        <VBox styleClass="bottom-sheet" maxWidth="380.0" StackPane.alignment="BOTTOM_CENTER">
+            <!-- Puxador Superior Decorativo -->
+            <HBox alignment="CENTER">
+                <Region styleClass="sheet-handle" />
+            </HBox>
+
+            <!-- Cabeçalho do Bottom Sheet -->
+            <HBox alignment="CENTER_LEFT" style="-fx-padding: 10px 0 16px 0;">
+                <Label text="Ordenar Histórico por" styleClass="sheet-title" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button text="✕" styleClass="btn-close-modal" onAction="#handleFecharFiltro" />
+            </HBox>
+
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" vbarPolicy="NEVER" prefHeight="420.0">
+                <content>
+                    <VBox spacing="16.0" style="-fx-background-color: #1E1E1E;">
+                        
+                        <fx:define>
+                            <ToggleGroup fx:id="ordenacaoGroup" />
+                        </fx:define>
+
+                        <!-- DATA -->
+                        <VBox spacing="8.0">
+                            <Label text="DATA" styleClass="filter-category-label" />
+                            <RadioButton fx:id="optRecentes" text="Mais recentes primeiro" toggleGroup="$ordenacaoGroup" styleClass="filter-option-radio" selected="true" />
+                            <RadioButton fx:id="optAntigos" text="Mais antigos primeiro" toggleGroup="$ordenacaoGroup" styleClass="filter-option-radio" />
+                        </VBox>
+
+                        <!-- CARGA -->
+                        <VBox spacing="8.0">
+                            <Label text="CARGA" styleClass="filter-category-label" />
+                            <RadioButton fx:id="optMaiorCarga" text="Maior Carga (PR)" toggleGroup="$ordenacaoGroup" styleClass="filter-option-radio" />
+                            <RadioButton fx:id="optMenorCarga" text="Menor Carga" toggleGroup="$ordenacaoGroup" styleClass="filter-option-radio" />
+                        </VBox>
+
+                        <!-- REPETIÇÕES -->
+                        <VBox spacing="8.0">
+                            <Label text="REPETIÇÕES" styleClass="filter-category-label" />
+                            <RadioButton fx:id="optMaisReps" text="Mais repetições" toggleGroup="$ordenacaoGroup" styleClass="filter-option-radio" />
+                            <RadioButton fx:id="optMenosReps" text="Menos repetições" toggleGroup="$ordenacaoGroup" styleClass="filter-option-radio" />
+                        </VBox>
+
+                        <!-- VOLUME TOTAL -->
+                        <VBox spacing="8.0">
+                            <Label text="VOLUME TOTAL" styleClass="filter-category-label" />
+                            <RadioButton fx:id="optMaiorVolume" text="Maior Volume (Carga × Reps)" toggleGroup="$ordenacaoGroup" styleClass="filter-option-radio" />
+                            <RadioButton fx:id="optMenorVolume" text="Menor Volume" toggleGroup="$ordenacaoGroup" styleClass="filter-option-radio" />
+                        </VBox>
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+            <!-- Botão Verde Aplicar Filtro -->
+            <VBox style="-fx-padding: 16px 0 0 0;">
+                <Button text="Aplicar Filtro" styleClass="btn-primary-action" maxWidth="Infinity" prefHeight="50.0" onAction="#handleAplicarFiltro" />
+            </VBox>
+        </VBox>
+    </StackPane>
+
+</StackPane>
