@@ -16,5 +16,5 @@ server:
 
 security:
   jwt:
-    secret: ${JWT_SECRET:desenvolvimento-segredo-jwt-com-mais-de-32-bytes}
+    secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION_MS:3600000}

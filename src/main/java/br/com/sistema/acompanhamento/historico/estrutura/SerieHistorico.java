@@ -5,4 +5,5 @@ public interface SerieHistorico {
     GrupoMuscularEnum getGrupoMuscular();
     double getCarga();
     int getRepeticoes();
+    default java.math.BigDecimal getCargaDecimal() { return java.math.BigDecimal.valueOf(getCarga()); }
 }

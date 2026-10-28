@@ -1,0 +1,2102 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FitTrack Backend API",
+    "version": "1.0.0",
+    "description": "Fluxo: cadastre ou autentique o praticante, envie o Bearer token, consulte exercícios, crie modelo, inicie execução, registre séries, finalize e consulte histórico, recordes e dashboard. Apenas execuções concluídas entram nas métricas."
+  },
+  "servers": [
+    {
+      "url": "{baseUrl}",
+      "description": "URL configurada pelo cliente",
+      "variables": {
+        "baseUrl": {
+          "default": "http://localhost:8080",
+          "description": "Endereço do backend no ambiente em uso"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/cadastrar": {
+      "post": {
+        "summary": "Cadastra um praticante",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cadastro"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PraticanteResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Valida credenciais e emite JWT",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/exercicios": {
+      "get": {
+        "summary": "Lista exercícios ativos globais e do praticante",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExercicioResposta"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Cria exercício próprio",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NovoExercicio"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExercicioResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercicios/{id}": {
+      "get": {
+        "summary": "Consulta exercício acessível",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExercicioResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercicios/{id}/recordes": {
+      "get": {
+        "summary": "Recordes pessoais calculados em execuções concluídas",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordeResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercicios/{id}/maior-reps": {
+      "get": {
+        "summary": "Maior repetição para carga informada",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "carga",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
+            "example": 40.5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaiorRepsResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modelos": {
+      "get": {
+        "summary": "Lista modelos do praticante",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TreinoResposta"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Cria treino modelo",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NovoModelo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreinoResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modelos/{id}": {
+      "get": {
+        "summary": "Consulta um modelo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreinoResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modelos/{id}/iniciar": {
+      "post": {
+        "summary": "Clona modelo para execução",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreinoResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/execucoes/{id}": {
+      "get": {
+        "summary": "Consulta itens e séries de uma execução",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreinoResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/execucoes/{id}/itens/{itemId}/series": {
+      "post": {
+        "summary": "Registra série em execução em andamento",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SerieEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerieResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/execucoes/{id}/itens/{itemId}/series/{serieId}": {
+      "put": {
+        "summary": "Atualiza carga e repetições sem renumerar série",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "serieId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SerieEntrada"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerieResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/execucoes/{id}/finalizar": {
+      "post": {
+        "summary": "Finaliza execução uma única vez",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreinoResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/historico": {
+      "get": {
+        "summary": "Lista execuções concluídas em ordem cronológica",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TreinoResposta"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/historico/comparar": {
+      "get": {
+        "summary": "Compara volume e melhor série de duas sessões do mesmo praticante",
+        "parameters": [
+          {
+            "name": "sessao1Id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "sessao2Id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "exercicioId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComparacaoResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "summary": "Consulta total de sessões e volumes executados",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Recurso não encontrado ou não pertence ao praticante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito de estado ou duplicidade",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercicios/{id}/volume": {
+      "get": {
+        "summary": "Volume total do exercício em execuções concluídas",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VolumeExercicioResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/historico/{id}/anterior": {
+      "get": {
+        "summary": "Sessão anterior mais recente com o exercício",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "exercicioId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TreinoResposta"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente ou inválido"
+          },
+          "404": {
+            "description": "Não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erro"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Cadastro": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "senha": {
+            "type": "string",
+            "format": "password"
+          }
+        },
+        "required": [
+          "nome",
+          "email",
+          "senha"
+        ],
+        "example": {
+          "nome": "Pessoa Exemplo",
+          "email": "pessoa@example.com",
+          "senha": "senha-de-exemplo"
+        }
+      },
+      "Login": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "senha": {
+            "type": "string",
+            "format": "password"
+          }
+        },
+        "required": [
+          "email",
+          "senha"
+        ],
+        "example": {
+          "email": "pessoa@example.com",
+          "senha": "senha-de-exemplo"
+        }
+      },
+      "PraticanteResposta": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "email"
+        ]
+      },
+      "LoginResposta": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "tipo": {
+            "type": "string",
+            "example": "Bearer"
+          },
+          "praticante": {
+            "$ref": "#/components/schemas/PraticanteResposta"
+          }
+        },
+        "required": [
+          "token",
+          "tipo",
+          "praticante"
+        ]
+      },
+      "ExercicioResposta": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "grupoMuscular": {
+            "type": "string",
+            "example": "PEITO"
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true
+          },
+          "recordeCarga": {
+            "type": "number",
+            "nullable": true
+          },
+          "recordeRepsParaCarga": {
+            "type": "integer",
+            "nullable": true
+          },
+          "recordeVolumeSessao": {
+            "type": "number",
+            "nullable": true
+          },
+          "totalVezesRealizado": {
+            "type": "integer"
+          },
+          "ativo": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "grupoMuscular",
+          "ativo"
+        ],
+        "description": "Campos de recorde na entidade são preenchidos para exercícios próprios. Consulte /recordes para resultado pessoal calculado, inclusive em exercícios globais."
+      },
+      "ItemModelo": {
+        "type": "object",
+        "properties": {
+          "exercicioId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ordem": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "seriesPrevistas": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "repsPrevistas": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "cargaPrevista": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "exercicioId",
+          "ordem",
+          "seriesPrevistas",
+          "repsPrevistas"
+        ]
+      },
+      "NovoModelo": {
+        "type": "object",
+        "properties": {
+          "identificacao": {
+            "type": "string"
+          },
+          "itens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemModelo"
+            }
+          }
+        },
+        "required": [
+          "identificacao",
+          "itens"
+        ],
+        "example": {
+          "identificacao": "Treino A",
+          "itens": [
+            {
+              "exercicioId": 7,
+              "ordem": 1,
+              "seriesPrevistas": 3,
+              "repsPrevistas": 10,
+              "cargaPrevista": 40.0
+            }
+          ]
+        }
+      },
+      "SerieEntrada": {
+        "type": "object",
+        "properties": {
+          "numeroSerie": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "carga": {
+            "type": "number",
+            "minimum": 0,
+            "example": 40.5
+          },
+          "repeticoes": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 10
+          }
+        },
+        "required": [
+          "numeroSerie",
+          "carga",
+          "repeticoes"
+        ],
+        "example": {
+          "numeroSerie": 1,
+          "carga": 40.5,
+          "repeticoes": 10
+        }
+      },
+      "SerieResposta": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "numeroSerie": {
+            "type": "integer"
+          },
+          "carga": {
+            "type": "number"
+          },
+          "repeticoes": {
+            "type": "integer"
+          },
+          "volume": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "numeroSerie",
+          "carga",
+          "repeticoes",
+          "volume"
+        ],
+        "example": {
+          "id": 21,
+          "numeroSerie": 1,
+          "carga": 40.5,
+          "repeticoes": 10,
+          "volume": 405.0
+        }
+      },
+      "ItemResposta": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "exercicioId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "exercicioNome": {
+            "type": "string"
+          },
+          "ordem": {
+            "type": "integer"
+          },
+          "seriesPrevistas": {
+            "type": "integer"
+          },
+          "repsPrevistas": {
+            "type": "integer"
+          },
+          "cargaPrevista": {
+            "type": "number",
+            "nullable": true
+          },
+          "concluido": {
+            "type": "boolean"
+          },
+          "series": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SerieResposta"
+            }
+          },
+          "volume": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "exercicioId",
+          "exercicioNome",
+          "ordem",
+          "seriesPrevistas",
+          "repsPrevistas",
+          "concluido",
+          "series",
+          "volume"
+        ]
+      },
+      "TreinoResposta": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "modeloOrigemId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "identificacao": {
+            "type": "string"
+          },
+          "modelo": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "MODELO",
+              "EM_ANDAMENTO",
+              "CONCLUIDO"
+            ]
+          },
+          "iniciadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "finalizadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "itens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemResposta"
+            }
+          },
+          "volume": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "identificacao",
+          "modelo",
+          "status",
+          "itens",
+          "volume"
+        ],
+        "example": {
+          "id": 12,
+          "modeloOrigemId": 5,
+          "identificacao": "Treino A",
+          "modelo": false,
+          "status": "CONCLUIDO",
+          "iniciadoEm": "2026-10-28T09:00:00-03:00",
+          "finalizadoEm": "2026-10-28T09:45:00-03:00",
+          "itens": [
+            {
+              "id": 30,
+              "exercicioId": 7,
+              "exercicioNome": "Supino reto",
+              "ordem": 1,
+              "seriesPrevistas": 1,
+              "repsPrevistas": 10,
+              "cargaPrevista": 40.0,
+              "concluido": true,
+              "series": [
+                {
+                  "id": 21,
+                  "numeroSerie": 1,
+                  "carga": 40.5,
+                  "repeticoes": 10,
+                  "volume": 405.0
+                }
+              ],
+              "volume": 405.0
+            }
+          ],
+          "volume": 405.0
+        }
+      },
+      "ComparacaoResposta": {
+        "type": "object",
+        "properties": {
+          "sessao1Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sessao2Id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "exercicioId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "volumeSessao1": {
+            "type": "number"
+          },
+          "volumeSessao2": {
+            "type": "number"
+          },
+          "diferenca": {
+            "type": "number"
+          },
+          "desempenho": {
+            "type": "string",
+            "enum": [
+              "AUMENTO_CARGA",
+              "REDUCAO_CARGA",
+              "AUMENTO_REPETICOES",
+              "REDUCAO_REPETICOES",
+              "MANUTENCAO",
+              "SEM_DADOS"
+            ]
+          }
+        },
+        "required": [
+          "sessao1Id",
+          "sessao2Id",
+          "exercicioId",
+          "volumeSessao1",
+          "volumeSessao2",
+          "diferenca",
+          "desempenho"
+        ]
+      },
+      "DashboardResposta": {
+        "type": "object",
+        "properties": {
+          "sessoesConcluidas": {
+            "type": "integer"
+          },
+          "volumeTotal": {
+            "type": "number"
+          },
+          "volumePorGrupo": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "sessoesConcluidas",
+          "volumeTotal",
+          "volumePorGrupo"
+        ],
+        "example": {
+          "sessoesConcluidas": 2,
+          "volumeTotal": 1620.0,
+          "volumePorGrupo": {
+            "PEITO": 1620.0,
+            "COSTAS": 0.0
+          }
+        }
+      },
+      "MaiorRepsResposta": {
+        "type": "object",
+        "properties": {
+          "exercicioId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "carga": {
+            "type": "number"
+          },
+          "repeticoes": {
+            "type": "integer",
+            "nullable": true
+          }
+        },
+        "required": [
+          "exercicioId",
+          "carga"
+        ]
+      },
+      "RecordeResposta": {
+        "type": "object",
+        "properties": {
+          "exercicioId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maiorCarga": {
+            "type": "number",
+            "nullable": true
+          },
+          "repeticoesNaMaiorCarga": {
+            "type": "integer",
+            "nullable": true
+          },
+          "maiorVolumeSessao": {
+            "type": "number",
+            "nullable": true
+          },
+          "sessoesRealizadas": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "exercicioId",
+          "sessoesRealizadas"
+        ],
+        "example": {
+          "exercicioId": 7,
+          "maiorCarga": 50.0,
+          "repeticoesNaMaiorCarga": 8,
+          "maiorVolumeSessao": 810.0,
+          "sessoesRealizadas": 2
+        }
+      },
+      "Erro": {
+        "type": "object",
+        "properties": {
+          "codigo": {
+            "type": "string"
+          },
+          "mensagem": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "codigo",
+          "mensagem"
+        ],
+        "example": {
+          "codigo": "ESTADO_INVALIDO",
+          "mensagem": "Execução já finalizada ou inválida"
+        }
+      },
+      "NovoExercicio": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "Supino reto"
+          },
+          "grupoMuscular": {
+            "type": "string",
+            "enum": [
+              "PEITO",
+              "COSTAS",
+              "PERNAS",
+              "OMBROS",
+              "BRACOS"
+            ]
+          },
+          "descricao": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nome",
+          "grupoMuscular"
+        ],
+        "example": {
+          "nome": "Supino reto",
+          "grupoMuscular": "PEITO",
+          "descricao": "Barra livre"
+        }
+      },
+      "VolumeExercicioResposta": {
+        "type": "object",
+        "properties": {
+          "exercicioId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "volumeTotal": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "exercicioId",
+          "volumeTotal"
+        ]
+      }
+    }
+  }
+}

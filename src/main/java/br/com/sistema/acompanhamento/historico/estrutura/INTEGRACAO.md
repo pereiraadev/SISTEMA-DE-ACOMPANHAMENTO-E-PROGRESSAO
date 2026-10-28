@@ -1,9 +1,9 @@
 # Integração do histórico
 
-`CarregadorHistorico` recebe os treinos em qualquer ordem, remove fichas modelo, elimina referências repetidas e ordena pela data de realização. O método `carregar` cria uma lista nova em cada chamada.
+`TreinoWorkflowService` consulta as entidades oficiais `Treino`, `ItemTreino`, `SerieExecutada` e `Exercicio` dentro de transações de leitura. Monta adaptadores pequenos de `TreinoComSeries` e `SerieHistorico` e chama `CarregadorHistorico`, que utiliza `ListaDuplaTreinos` e `NoTreino`.
 
-Ainda não existem neste código as entidades e os repositórios oficiais de treino, exercício e série. Quando forem definidos, um adaptador deve implementar `TreinoComSeries` e `SerieHistorico`, consultar as execuções reais e chamar `CarregadorHistorico` na inicialização de um componente Spring com `@PostConstruct`. O adaptador deve fornecer IDs de sessão estáveis, data de realização, séries executadas e grupo muscular de cada exercício.
+Somente execuções do praticante autenticado com `status=CONCLUIDO` e `finalizadoEm` preenchido entram na lista. O carregador ignora modelos, ordena pela hora real convertida a UTC e desempata pelo ID. IDs persistidos repetidos não entram duas vezes. A lista é reconstruída a cada consulta, sem manter entidades JPA em memória entre requisições.
 
-`GrupoMuscularEnum` é provisório. Antes de conectar a persistência, alinhar seus valores ao enum oficial da equipe, se houver. Não se criou entidade JPA nem migração.
+As séries são consultadas em lote pelos IDs dos treinos. Carga e volume nas respostas e nos cálculos integrados usam `BigDecimal`. Os métodos acadêmicos anteriores que retornam `double` permanecem disponíveis para compatibilidade. A coluna `volume_calculado` é gerada pelo PostgreSQL; as respostas imediatas usam a mesma fórmula `carga_utilizada × repeticoes_realizadas`.
 
-Consultas sem série correspondente retornam `null` em `obterMaiorRepsParaCarga`. `compararVolumeEntreSessoes` retorna `null` se faltar uma sessão ou o exercício em uma delas. Grupos sem série têm volume zero. Volume é a soma de carga multiplicada por repetições; a diferença é sessão 2 menos sessão 1.
+O enum de grupo muscular corresponde aos cinco valores descritos em `docs/01-entidades.md`. O campo JPA de `Exercicio` é `String`; um valor desconhecido no banco não é atribuído a um grupo do enum. Antes da homologação, conferir esses valores com o banco de teste.

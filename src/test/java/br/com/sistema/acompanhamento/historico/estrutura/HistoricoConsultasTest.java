@@ -85,4 +85,14 @@ class HistoricoConsultasTest {
         assertEquals(300, lista.obterVolumePorGrupoMuscular().get(GrupoMuscularEnum.COSTAS));
         assertEquals(0, lista.obterVolumePorGrupoMuscular().get(GrupoMuscularEnum.PERNAS));
     }
+    @Test void evitaDuplicidadePorIdEDesempataPeloId() {
+        Treino idMaior = new Treino(9, 1, false);
+        Treino idMenor = new Treino(2, 1, false);
+        Treino repetido = new Treino(9, 2, false);
+        ListaDuplaTreinos<Treino> lista = new CarregadorHistorico<Treino>()
+                .carregar(List.of(idMaior, repetido, idMenor));
+        assertEquals(2, lista.getTamanho());
+        assertSame(idMenor, lista.getInicio().getTreino());
+        assertSame(idMaior, lista.getFim().getTreino());
+    }
 }

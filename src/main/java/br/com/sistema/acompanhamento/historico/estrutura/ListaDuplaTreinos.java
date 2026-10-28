@@ -3,6 +3,7 @@ package br.com.sistema.acompanhamento.historico.estrutura;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
+import java.math.BigDecimal;
 
 // Guarda os treinos em uma lista duplamente encadeada
 public class ListaDuplaTreinos<T extends TreinoComExercicios> {
@@ -78,13 +79,17 @@ public class ListaDuplaTreinos<T extends TreinoComExercicios> {
 
     // Retorna null quando nenhuma série corresponde à carga e ao exercício.
     public Integer obterMaiorRepsParaCarga(Long exercicioId, double carga) {
+        return obterMaiorRepsParaCarga(exercicioId, BigDecimal.valueOf(carga));
+    }
+
+    public Integer obterMaiorRepsParaCarga(Long exercicioId, BigDecimal carga) {
         Integer maior = null;
         NoTreino<T> atual = inicio;
         while (atual != null) {
             if (atual.getTreino() instanceof TreinoComSeries treino) {
                 for (SerieHistorico serie : treino.getSeriesExecutadas()) {
                     if (Objects.equals(exercicioId, serie.getExercicioId())
-                            && Double.compare(carga, serie.getCarga()) == 0
+                            && carga.compareTo(serie.getCargaDecimal()) == 0
                             && (maior == null || serie.getRepeticoes() > maior)) {
                         maior = serie.getRepeticoes();
                     }
@@ -97,8 +102,15 @@ public class ListaDuplaTreinos<T extends TreinoComExercicios> {
 
     // Retorna null se alguma sessão não existir ou não tiver o exercício.
     public ComparacaoVolume compararVolumeEntreSessoes(Long id1, Long id2, Long exercicioId) {
-        Double primeiro = null;
-        Double segundo = null;
+        ComparacaoVolumeDecimal exato = compararVolumeDecimal(id1, id2, exercicioId);
+        if (exato == null) return null;
+        return new ComparacaoVolume(exato.volumeSessao1().doubleValue(), exato.volumeSessao2().doubleValue(),
+                exato.diferenca().doubleValue());
+    }
+
+    public ComparacaoVolumeDecimal compararVolumeDecimal(Long id1, Long id2, Long exercicioId) {
+        BigDecimal primeiro = null;
+        BigDecimal segundo = null;
         NoTreino<T> atual = inicio;
         while (atual != null) {
             if (atual.getTreino() instanceof TreinoComSeries treino) {
@@ -108,15 +120,15 @@ public class ListaDuplaTreinos<T extends TreinoComExercicios> {
             atual = atual.getProximo();
         }
         if (primeiro == null || segundo == null) return null;
-        return new ComparacaoVolume(primeiro, segundo, segundo - primeiro);
+        return new ComparacaoVolumeDecimal(primeiro, segundo, segundo.subtract(primeiro));
     }
 
-    private Double volume(TreinoComSeries treino, Long exercicioId) {
-        double total = 0;
+    private BigDecimal volume(TreinoComSeries treino, Long exercicioId) {
+        BigDecimal total = BigDecimal.ZERO;
         boolean encontrou = false;
         for (SerieHistorico serie : treino.getSeriesExecutadas()) {
             if (Objects.equals(exercicioId, serie.getExercicioId())) {
-                total += serie.getCarga() * serie.getRepeticoes();
+                total = total.add(serie.getCargaDecimal().multiply(BigDecimal.valueOf(serie.getRepeticoes())));
                 encontrou = true;
             }
         }
@@ -125,15 +137,22 @@ public class ListaDuplaTreinos<T extends TreinoComExercicios> {
 
     // Um grupo sem séries realizadas permanece com volume zero.
     public Map<GrupoMuscularEnum, Double> obterVolumePorGrupoMuscular() {
-        Map<GrupoMuscularEnum, Double> volumes = new EnumMap<>(GrupoMuscularEnum.class);
-        for (GrupoMuscularEnum grupo : GrupoMuscularEnum.values()) volumes.put(grupo, 0.0);
+        Map<GrupoMuscularEnum, Double> resultado = new EnumMap<>(GrupoMuscularEnum.class);
+        for (var entrada : obterVolumePorGrupoMuscularDecimal().entrySet())
+            resultado.put(entrada.getKey(), entrada.getValue().doubleValue());
+        return resultado;
+    }
+
+    public Map<GrupoMuscularEnum, BigDecimal> obterVolumePorGrupoMuscularDecimal() {
+        Map<GrupoMuscularEnum, BigDecimal> volumes = new EnumMap<>(GrupoMuscularEnum.class);
+        for (GrupoMuscularEnum grupo : GrupoMuscularEnum.values()) volumes.put(grupo, BigDecimal.ZERO);
         NoTreino<T> atual = inicio;
         while (atual != null) {
             if (atual.getTreino() instanceof TreinoComSeries treino) {
                 for (SerieHistorico serie : treino.getSeriesExecutadas()) {
                     GrupoMuscularEnum grupo = serie.getGrupoMuscular();
                     if (grupo != null) volumes.put(grupo,
-                            volumes.get(grupo) + serie.getCarga() * serie.getRepeticoes());
+                            volumes.get(grupo).add(serie.getCargaDecimal().multiply(BigDecimal.valueOf(serie.getRepeticoes()))));
                 }
             }
             atual = atual.getProximo();
