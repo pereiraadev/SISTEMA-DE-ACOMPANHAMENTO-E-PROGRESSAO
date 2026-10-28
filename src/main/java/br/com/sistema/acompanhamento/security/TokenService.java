@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
+// Centraliza a emissão e a validação dos tokens JWT usados pela API.
 public class TokenService {
     private final SecretKey chave;
     private final long expiracaoMs;
@@ -28,6 +29,7 @@ public class TokenService {
         this.expiracaoMs = expiracaoMs;
     }
 
+    // O e-mail é usado como subject para identificar o praticante autenticado.
     public String gerarToken(String email) {
         Date agora = new Date();
         return Jwts.builder()

@@ -15,6 +15,7 @@ public class PraticanteService {
     }
 
     @Transactional
+    // Normaliza o e-mail e codifica a senha com BCrypt antes de salvar no banco.
     public Praticante cadastrar(String nome, String email, String senha) {
         String emailNormalizado = email.trim().toLowerCase();
         if (repository.existsByEmailIgnoreCase(emailNormalizado)) {
