@@ -1,5 +1,7 @@
 package com.fittrack.fittrack_frontend.controller;
 
+import com.fittrack.fittrack_frontend.util.NavigationManager;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,7 +14,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.springframework.stereotype.Controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -27,130 +28,150 @@ public class GroupDetailController {
     @FXML private Label lblTotalTreinos;
     @FXML private Label lblMediaSemanal;
 
-    // Estruturas de Dados para Receber os Valores Reais
+    // Estruturas de Dados para Transporte dos Dados Reais da API
     public static class ExercisioVolumeData {
-        String nome;
-        double volumeKg;
-        String corHex;
+        private final String nome;
+        private final double volumeKg;
+        private final String corHex;
 
         public ExercisioVolumeData(String nome, double volumeKg, String corHex) {
             this.nome = nome;
             this.volumeKg = volumeKg;
             this.corHex = corHex;
         }
+
+        public String getNome() { return nome; }
+        public double getVolumeKg() { return volumeKg; }
+        public String getCorHex() { return corHex; }
     }
 
     public static class FrequenciaMesData {
-        String mes;
-        int qtdTreinos;
+        private final String mes;
+        private final int qtdTreinos;
 
         public FrequenciaMesData(String mes, int qtdTreinos) {
             this.mes = mes;
             this.qtdTreinos = qtdTreinos;
         }
+
+        public String getMes() { return mes; }
+        public int getQtdTreinos() { return qtdTreinos; }
     }
 
     @FXML
     public void initialize() {
-        // Dados de teste mockados (Serão substituídos pela chamada da API)
-        List<ExercisioVolumeData> exercicios = new ArrayList<>();
-        exercicios.add(new ExercisioVolumeData("Supino Reto", 3802.5, "#43D61B"));
-        exercicios.add(new ExercisioVolumeData("Inclinado", 2112.5, "#2E7D32"));
-        exercicios.add(new ExercisioVolumeData("Crucifixo", 1521.0, "#38B6FF"));
-        exercicios.add(new ExercisioVolumeData("Crossover", 1014.0, "#888888"));
-
-        List<FrequenciaMesData> frequencias = new ArrayList<>();
-        frequencias.add(new FrequenciaMesData("Jun", 12));
-        frequencias.add(new FrequenciaMesData("Jul", 15));
-        frequencias.add(new FrequenciaMesData("Ago", 18));
-        frequencias.add(new FrequenciaMesData("Set", 21));
-
-        carregarEMedirMetricasReais("Peitoral", "Foco A", exercicios, frequencias);
+        if (chartVolume != null) chartVolume.getData().clear();
+        if (gridLegenda != null) gridLegenda.getChildren().clear();
+        if (containerBarrasFrequencia != null) containerBarrasFrequencia.getChildren().clear();
     }
 
+    /**
+     * Injeta e calcula dinamicamente as métricas do grupo muscular vindo da API/Sessão.
+     */
     public void carregarEMedirMetricasReais(String nomeGrupo, String tagFoco, 
-                                           List<ExercisioVolumeData> exercicios, 
-                                           List<FrequenciaMesData> frequencias) {
-        lblNomeGrupo.setText(nomeGrupo);
-        lblTagFoco.setText(tagFoco);
+                                            List<ExercisioVolumeData> exercicios, 
+                                            List<FrequenciaMesData> frequencias) {
+        if (lblNomeGrupo != null) lblNomeGrupo.setText(nomeGrupo != null ? nomeGrupo : "Grupo Muscular");
+        if (lblTagFoco != null) lblTagFoco.setText(tagFoco != null ? tagFoco : "");
 
         // 1. CÁLCULO E MEDIÇÃO DO VOLUME TOTAL E PERCENTUAIS
         double volumeTotal = 0.0;
-        for (ExercisioVolumeData item : exercicios) {
-            volumeTotal += item.volumeKg;
+        if (exercicios != null) {
+            for (ExercisioVolumeData item : exercicios) {
+                volumeTotal += item.getVolumeKg();
+            }
         }
 
-        lblVolumeTotalFormatado.setText(String.format("%,.0f", volumeTotal).replace(",", "."));
+        if (lblVolumeTotalFormatado != null) {
+            lblVolumeTotalFormatado.setText(String.format("%,.0f", volumeTotal).replace(",", "."));
+        }
 
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
-        gridLegenda.getChildren().clear();
+        if (gridLegenda != null) gridLegenda.getChildren().clear();
 
-        for (int i = 0; i < exercicios.size(); i++) {
-            ExercisioVolumeData item = exercicios.get(i);
-            double pct = volumeTotal > 0 ? (item.volumeKg / volumeTotal) * 100 : 0;
+        if (exercicios != null && !exercicios.isEmpty()) {
+            for (int i = 0; i < exercicios.size(); i++) {
+                ExercisioVolumeData item = exercicios.get(i);
+                double pct = volumeTotal > 0 ? (item.getVolumeKg() / volumeTotal) * 100 : 0;
 
-            pieData.add(new PieChart.Data(item.nome, item.volumeKg));
+                pieData.add(new PieChart.Data(item.getNome(), item.getVolumeKg()));
 
-            // Legenda em 2 Colunas com Percentual Calculado
-            HBox itemLegenda = new HBox(6.0);
-            itemLegenda.setAlignment(Pos.CENTER_LEFT);
+                if (gridLegenda != null) {
+                    HBox itemLegenda = new HBox(6.0);
+                    itemLegenda.setAlignment(Pos.CENTER_LEFT);
 
-            Region dot = new Region();
-            dot.getStyleClass().add("legend-dot");
-            dot.setStyle("-fx-background-color: " + item.corHex + ";");
+                    Region dot = new Region();
+                    dot.getStyleClass().add("legend-dot");
+                    String cor = (item.getCorHex() != null && !item.getCorHex().isBlank()) ? item.getCorHex() : "#43D61B";
+                    dot.setStyle("-fx-background-color: " + cor + ";");
 
-            Label lblText = new Label(String.format("%s (%.0f%%)", item.nome, pct));
-            lblText.setStyle("-fx-text-fill: #CCCCCC; -fx-font-size: 11px;");
+                    Label lblText = new Label(String.format("%s (%.0f%%)", item.getNome(), pct));
+                    lblText.setStyle("-fx-text-fill: #CCCCCC; -fx-font-size: 11px;");
 
-            itemLegenda.getChildren().addAll(dot, lblText);
+                    itemLegenda.getChildren().addAll(dot, lblText);
 
-            int col = i % 2;
-            int row = i / 2;
-            gridLegenda.add(itemLegenda, col, row);
+                    int col = i % 2;
+                    int row = i / 2;
+                    gridLegenda.add(itemLegenda, col, row);
+                }
+            }
         }
 
-        chartVolume.setData(pieData);
+        if (chartVolume != null) {
+            chartVolume.setData(pieData);
+        }
 
         // 2. CÁLCULO DA FREQUÊNCIA E BARRAS PROPORCIONAIS
-        containerBarrasFrequencia.getChildren().clear();
+        if (containerBarrasFrequencia != null) containerBarrasFrequencia.getChildren().clear();
         int totalTreinosAcumulado = 0;
         int maxTreinosMes = 1;
 
-        for (FrequenciaMesData f : frequencias) {
-            if (f.qtdTreinos > maxTreinosMes) maxTreinosMes = f.qtdTreinos;
-            totalTreinosAcumulado += f.qtdTreinos;
-        }
+        if (frequencias != null && !frequencias.isEmpty()) {
+            for (FrequenciaMesData f : frequencias) {
+                if (f.getQtdTreinos() > maxTreinosMes) maxTreinosMes = f.getQtdTreinos();
+                totalTreinosAcumulado += f.getQtdTreinos();
+            }
 
-        for (FrequenciaMesData f : frequencias) {
-            VBox barBox = new VBox(6.0);
-            barBox.setAlignment(Pos.BOTTOM_CENTER);
+            for (FrequenciaMesData f : frequencias) {
+                VBox barBox = new VBox(6.0);
+                barBox.setAlignment(Pos.BOTTOM_CENTER);
 
-            Label lblValor = new Label(String.valueOf(f.qtdTreinos));
-            lblValor.setStyle("-fx-text-fill: #43D61B; -fx-font-weight: bold; -fx-font-size: 11px;");
+                Label lblValor = new Label(String.valueOf(f.getQtdTreinos()));
+                lblValor.setStyle("-fx-text-fill: #43D61B; -fx-font-weight: bold; -fx-font-size: 11px;");
 
-            Region barRect = new Region();
-            barRect.getStyleClass().add("chart-bar-rect");
-            barRect.setPrefWidth(26.0);
-            
-            // Altura proporcional calculada dinamicamente (Max = 95px)
-            double alturaCalculada = (double) f.qtdTreinos / maxTreinosMes * 95.0;
-            barRect.setPrefHeight(Math.max(15.0, alturaCalculada));
+                Region barRect = new Region();
+                barRect.getStyleClass().add("chart-bar-rect");
+                barRect.setPrefWidth(26.0);
 
-            Label lblMes = new Label(f.mes);
-            lblMes.setStyle("-fx-text-fill: #888888; -fx-font-size: 11px;");
+                double alturaCalculada = (double) f.getQtdTreinos() / maxTreinosMes * 95.0;
+                barRect.setPrefHeight(Math.max(15.0, alturaCalculada));
 
-            barBox.getChildren().addAll(lblValor, barRect, lblMes);
-            containerBarrasFrequencia.getChildren().add(barBox);
+                Label lblMes = new Label(f.getMes());
+                lblMes.setStyle("-fx-text-fill: #888888; -fx-font-size: 11px;");
+
+                barBox.getChildren().addAll(lblValor, barRect, lblMes);
+                if (containerBarrasFrequencia != null) {
+                    containerBarrasFrequencia.getChildren().add(barBox);
+                }
+            }
         }
 
         // 3. KPI TOTAL E MÉDIA SEMANAL CALCULADA
-        lblTotalTreinos.setText(totalTreinosAcumulado + " realizados");
-        double mediaSemanalCalculada = (double) totalTreinosAcumulado / (frequencias.size() * 4);
-        lblMediaSemanal.setText(String.format("%.1fx frequência", mediaSemanalCalculada));
+        if (lblTotalTreinos != null) {
+            lblTotalTreinos.setText(totalTreinosAcumulado + " realizados");
+        }
+
+        if (lblMediaSemanal != null) {
+            int numMeses = (frequencias != null && !frequencias.isEmpty()) ? frequencias.size() : 1;
+            double mediaSemanalCalculada = (double) totalTreinosAcumulado / (numMeses * 4);
+            lblMediaSemanal.setText(String.format("%.1fx frequência", mediaSemanalCalculada));
+        }
     }
 
     @FXML
     private void handleVoltar() {
-        System.out.println("Voltar para Métricas de Grupos...");
+        if (lblNomeGrupo != null) {
+            NavigationManager.navegarPara(lblNomeGrupo, "/fxml/group_detail_view.fxml");
+        }
     }
 }

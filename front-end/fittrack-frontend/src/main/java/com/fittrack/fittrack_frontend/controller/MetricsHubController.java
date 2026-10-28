@@ -1,5 +1,10 @@
 package com.fittrack.fittrack_frontend.controller;
 
+import com.fittrack.fittrack_frontend.dto.DesempenhoGrupoDTO;
+import com.fittrack.fittrack_frontend.dto.ExercicioDTO;
+import com.fittrack.fittrack_frontend.dto.MetricaTreinoDTO;
+import com.fittrack.fittrack_frontend.util.NavigationManager;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,6 +20,9 @@ import javafx.scene.layout.VBox;
 import org.springframework.stereotype.Controller;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class MetricsHubController {
@@ -29,55 +37,118 @@ public class MetricsHubController {
     @FXML private HBox boxRodapeTotal;
     @FXML private Label lblTotalRealizados;
 
+    private enum AbaAtiva { GRUPOS, EXERCICIOS, TREINOS }
+    private AbaAtiva abaAtivaAtual = AbaAtiva.GRUPOS;
+
+    private final List<DesempenhoGrupoDTO> listaGrupos = new ArrayList<>();
+    private final List<ExercicioDTO> listaExercicios = new ArrayList<>();
+    private final List<MetricaTreinoDTO> listaTreinos = new ArrayList<>();
+
     @FXML
     public void initialize() {
+        if (inputBusca != null) {
+            inputBusca.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (abaAtivaAtual == AbaAtiva.EXERCICIOS) {
+                    filtrarERenderizarExercicios(newVal);
+                }
+            });
+        }
         carregarTabGrupos();
+    }
+
+    /**
+     * Injeta e atualiza os dados dinâmicos de métricas vindos da API Spring Boot.
+     */
+    public void carregarMetricas(List<DesempenhoGrupoDTO> grupos,
+                                 List<ExercicioDTO> exercicios,
+                                 List<MetricaTreinoDTO> treinos) {
+        this.listaGrupos.clear();
+        if (grupos != null) this.listaGrupos.addAll(grupos);
+
+        this.listaExercicios.clear();
+        if (exercicios != null) this.listaExercicios.addAll(exercicios);
+
+        this.listaTreinos.clear();
+        if (treinos != null) this.listaTreinos.addAll(treinos);
+
+        switch (abaAtivaAtual) {
+            case GRUPOS -> carregarTabGrupos();
+            case EXERCICIOS -> carregarTabExercicios();
+            case TREINOS -> carregarTabTreinos();
+        }
     }
 
     @FXML
     private void handleSelecionarTabGrupos() {
+        abaAtivaAtual = AbaAtiva.GRUPOS;
         resetTabStyles();
-        btnTabGrupos.getStyleClass().add("tab-button-active");
+        if (btnTabGrupos != null) btnTabGrupos.getStyleClass().add("tab-button-active");
         carregarTabGrupos();
     }
 
     @FXML
     private void handleSelecionarTabExercicios() {
+        abaAtivaAtual = AbaAtiva.EXERCICIOS;
         resetTabStyles();
-        btnTabExercicios.getStyleClass().add("tab-button-active");
+        if (btnTabExercicios != null) btnTabExercicios.getStyleClass().add("tab-button-active");
         carregarTabExercicios();
     }
 
     @FXML
     private void handleSelecionarTabTreinos() {
+        abaAtivaAtual = AbaAtiva.TREINOS;
         resetTabStyles();
-        btnTabTreinos.getStyleClass().add("tab-button-active");
+        if (btnTabTreinos != null) btnTabTreinos.getStyleClass().add("tab-button-active");
         carregarTabTreinos();
     }
 
     private void resetTabStyles() {
-        btnTabGrupos.getStyleClass().removeAll("tab-button-active");
-        btnTabExercicios.getStyleClass().removeAll("tab-button-active");
-        btnTabTreinos.getStyleClass().removeAll("tab-button-active");
+        if (btnTabGrupos != null) {
+            btnTabGrupos.getStyleClass().removeAll("tab-button-active");
+            btnTabGrupos.getStyleClass().add("tab-button");
+        }
+        if (btnTabExercicios != null) {
+            btnTabExercicios.getStyleClass().removeAll("tab-button-active");
+            btnTabExercicios.getStyleClass().add("tab-button");
+        }
+        if (btnTabTreinos != null) {
+            btnTabTreinos.getStyleClass().removeAll("tab-button-active");
+            btnTabTreinos.getStyleClass().add("tab-button");
+        }
 
-        btnTabGrupos.getStyleClass().add("tab-button");
-        btnTabExercicios.getStyleClass().add("tab-button");
-        btnTabTreinos.getStyleClass().add("tab-button");
-
-        boxBusca.setVisible(false);
-        boxBusca.setManaged(false);
-        boxRodapeTotal.setVisible(false);
-        boxRodapeTotal.setManaged(false);
+        if (boxBusca != null) {
+            boxBusca.setVisible(false);
+            boxBusca.setManaged(false);
+        }
+        if (boxRodapeTotal != null) {
+            boxRodapeTotal.setVisible(false);
+            boxRodapeTotal.setManaged(false);
+        }
     }
 
     // 1. ABA GRUPOS MUSCULARES
     private void carregarTabGrupos() {
+        if (containerCards == null) return;
         containerCards.getChildren().clear();
 
-        adicionarCardGrupo("/icons/Frame (1).png", "Peitoral", "Volume semanal: 8.450 kg", "+12% vol", true, () -> abrirDetalhePeitoral()); //[cite: 37, 41]
-        adicionarCardGrupo("/icons/Frame (2).png", "Costas", "Volume semanal: 7.210 kg", "+8% vol", true, null); //[cite: 36, 41]
-        adicionarCardGrupo("/icons/Frame (3).png", "Pernas", "Volume semanal: 12.300 kg", "-3% vol", false, null); //[cite: 35, 41]
-        adicionarCardGrupo("/icons/Frame (4).png", "Ombros", "Volume semanal: 4.120 kg", "+5% vol", true, null); //[cite: 34, 41]
+        if (listaGrupos.isEmpty()) {
+            exibirMensagemVazia("Nenhum grupo muscular registrado.");
+            return;
+        }
+
+        for (DesempenhoGrupoDTO grupo : listaGrupos) {
+            String sub = String.format("Volume semanal: %,.0f kg", grupo.volumeSemanal());
+            String iconPath = obterIconeGrupo(grupo.grupoMuscular());
+            
+            adicionarCardGrupo(
+                iconPath,
+                grupo.grupoMuscular(),
+                sub,
+                grupo.percentualVariacao() != null ? grupo.percentualVariacao() : "0%",
+                grupo.isAumento(),
+                () -> abrirDetalheGrupo(grupo)
+            );
+        }
     }
 
     private void adicionarCardGrupo(String iconPath, String titulo, String sub, String varVol, boolean positivo, Runnable onAction) {
@@ -108,16 +179,41 @@ public class MetricsHubController {
 
     // 2. ABA EXERCÍCIOS
     private void carregarTabExercicios() {
-        boxBusca.setVisible(true);
-        boxBusca.setManaged(true);
+        if (boxBusca != null) {
+            boxBusca.setVisible(true);
+            boxBusca.setManaged(true);
+        }
+        String termo = (inputBusca != null && inputBusca.getText() != null) ? inputBusca.getText() : "";
+        filtrarERenderizarExercicios(termo);
+    }
+
+    private void filtrarERenderizarExercicios(String termo) {
+        if (containerCards == null) return;
         containerCards.getChildren().clear();
 
-        adicionarCardExercicio("Supino Reto", "Peitoral", "PR: 100 kg", () -> abrirExercicioEspecífico("supino_reto")); //[cite: 39]
-        adicionarCardExercicio("Agachamento Livre", "Pernas", "PR: 180 kg", () -> abrirExercicioEspecífico("agachamento")); //[cite: 39]
-        adicionarCardExercicio("Levantamento Terra", "Costas", "PR: 160 kg", null); //[cite: 39]
-        adicionarCardExercicio("Desenvolvimento", "Ombros", "PR: 60 kg", null); //[cite: 39]
-        adicionarCardExercicio("Rosca Direta", "Bíceps", "PR: 40 kg", null); //[cite: 39]
-        adicionarCardExercicio("Tríceps Corda", "Tríceps", "PR: 35 kg", null); //[cite: 39]
+        List<ExercicioDTO> filtrados = listaExercicios;
+        if (termo != null && !termo.trim().isEmpty()) {
+            String t = termo.trim().toLowerCase();
+            filtrados = listaExercicios.stream()
+                    .filter(e -> (e.nome() != null && e.nome().toLowerCase().contains(t)) ||
+                                 (e.grupoMuscular() != null && e.grupoMuscular().toLowerCase().contains(t)))
+                    .collect(Collectors.toList());
+        }
+
+        if (filtrados.isEmpty()) {
+            exibirMensagemVazia("Nenhum exercício encontrado.");
+            return;
+        }
+
+        for (ExercicioDTO ex : filtrados) {
+            String prText = ex.recordeCarga() != null ? String.format("PR: %.0f kg", ex.recordeCarga()) : "Sem PR";
+            adicionarCardExercicio(
+                ex.nome(),
+                ex.grupoMuscular() != null ? ex.grupoMuscular() : "Geral",
+                prText,
+                () -> abrirDetalheExercicio(ex)
+            );
+        }
     }
 
     private void adicionarCardExercicio(String titulo, String sub, String prText, Runnable onAction) {
@@ -146,14 +242,37 @@ public class MetricsHubController {
 
     // 3. ABA TREINOS
     private void carregarTabTreinos() {
-        boxRodapeTotal.setVisible(true);
-        boxRodapeTotal.setManaged(true);
+        if (boxRodapeTotal != null) {
+            boxRodapeTotal.setVisible(true);
+            boxRodapeTotal.setManaged(true);
+        }
+        if (containerCards == null) return;
         containerCards.getChildren().clear();
 
-        adicionarCardTreino("Treino A — Peito e Tríceps", "Último: 18 Set 2025", "85%", 24, null); //[cite: 38]
-        adicionarCardTreino("Treino B — Costas e Bíceps", "Último: 17 Set 2025", "78%", 22, null); //[cite: 38]
-        adicionarCardTreino("Treino C — Pernas e Ombros", "Último: 16 Set 2025", "92%", 26, null); //[cite: 38]
-        adicionarCardTreino("Treino D — Full Body", "Último: 14 Set 2025", "65%", 12, null); //[cite: 38]
+        if (listaTreinos.isEmpty()) {
+            exibirMensagemVazia("Nenhum treino registrado.");
+            if (lblTotalRealizados != null) lblTotalRealizados.setText("Total: 0 treinos realizados");
+            return;
+        }
+
+        int somaSessoes = 0;
+        for (MetricaTreinoDTO t : listaTreinos) {
+            somaSessoes += t.totalSessoes();
+            String sub = "Último: " + (t.ultimaSessaoData() != null ? t.ultimaSessaoData() : "—");
+            String consistenciaStr = t.consistenciaPercentual() + "%";
+            
+            adicionarCardTreino(
+                t.identificacao(),
+                sub,
+                consistenciaStr,
+                t.totalSessoes(),
+                () -> abrirHistoricoTreino(t)
+            );
+        }
+
+        if (lblTotalRealizados != null) {
+            lblTotalRealizados.setText("Total: " + somaSessoes + " treinos realizados");
+        }
     }
 
     private void adicionarCardTreino(String titulo, String sub, String consistencia, int sessoes, Runnable onAction) {
@@ -176,7 +295,6 @@ public class MetricsHubController {
         setinha.setStyle("-fx-text-fill: #666666; -fx-font-size: 18px; -fx-font-weight: bold;");
         topo.getChildren().addAll(info, spacer, setinha);
 
-        // Linha com barra de consistência e sessões
         HBox baixo = new HBox();
         baixo.setAlignment(Pos.CENTER_LEFT);
 
@@ -195,7 +313,10 @@ public class MetricsHubController {
 
         Region progressFill = new Region();
         progressFill.getStyleClass().add("progress-bar-fill");
-        int pct = Integer.parseInt(consistencia.replace("%", ""));
+        int pct = 0;
+        try {
+            pct = Integer.parseInt(consistencia.replace("%", "").trim());
+        } catch (NumberFormatException ignored) {}
         progressFill.setPrefWidth(160.0 * (pct / 100.0));
 
         progressBg.getChildren().add(progressFill);
@@ -229,14 +350,53 @@ public class MetricsHubController {
         return img;
     }
 
-    private void abrirDetalhePeitoral() {
-        System.out.println("Navegando para o Detalhe do Peitoral...");
+    private String obterIconeGrupo(String grupo) {
+        if (grupo == null) return "/icons/Frame (1).png";
+        return switch (grupo.toLowerCase()) {
+            case "peitoral", "peito" -> "/icons/Frame (1).png";
+            case "costas" -> "/icons/Frame (2).png";
+            case "pernas" -> "/icons/Frame (3).png";
+            case "ombros" -> "/icons/Frame (4).png";
+            default -> "/icons/Frame (1).png";
+        };
     }
 
-    private void abrirExercicioEspecífico(String id) {
-        System.out.println("Navegando para Detalhes do Exercício: " + id);
+    private void exibirMensagemVazia(String mensagem) {
+        Label lbl = new Label(mensagem);
+        lbl.setStyle("-fx-text-fill: #888888; -fx-font-size: 14px;");
+        containerCards.getChildren().add(lbl);
     }
 
-    @FXML private void handleNavInicio() { System.out.println("Navegar para Home"); }
-    @FXML private void handleNavTreinos() { System.out.println("Navegar para Treinos"); }
+    private void abrirDetalheGrupo(DesempenhoGrupoDTO grupo) {
+        GroupDetailController controller = NavigationManager.navegarComController(containerCards, "/fxml/group_detail_view.fxml");
+        if (controller != null && grupo != null) {
+            controller.carregarEMedirMetricasReais(grupo.grupoMuscular(), "Foco A", List.of(), List.of());
+        }
+    }
+
+    private void abrirDetalheExercicio(ExercicioDTO ex) {
+        ExerciseDetailsController controller = NavigationManager.navegarComController(containerCards, "/fxml/exercise_details_view.fxml");
+        if (controller != null && ex != null) {
+            controller.carregarDetalhesExercicio(ex, List.of(), null);
+        }
+    }
+
+    private void abrirHistoricoTreino(MetricaTreinoDTO treino) {
+        if (treino != null && containerCards != null) {
+            System.out.println("Navegando para histórico do treino ID: " + treino.treinoId());
+            NavigationManager.navegarPara(containerCards, "/fxml/exercise_details_view.fxml");
+        }
+    }
+
+    @FXML 
+    private void handleNavInicio() { 
+        if (containerCards != null) {
+            NavigationManager.navegarPara(containerCards, "/fxml/dashboard_home_view.fxml"); 
+        }
+    }
+
+    @FXML 
+    private void handleNavTreinos() { 
+        handleSelecionarTabTreinos();
+    }
 }

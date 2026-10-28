@@ -1,5 +1,9 @@
 package com.fittrack.fittrack_frontend.controller;
 
+import com.fittrack.fittrack_frontend.dto.ExercicioDTO;
+import com.fittrack.fittrack_frontend.dto.HistoricoExercicioItemDTO;
+import com.fittrack.fittrack_frontend.util.NavigationManager;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.chart.LineChart;
@@ -20,7 +24,8 @@ import java.util.List;
 @Controller
 public class ExerciseDetailsController {
 
-    @FXML private Label lblNomeExercício;
+    @FXML private Label lblNomeExercicio;
+    @FXML private Label lblNomeExercício; // Suporte a variação com acento no FXML
     @FXML private Label lblGrupoMuscular;
     @FXML private Label lblStatus;
     @FXML private Label lblFiltroAtual;
@@ -33,7 +38,7 @@ public class ExerciseDetailsController {
     @FXML private LineChart<String, Number> chartEvolucao;
     @FXML private VBox containerHistorico;
 
-    // Elementos do Bottom Sheet de Filtro
+    // Elementos do Bottom Sheet / Modal de Filtro
     @FXML private StackPane modalOverlay;
     @FXML private ToggleGroup ordenacaoGroup;
     @FXML private RadioButton optRecentes;
@@ -45,131 +50,182 @@ public class ExerciseDetailsController {
     @FXML private RadioButton optMaiorVolume;
     @FXML private RadioButton optMenorVolume;
 
-    private static class HistoricoEntry {
-        String data;
-        double carga;
-        int reps;
-        double volume;
-        String rotuloTag;
-        String cssClassTag;
-
-        HistoricoEntry(String data, double carga, int reps, double volume, String rotuloTag, String cssClassTag) {
-            this.data = data;
-            this.carga = carga;
-            this.reps = reps;
-            this.volume = volume;
-            this.rotuloTag = rotuloTag;
-            this.cssClassTag = cssClassTag;
-        }
-    }
-
-    private final List<HistoricoEntry> listaHistorico = new ArrayList<>();
+    private Long exercicioId;
+    private final List<HistoricoExercicioItemDTO> listaHistorico = new ArrayList<>();
 
     @FXML
     public void initialize() {
-        carregarDadosIniciais();
+        if (containerHistorico != null) {
+            containerHistorico.getChildren().clear();
+        }
+        if (chartEvolucao != null) {
+            chartEvolucao.getData().clear();
+        }
+        fecharModalFiltro();
+    }
+
+    /**
+     * Injeta os dados do exercício e seu histórico temporal de execuções trazidos da API Spring Boot.
+     */
+    public void carregarDetalhesExercicio(ExercicioDTO exercicio, List<HistoricoExercicioItemDTO> historico, XYChart.Series<String, Number> dadosGrafico) {
+        if (exercicio != null) {
+            this.exercicioId = exercicio.id();
+
+            String nome = exercicio.nome();
+            if (lblNomeExercicio != null) lblNomeExercicio.setText(nome);
+            if (lblNomeExercício != null) lblNomeExercício.setText(nome);
+
+            if (lblGrupoMuscular != null) {
+                lblGrupoMuscular.setText(exercicio.grupoMuscular() != null ? exercicio.grupoMuscular() : "Geral");
+            }
+
+            if (lblStatus != null) {
+                lblStatus.setText(exercicio.ativo() ? "Ativo" : "Inativo");
+            }
+
+            // Mapeamento dos Recordes Pessoais (PRs) do Exercício
+            if (lblMaiorCarga != null && exercicio.recordeCarga() != null) {
+                lblMaiorCarga.setText(String.format("%.0f kg", exercicio.recordeCarga()));
+            }
+
+            if (lblMaiorReps != null && exercicio.recordeRepsParaCarga() != null) {
+                lblMaiorReps.setText(exercicio.recordeRepsParaCarga() + " reps");
+            }
+        }
+
+        // Atualização do Gráfico de Evolução
+        if (chartEvolucao != null) {
+            chartEvolucao.getData().clear();
+            if (dadosGrafico != null) {
+                chartEvolucao.getData().add(dadosGrafico);
+            }
+        }
+
+        // Atualização da Lista do Histórico
+        this.listaHistorico.clear();
+        if (historico != null) {
+            this.listaHistorico.addAll(historico);
+        }
+
         renderizarHistorico();
     }
 
-    private void carregarDadosIniciais() {
-        // Popula o gráfico de evolução
-        chartEvolucao.getData().clear();
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.getData().add(new XYChart.Data<>("Jan", 68));
-        series.getData().add(new XYChart.Data<>("Fev", 76));
-        series.getData().add(new XYChart.Data<>("Mar", 73));
-        series.getData().add(new XYChart.Data<>("Abr", 85));
-        series.getData().add(new XYChart.Data<>("Mai", 83));
-        series.getData().add(new XYChart.Data<>("Jun", 98));
-        chartEvolucao.getData().add(series);
-
-        // Popula lista base do histórico
-        listaHistorico.clear();
-        listaHistorico.add(new HistoricoEntry("18 Set 2025", 85.0, 10, 3400.0, "Aumento de carga ↑", "tag-aumento"));
-        listaHistorico.add(new HistoricoEntry("11 Set 2025", 80.0, 12, 3840.0, "Evolução por reps ↑", "tag-reps"));
-        listaHistorico.add(new HistoricoEntry("04 Set 2025", 80.0, 10, 3200.0, "Manutenção =", "tag-manutencao"));
-        listaHistorico.add(new HistoricoEntry("28 Ago 2025", 80.0, 8, 2560.0, "Redução ↓", "tag-reducao"));
-    }
-
     private void renderizarHistorico() {
+        if (containerHistorico == null) return;
         containerHistorico.getChildren().clear();
 
-        for (HistoricoEntry entry : listaHistorico) {
+        if (listaHistorico.isEmpty()) {
+            Label lblVazio = new Label("Nenhum registro no histórico deste exercício.");
+            lblVazio.setStyle("-fx-text-fill: #888888; -fx-font-size: 14px;");
+            containerHistorico.getChildren().add(lblVazio);
+            return;
+        }
+
+        for (HistoricoExercicioItemDTO item : listaHistorico) {
             HBox card = new HBox(10.0);
             card.getStyleClass().add("history-card");
             card.setAlignment(Pos.CENTER_LEFT);
 
             VBox info = new VBox(2.0);
-            Label lblData = new Label(entry.data);
+            Label lblData = new Label(item.dataTreino() != null ? item.dataTreino() : "—");
             lblData.getStyleClass().add("history-date");
 
-            String desc = String.format("4×%d • %.0f kg • Vol: %,.0f kg", entry.reps, entry.carga, entry.volume);
+            String desc = String.format("%s • %.0f kg • Vol: %,.0f kg",
+                    (item.descricaoSeries() != null ? item.descricaoSeries() : "Séries"),
+                    item.carga(),
+                    item.volumeCalculado());
             Label lblDesc = new Label(desc);
             lblDesc.getStyleClass().add("history-desc");
 
             info.getChildren().addAll(lblData, lblDesc);
             HBox.setHgrow(info, Priority.ALWAYS);
 
-            Label tag = new Label(entry.rotuloTag);
-            tag.getStyleClass().add(entry.cssClassTag);
+            // Mapeamento dinâmico da tag de status de evolução
+            String status = item.statusEvolucao() != null ? item.statusEvolucao() : "Manutenção";
+            Label tag = new Label(status);
+            tag.getStyleClass().add(obterCssClassParaStatus(status));
 
             card.getChildren().addAll(info, tag);
             containerHistorico.getChildren().add(card);
         }
     }
 
+    private String obterCssClassParaStatus(String status) {
+        String lower = status.toLowerCase();
+        if (lower.contains("aumento") || lower.contains("carga")) {
+            return "tag-aumento";
+        } else if (lower.contains("reps") || lower.contains("evolu")) {
+            return "tag-reps";
+        } else if (lower.contains("redu")) {
+            return "tag-reducao";
+        }
+        return "tag-manutencao";
+    }
+
     @FXML
     private void handleAbrirFiltro() {
-        modalOverlay.setManaged(true);
-        modalOverlay.setVisible(true);
+        if (modalOverlay != null) {
+            modalOverlay.setManaged(true);
+            modalOverlay.setVisible(true);
+        }
     }
 
     @FXML
     private void handleFecharFiltro() {
-        modalOverlay.setVisible(false);
-        modalOverlay.setManaged(false);
+        fecharModalFiltro();
+    }
+
+    private void fecharModalFiltro() {
+        if (modalOverlay != null) {
+            modalOverlay.setVisible(false);
+            modalOverlay.setManaged(false);
+        }
     }
 
     @FXML
     private void handleAplicarFiltro() {
+        if (ordenacaoGroup == null) {
+            fecharModalFiltro();
+            return;
+        }
+
         RadioButton selected = (RadioButton) ordenacaoGroup.getSelectedToggle();
         if (selected == null) {
-            handleFecharFiltro();
+            fecharModalFiltro();
             return;
         }
 
         if (selected == optRecentes) {
-            lblFiltroAtual.setText("Data ⤓");
-            carregarDadosIniciais();
+            if (lblFiltroAtual != null) lblFiltroAtual.setText("Data ⤓");
         } else if (selected == optAntigos) {
-            lblFiltroAtual.setText("Data ⤒");
+            if (lblFiltroAtual != null) lblFiltroAtual.setText("Data ⤒");
             Collections.reverse(listaHistorico);
         } else if (selected == optMaiorCarga) {
-            lblFiltroAtual.setText("Carga ⤓");
-            listaHistorico.sort((a, b) -> Double.compare(b.carga, a.carga));
+            if (lblFiltroAtual != null) lblFiltroAtual.setText("Carga ⤓");
+            listaHistorico.sort((a, b) -> Double.compare(b.carga(), a.carga()));
         } else if (selected == optMenorCarga) {
-            lblFiltroAtual.setText("Carga ⤒");
-            listaHistorico.sort((a, b) -> Double.compare(a.carga, b.carga));
-        } else if (selected == optMaisReps) {
-            lblFiltroAtual.setText("Reps ⤓");
-            listaHistorico.sort((a, b) -> Integer.compare(b.reps, a.reps));
-        } else if (selected == optMenosReps) {
-            lblFiltroAtual.setText("Reps ⤒");
-            listaHistorico.sort((a, b) -> Integer.compare(a.reps, b.reps));
+            if (lblFiltroAtual != null) lblFiltroAtual.setText("Carga ⤒");
+            listaHistorico.sort((a, b) -> Double.compare(a.carga(), b.carga()));
         } else if (selected == optMaiorVolume) {
-            lblFiltroAtual.setText("Volume ⤓");
-            listaHistorico.sort((a, b) -> Double.compare(b.volume, a.volume));
+            if (lblFiltroAtual != null) lblFiltroAtual.setText("Volume ⤓");
+            listaHistorico.sort((a, b) -> Double.compare(b.volumeCalculado(), a.volumeCalculado()));
         } else if (selected == optMenorVolume) {
-            lblFiltroAtual.setText("Volume ⤒");
-            listaHistorico.sort((a, b) -> Double.compare(a.volume, b.volume));
+            if (lblFiltroAtual != null) lblFiltroAtual.setText("Volume ⤒");
+            listaHistorico.sort((a, b) -> Double.compare(a.volumeCalculado(), b.volumeCalculado()));
         }
 
         renderizarHistorico();
-        handleFecharFiltro();
+        fecharModalFiltro();
     }
 
     @FXML
     private void handleVoltar() {
-        System.out.println("Navegando de volta...");
+        if (containerHistorico != null) {
+            NavigationManager.navegarPara(containerHistorico, "/fxml/metrics_hub_view.fxml");
+        }
+    }
+
+    public Long getExercicioId() {
+        return exercicioId;
     }
 }

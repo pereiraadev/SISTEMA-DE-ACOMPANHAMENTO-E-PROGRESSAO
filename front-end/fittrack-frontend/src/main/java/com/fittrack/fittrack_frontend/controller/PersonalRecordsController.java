@@ -1,5 +1,9 @@
 package com.fittrack.fittrack_frontend.controller;
 
+import com.fittrack.fittrack_frontend.dto.ExercicioDTO;
+import com.fittrack.fittrack_frontend.dto.RecordesPessoaisDTO;
+import com.fittrack.fittrack_frontend.util.NavigationManager;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -12,30 +16,94 @@ import javafx.scene.shape.Rectangle;
 import org.springframework.stereotype.Controller;
 
 import java.io.InputStream;
+import java.util.List;
 
 @Controller
 public class PersonalRecordsController {
 
+    @FXML private Label lblMaiorCargaDestaque;
+    @FXML private Label lblExercicioDestaque;
+    @FXML private Label lblDataDestaque;
+
+    @FXML private Label lblMaiorCargaAbsoluta;
+    @FXML private Label lblMaiorVolumeTreino;
+    @FXML private Label lblMaiorRepsSobCarga;
+    @FXML private Label lblMaiorFrequenciaSemanas;
+
     @FXML private VBox containerPRsExercício;
+    @FXML private VBox containerPRsExercicio; // Suporte a variação de ID sem acento no FXML
 
     @FXML
     public void initialize() {
-        carregarPRsSimulados();
+        limparContainers();
     }
 
-    private void carregarPRsSimulados() {
-        containerPRsExercício.getChildren().clear();
-
-        // Certifique-se de que estes arquivos existem na pasta src/main/resources/images/
-        adicionarItemPR("/images/Rectangle (4).png", "Supino Reto", "Alcançado em 15 Out 2025", "100 kg", "↑ +5 kg");
-        adicionarItemPR("/images/Rectangle (1).png", "Agachamento Livre", "Alcançado em 15 Out 2025", "180 kg", "↑ +10 kg");
-        adicionarItemPR("/images/Rectangle (5).png", "Levantamento Terra", "Alcançado em 08 Out 2025", "160 kg", "↑ +2 reps");
+    private void limparContainers() {
+        if (containerPRsExercício != null) containerPRsExercício.getChildren().clear();
+        if (containerPRsExercicio != null) containerPRsExercicio.getChildren().clear();
     }
 
-    private void adicionarItemPR(String imagePath, String titulo, String data, String valorPR, String evolucao) {
+    /**
+     * Injeta e exibe os dados reais do Hall da Fama / Recordes Pessoais trazidos da API Spring Boot.
+     */
+    public void carregarRecordesPessoais(RecordesPessoaisDTO recordes) {
+        limparContainers();
+
+        if (recordes == null) return;
+
+        // 1. Preenchimento dos Cards de Destaque e Métricas Gerais
+        if (lblMaiorCargaDestaque != null && recordes.maiorCargaAbsoluta() != null) {
+            lblMaiorCargaDestaque.setText(String.format("%.0f kg", recordes.maiorCargaAbsoluta()));
+        }
+
+        if (lblExercicioDestaque != null && recordes.exercicioMaiorCarga() != null) {
+            lblExercicioDestaque.setText(recordes.exercicioMaiorCarga().toUpperCase());
+        }
+
+        if (lblMaiorCargaAbsoluta != null && recordes.maiorCargaAbsoluta() != null) {
+            lblMaiorCargaAbsoluta.setText(String.format("%.0f kg", recordes.maiorCargaAbsoluta()));
+        }
+
+        if (lblMaiorVolumeTreino != null && recordes.maiorVolumeTreino() != null) {
+            lblMaiorVolumeTreino.setText(String.format("%,.0f kg", recordes.maiorVolumeTreino()));
+        }
+
+        if (lblMaiorRepsSobCarga != null && recordes.maiorRepsSobCarga() != null) {
+            lblMaiorRepsSobCarga.setText(recordes.maiorRepsSobCarga());
+        }
+
+        if (lblMaiorFrequenciaSemanas != null && recordes.maiorFrequenciaSemanas() != null) {
+            lblMaiorFrequenciaSemanas.setText(recordes.maiorFrequenciaSemanas() + " semanas");
+        }
+
+        // 2. Renderização dos PRs por Exercício
+        if (recordes.prsPorExercicio() != null && !recordes.prsPorExercicio().isEmpty()) {
+            renderizarListaPRs(recordes.prsPorExercicio());
+        } else {
+            exibirMensagemVazia();
+        }
+    }
+
+    private void renderizarListaPRs(List<ExercicioDTO> exercicios) {
+        for (ExercicioDTO ex : exercicios) {
+            String imagePath = obterCaminhoImagemExercicio(ex.nome());
+            String titulo = ex.nome();
+            String dataText = "Recorde Histórico";
+            String valorPR = ex.recordeCarga() != null ? String.format("%.0f kg", ex.recordeCarga()) : "—";
+            String evolucao = ex.totalVezesRealizado() != null ? (ex.totalVezesRealizado() + " treinos") : "Ativo";
+
+            adicionarItemPR(imagePath, titulo, dataText, valorPR, evolucao, ex);
+        }
+    }
+
+    private void adicionarItemPR(String imagePath, String titulo, String data, String valorPR, String evolucao, ExercicioDTO exercicio) {
         HBox card = new HBox(12.0);
         card.getStyleClass().add("exercise-pr-card");
         card.setAlignment(Pos.CENTER_LEFT);
+
+        if (exercicio != null) {
+            card.setOnMouseClicked(e -> abrirDetalheExercicio(exercicio));
+        }
 
         // Instanciação e configuração do ImageView com tratamento de recurso
         ImageView imgView = new ImageView();
@@ -46,14 +114,22 @@ public class PersonalRecordsController {
         InputStream imageStream = getClass().getResourceAsStream(imagePath);
         if (imageStream != null) {
             imgView.setImage(new Image(imageStream));
-            
-            // Clipe para cantos arredondados na imagem (Border Radius 10px)
+
+            // Clipe para cantos arredondados na imagem
             Rectangle clip = new Rectangle(48.0, 48.0);
             clip.setArcWidth(12.0);
             clip.setArcHeight(12.0);
             imgView.setClip(clip);
         } else {
-            System.err.println("Aviso: Imagem não encontrada no caminho " + imagePath);
+            // Tenta caminho padrão caso a imagem específica não seja encontrada
+            InputStream fallbackStream = getClass().getResourceAsStream("/images/Rectangle (4).png");
+            if (fallbackStream != null) {
+                imgView.setImage(new Image(fallbackStream));
+                Rectangle clip = new Rectangle(48.0, 48.0);
+                clip.setArcWidth(12.0);
+                clip.setArcHeight(12.0);
+                imgView.setClip(clip);
+            }
         }
 
         // Informações do Exercício
@@ -85,11 +161,51 @@ public class PersonalRecordsController {
 
         // Adiciona todos os nós ao card principal
         card.getChildren().addAll(imgView, info, valorBox);
-        containerPRsExercício.getChildren().add(card);
+
+        // Adiciona ao container presente no FXML
+        if (containerPRsExercício != null) {
+            containerPRsExercício.getChildren().add(card);
+        } else if (containerPRsExercicio != null) {
+            containerPRsExercicio.getChildren().add(card);
+        }
+    }
+
+    private String obterCaminhoImagemExercicio(String nomeExercicio) {
+        if (nomeExercicio == null) return "/images/Rectangle (4).png";
+        
+        String lower = nomeExercicio.toLowerCase();
+        if (lower.contains("agachamento")) {
+            return "/images/Rectangle (1).png";
+        } else if (lower.contains("terra")) {
+            return "/images/Rectangle (5).png";
+        } else {
+            return "/images/Rectangle (4).png";
+        }
+    }
+
+    private void abrirDetalheExercicio(ExercicioDTO exercicio) {
+        VBox refContainer = containerPRsExercício != null ? containerPRsExercício : containerPRsExercicio;
+        if (refContainer != null) {
+            ExerciseDetailsController controller = NavigationManager.navegarComController(refContainer, "/fxml/exercise_details_view.fxml");
+            if (controller != null && exercicio != null) {
+                controller.carregarDetalhesExercicio(exercicio, List.of(), null);
+            }
+        }
+    }
+
+    private void exibirMensagemVazia() {
+        Label lblVazio = new Label("Nenhum recorde pessoal registrado ainda.");
+        lblVazio.setStyle("-fx-text-fill: #888888; -fx-font-size: 14px;");
+        
+        if (containerPRsExercício != null) containerPRsExercício.getChildren().add(lblVazio);
+        else if (containerPRsExercicio != null) containerPRsExercicio.getChildren().add(lblVazio);
     }
 
     @FXML
     private void handleVoltar() {
-        System.out.println("Voltar para Métricas do Exercício...");
+        VBox refContainer = containerPRsExercício != null ? containerPRsExercício : containerPRsExercicio;
+        if (refContainer != null) {
+            NavigationManager.navegarPara(refContainer, "/fxml/metrics_hub_view.fxml");
+        }
     }
 }
