@@ -36,6 +36,13 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- Cliente HTTP (RestClient / spring-web + Jackson) para consumir a API REST do back-end.
+             Não inicia servidor web: o front-end é apenas cliente. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
+        </dependency>
+
         <!-- JavaFX Controls: Componentes de interface gráfica (Botões, Tabelas, Campos de Texto) -->
         <dependency>
             <groupId>org.openjfx</groupId>
