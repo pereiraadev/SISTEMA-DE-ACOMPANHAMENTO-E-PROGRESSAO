@@ -27,7 +27,7 @@ public class JavaFxApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        var resource = getClass().getResource("/fxml/auth_view.fxml");
+        var resource = getClass().getResource("/fxml/dashboard_home_view.fxml");
         
         if (resource == null) {
             System.err.println("ERRO: O arquivo FXML não foi encontrado em 'src/main/resources/fxml/auth_view.fxml'.");

@@ -23,21 +23,28 @@ public class MainController {
     }
 
     /**
-     * Registra o usuário autenticado na sessão global do front-end após o login[cite: 21].
+     * Registra o usuário autenticado na sessão global do front-end após o login.
      */
     public static void setUsuarioLogado(AuthResponseDTO usuario) {
         usuarioLogado = usuario;
     }
 
     /**
-     * Retorna os dados do usuário autenticado na sessão atual[cite: 21].
+     * Retorna os dados do usuário autenticado na sessão atual.
      */
     public static AuthResponseDTO getUsuarioLogado() {
         return usuarioLogado;
     }
 
     /**
-     * Limpa a sessão global (Logout) e redireciona o usuário para a tela de autenticação[cite: 11, 21].
+     * Id do praticante autenticado (usado nas chamadas à API), ou null se não houver sessão.
+     */
+    public static Long getUsuarioLogadoId() {
+        return usuarioLogado != null ? usuarioLogado.praticanteId() : null;
+    }
+
+    /**
+     * Limpa a sessão global (Logout) e redireciona o usuário para a tela de autenticação.
      */
     public void efetuarLogout(Node nodeOrigem) {
         usuarioLogado = null;
