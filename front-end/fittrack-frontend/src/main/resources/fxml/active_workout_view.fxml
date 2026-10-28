@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@/styles/active_workout.css" 
+<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@../styles/active_workout.css" 
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="com.fittrack.fittrack_frontend.controller.ActiveWorkoutController">
 
@@ -27,7 +27,7 @@
             <HBox alignment="CENTER_LEFT">
                 <Button text="‹" styleClass="btn-icon-back" onAction="#handleVoltar" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label text="Treino A - Peito e Tríceps" style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                <Label fx:id="txtNomeTreino" text="Treino A - Peito e Tríceps" style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px; -fx-font-weight: bold;" />
                 <Region HBox.hgrow="ALWAYS" />
                 <Button text="Finalizar" styleClass="btn-finish-workout" onAction="#handleFinalizarTreino" />
             </HBox>
@@ -35,16 +35,16 @@
             <!-- Cronômetro -->
             <VBox alignment="CENTER" spacing="2.0">
                 <Label text="TEMPO DECORRIDO" styleClass="timer-label" />
-                <Label fx:id="txtCronometro" text="12:34" styleClass="timer-value" />
+                <Label fx:id="txtCronometro" text="00:00" styleClass="timer-value" />
             </VBox>
 
             <!-- Banner Informativo -->
             <HBox styleClass="info-card" alignment="CENTER_LEFT" spacing="10.0">
                 <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
-                    <Image url="@/icons/info.png" />
+                    <Image url="@../icons/info.png" />
                 </ImageView>
-                <Label text="Treino Anterior:  " style="-fx-text-fill: #888888; -fx-font-size: 13px;" />
-                <Label text="4×10 - 80kg" style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold;" />
+                <Label text="Previsto:  " style="-fx-text-fill: #888888; -fx-font-size: 13px;" />
+                <Label fx:id="txtReferenciaAnterior" text="Sem registro anterior" style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold;" />
             </HBox>
 
             <!-- BANNER DE ALERTA VISUAL NA TELA -->
@@ -66,16 +66,25 @@
                     <!-- Titulo Exercício e Badge de Progresso -->
                     <HBox alignment="CENTER_LEFT">
                         <VBox spacing="2.0">
-                            <Label text="Supino Reto" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
-                            <Label text="Peito" style="-fx-text-fill: #888888; -fx-font-size: 13px;" />
+                            <Label fx:id="txtNomeExercicio" text="Exercício" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                            <Label fx:id="txtGrupoMuscular" text="Grupo Muscular" style="-fx-text-fill: #888888; -fx-font-size: 13px;" />
                         </VBox>
                         <Region HBox.hgrow="ALWAYS" />
                         <HBox styleClass="badge-progress" alignment="CENTER">
-                            <Label fx:id="txtProgressoSeries" text="2 de 4 séries" styleClass="badge-text" />
+                            <Label fx:id="txtProgressoSeries" text="0 de 0 séries" styleClass="badge-text" />
                         </HBox>
                     </HBox>
 
-                    <!-- Cabeçalho da Tabela (GridPane com colunas idênticas às séries) -->
+                    <!-- Navegação sequencial entre os exercícios da sessão -->
+                    <HBox alignment="CENTER" spacing="12.0">
+                        <Button fx:id="btnExercicioAnterior" text="‹ Anterior" styleClass="btn-exercise-nav" onAction="#handleExercicioAnterior" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="txtProgressoExercicios" text="Exercício 1 de 1" styleClass="exercise-counter" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnProximoExercicio" text="Próximo ›" styleClass="btn-exercise-nav" onAction="#handleProximoExercicio" />
+                    </HBox>
+
+                    <!-- Cabeçalho da Tabela -->
                     <GridPane alignment="CENTER_LEFT">
                         <columnConstraints>
                             <ColumnConstraints percentWidth="12.0" />
@@ -104,7 +113,7 @@
                         <HBox alignment="CENTER_LEFT">
                             <Label text="Volume do exercício" styleClass="volume-label" />
                             <Region HBox.hgrow="ALWAYS" />
-                            <Label fx:id="txtVolumeExercício" text="1.460 kg" styleClass="volume-value" />
+                            <Label fx:id="txtVolumeExercicio" text="0 kg" styleClass="volume-value" />
                         </HBox>
                     </VBox>
 

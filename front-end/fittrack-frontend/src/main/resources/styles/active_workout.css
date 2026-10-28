@@ -147,3 +147,28 @@
     -fx-background-radius: 10px;
     -fx-padding: 10px 16px;
 }
+
+/* Navegação entre exercícios da sessão */
+.btn-exercise-nav {
+    -fx-background-color: #1E1E1E;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12px;
+    -fx-padding: 6px 14px;
+    -fx-cursor: hand;
+}
+
+.btn-exercise-nav:hover {
+    -fx-background-color: #2A2A2A;
+}
+
+.btn-exercise-nav:disabled {
+    -fx-opacity: 0.35;
+}
+
+.exercise-counter {
+    -fx-text-fill: #888888;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}

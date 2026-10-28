@@ -116,7 +116,7 @@
     </HBox>
 
     <!-- Botão Login Social / Cancelar -->
-    <Button style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;">
+    <Button style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;" onAction="#handleLimparCampos">
         <graphic>
             <ImageView fitWidth="48.0" fitHeight="48.0" preserveRatio="true">
                 <image>

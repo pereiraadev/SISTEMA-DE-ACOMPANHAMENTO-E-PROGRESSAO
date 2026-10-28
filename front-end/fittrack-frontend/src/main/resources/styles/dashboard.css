@@ -34,7 +34,7 @@
 .metric-card {
     -fx-background-color: #1E1E1E;
     -fx-background-radius: 16px;
-    -fx-padding: 18px 16px; /* Aumentado o padding vertical */
+    -fx-padding: 18px 16px;
     -fx-alignment: CENTER_LEFT;
 }
 
@@ -99,14 +99,39 @@
     -fx-background-color: #3bc217;
 }
 
-/* Bottom Navigation Bar */
+/* ==========================================================================
+   BARRA DE NAVEGAÇÃO INFERIOR (BOTTOM NAV)
+   ========================================================================== */
 .bottom-nav {
-    -fx-background-color: #181818;
-    -fx-border-color: #262626 transparent transparent transparent;
-    -fx-border-width: 1px;
-    -fx-padding: 10px 0px;
+    -fx-background-color: #121212;
+    -fx-border-color: #222222 transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 8px 0px 10px 0px;
 }
 
+/* Reseta completamente os efeitos nativos do JavaFX em todos os estados de botão
+   (evita a marcação cinza de foco/hover/seleção na navegação inferior) */
+.nav-button, .nav-button:focused, .nav-button:hover, .nav-button:armed, .nav-button:pressed {
+    -fx-background-color: transparent !important;
+    -fx-background-insets: 0 !important;
+    -fx-background-radius: 0 !important;
+    -fx-border-color: transparent !important;
+    -fx-focus-color: transparent !important;
+    -fx-faint-focus-color: transparent !important;
+    -fx-padding: 2px 0;
+    -fx-cursor: hand;
+}
+
+/* Ícones de Navegação */
+.nav-icon-active {
+    -fx-opacity: 1.0;
+}
+
+.nav-icon-inactive {
+    -fx-opacity: 0.45;
+}
+
+/* Rótulos de Navegação */
 .nav-item-active {
     -fx-text-fill: #43D61B;
     -fx-font-size: 11px;
@@ -114,11 +139,7 @@
 }
 
 .nav-item-inactive {
-    -fx-text-fill: #777777;
+    -fx-text-fill: #888888;
     -fx-font-size: 11px;
-}
-
-.nav-button {
-    -fx-background-color: transparent;
-    -fx-cursor: hand;
+    -fx-font-weight: normal;
 }

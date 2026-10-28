@@ -113,13 +113,7 @@
     -fx-max-height: 6px;
 }
 
-/* Barra de Navegação Inferior */
-.bottom-nav {
-    -fx-background-color: #121212;
-    -fx-border-color: #222222;
-    -fx-border-width: 1px 0 0 0;
-    -fx-padding: 10px 0;
-}
+/* A barra de navegação inferior (.bottom-nav / .nav-button) vem de dashboard.css */
 
 .nav-item {
     -fx-background-color: transparent;

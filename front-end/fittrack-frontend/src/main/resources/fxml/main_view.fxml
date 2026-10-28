@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<BorderPane fx:id="rootLayout" prefHeight="720.0" prefWidth="380.0" 
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.fittrack.fittrack_frontend.controller.MainController">
+
+    <!-- ÁREA CENTRAL REUTILIZÁVEL (CONTAINER PARA INJEÇÃO DE SUB-TELAS) -->
+    <center>
+        <StackPane fx:id="contentArea" prefHeight="720.0" prefWidth="380.0" />
+    </center>
+
+</BorderPane>
