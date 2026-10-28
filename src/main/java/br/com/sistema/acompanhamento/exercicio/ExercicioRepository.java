@@ -1,5 +1,6 @@
-package br.com.sistema.acompanhamento.exercicio;
+package br.com.sistema.acompanhamento.exercicio.domain;
 
+import br.com.sistema.acompanhamento.exercicio.domain.Exercicio;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

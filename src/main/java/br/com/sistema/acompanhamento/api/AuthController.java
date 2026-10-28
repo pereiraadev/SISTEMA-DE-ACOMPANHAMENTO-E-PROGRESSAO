@@ -1,6 +1,8 @@
 package br.com.sistema.acompanhamento.api;
 
-import br.com.sistema.acompanhamento.praticante.*;
+import br.com.sistema.acompanhamento.praticante.domain.Praticante;
+import br.com.sistema.acompanhamento.praticante.repository.PraticanteRepository;
+import br.com.sistema.acompanhamento.praticante.service.PraticanteService;
 import br.com.sistema.acompanhamento.security.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

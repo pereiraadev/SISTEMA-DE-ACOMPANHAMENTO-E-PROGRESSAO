@@ -1,8 +1,11 @@
-package br.com.sistema.acompanhamento.treino;
+package br.com.sistema.acompanhamento.treino.domain;
 
 import br.com.sistema.acompanhamento.api.*;
-import br.com.sistema.acompanhamento.exercicio.*;
-import br.com.sistema.acompanhamento.praticante.*;
+import br.com.sistema.acompanhamento.exercicio.domain.*;
+import br.com.sistema.acompanhamento.praticante.domain.*;
+import br.com.sistema.acompanhamento.praticante.repository.PraticanteRepository;
+import br.com.sistema.acompanhamento.treino.repository.*;
+import br.com.sistema.acompanhamento.treino.service.TreinoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

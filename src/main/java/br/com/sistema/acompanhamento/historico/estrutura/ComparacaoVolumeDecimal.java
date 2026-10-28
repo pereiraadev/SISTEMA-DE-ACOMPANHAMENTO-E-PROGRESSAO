@@ -1,4 +1,4 @@
-package br.com.sistema.acompanhamento.historico.estrutura;
+package br.com.sistema.acompanhamento.historico.domain;
 
 import java.math.BigDecimal;
 

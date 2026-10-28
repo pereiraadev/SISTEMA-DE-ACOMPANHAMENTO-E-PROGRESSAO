@@ -1,6 +1,6 @@
 package br.com.sistema.acompanhamento.api;
 
-import br.com.sistema.acompanhamento.treino.TreinoWorkflowService;
+import br.com.sistema.acompanhamento.treino.domain.TreinoWorkflowService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import java.math.BigDecimal;

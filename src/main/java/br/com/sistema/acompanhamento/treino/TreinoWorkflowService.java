@@ -1,10 +1,15 @@
-package br.com.sistema.acompanhamento.treino;
+package br.com.sistema.acompanhamento.treino.domain;
 
 import br.com.sistema.acompanhamento.api.*;
-import br.com.sistema.acompanhamento.exercicio.*;
-import br.com.sistema.acompanhamento.praticante.*;
-import br.com.sistema.acompanhamento.historico.estrutura.*;
-import br.com.sistema.acompanhamento.comparativo.*;
+import br.com.sistema.acompanhamento.exercicio.domain.*;
+import br.com.sistema.acompanhamento.praticante.domain.*;
+import br.com.sistema.acompanhamento.historico.domain.*;
+import br.com.sistema.acompanhamento.comparativo.domain.*;
+import br.com.sistema.acompanhamento.praticante.repository.PraticanteRepository;
+import br.com.sistema.acompanhamento.treino.repository.TreinoRepository;
+import br.com.sistema.acompanhamento.treino.repository.SerieExecutadaRepository;
+import br.com.sistema.acompanhamento.treino.service.TreinoService;
+import br.com.sistema.acompanhamento.historico.structure.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

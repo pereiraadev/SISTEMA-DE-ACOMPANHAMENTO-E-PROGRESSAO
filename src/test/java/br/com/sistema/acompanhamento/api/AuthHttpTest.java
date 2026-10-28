@@ -1,6 +1,8 @@
 package br.com.sistema.acompanhamento.api;
 
-import br.com.sistema.acompanhamento.praticante.*;
+import br.com.sistema.acompanhamento.praticante.domain.*;
+import br.com.sistema.acompanhamento.praticante.repository.PraticanteRepository;
+import br.com.sistema.acompanhamento.praticante.service.PraticanteService;
 import br.com.sistema.acompanhamento.security.TokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
