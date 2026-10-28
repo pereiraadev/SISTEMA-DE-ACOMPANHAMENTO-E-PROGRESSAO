@@ -13,11 +13,26 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.springframework.stereotype.Controller;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fittrack.fittrack_frontend.service.ApiClient;
+import com.fittrack.fittrack_frontend.service.NavigationService;
+import com.fittrack.fittrack_frontend.service.WorkoutModels;
 
 import java.io.InputStream;
+import java.util.List;
 
 @Controller
 public class MetricsHubController {
+    private final ApiClient apiClient;
+    private final NavigationService navigationService;
+    private final com.fittrack.fittrack_frontend.service.ExerciseSelection exerciseSelection;
+
+    public MetricsHubController(ApiClient apiClient, NavigationService navigationService,
+                                com.fittrack.fittrack_frontend.service.ExerciseSelection exerciseSelection) {
+        this.apiClient = apiClient;
+        this.navigationService = navigationService;
+        this.exerciseSelection = exerciseSelection;
+    }
 
     @FXML private Button btnTabGrupos;
     @FXML private Button btnTabExercicios;
@@ -111,13 +126,16 @@ public class MetricsHubController {
         boxBusca.setVisible(true);
         boxBusca.setManaged(true);
         containerCards.getChildren().clear();
-
-        adicionarCardExercicio("Supino Reto", "Peitoral", "PR: 100 kg", () -> abrirExercicioEspecífico("supino_reto")); //[cite: 39]
-        adicionarCardExercicio("Agachamento Livre", "Pernas", "PR: 180 kg", () -> abrirExercicioEspecífico("agachamento")); //[cite: 39]
-        adicionarCardExercicio("Levantamento Terra", "Costas", "PR: 160 kg", null); //[cite: 39]
-        adicionarCardExercicio("Desenvolvimento", "Ombros", "PR: 60 kg", null); //[cite: 39]
-        adicionarCardExercicio("Rosca Direta", "Bíceps", "PR: 40 kg", null); //[cite: 39]
-        adicionarCardExercicio("Tríceps Corda", "Tríceps", "PR: 35 kg", null); //[cite: 39]
+        try {
+            List<WorkoutModels.ExercicioResposta> exercicios = apiClient.getList("/api/exercicios", new TypeReference<>() {});
+            for (WorkoutModels.ExercicioResposta exercicio : exercicios) {
+                adicionarCardExercicio(exercicio.nome(), exercicio.grupoMuscular(),
+                        "PR: " + (exercicio.recordeCarga() == null ? "—" : exercicio.recordeCarga() + " kg"),
+                        () -> abrirExercicioEspecífico(String.valueOf(exercicio.id())));
+            }
+        } catch (Exception erro) {
+            adicionarCardExercicio("Não foi possível carregar", "Verifique o backend", "", null);
+        }
     }
 
     private void adicionarCardExercicio(String titulo, String sub, String prText, Runnable onAction) {
@@ -234,9 +252,10 @@ public class MetricsHubController {
     }
 
     private void abrirExercicioEspecífico(String id) {
-        System.out.println("Navegando para Detalhes do Exercício: " + id);
+        exerciseSelection.selecionar(Long.valueOf(id));
+        navigationService.navegar("/fxml/exercise_details_view.fxml");
     }
 
-    @FXML private void handleNavInicio() { System.out.println("Navegar para Home"); }
-    @FXML private void handleNavTreinos() { System.out.println("Navegar para Treinos"); }
+    @FXML private void handleNavInicio() { navigationService.navegar("/fxml/dashboard_home_view.fxml"); }
+    @FXML private void handleNavTreinos() { navigationService.navegar("/fxml/active_workout_view.fxml"); }
 }

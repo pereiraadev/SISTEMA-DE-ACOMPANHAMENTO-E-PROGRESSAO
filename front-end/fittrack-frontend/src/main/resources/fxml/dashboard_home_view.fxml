@@ -51,7 +51,7 @@
                                     <Image url="@/icons/trending-up.png" />
                                 </ImageView>
                             </HBox>
-                            <Label text="47" styleClass="metric-value">
+                            <Label fx:id="lblTotalTreinos" text="—" styleClass="metric-value">
                                 <VBox.margin><Insets top="8.0" /></VBox.margin>
                             </Label>
                         </VBox>
@@ -64,7 +64,7 @@
                                     <Image url="@/icons/dumbbell.png" />
                                 </ImageView>
                             </HBox>
-                            <Label text="312" styleClass="metric-value">
+                            <Label fx:id="lblTotalExercicios" text="—" styleClass="metric-value">
                                 <VBox.margin><Insets top="8.0" /></VBox.margin>
                             </Label>
                         </VBox>
@@ -77,7 +77,7 @@
                                     <Image url="@/icons/repeat-1.png" />
                                 </ImageView>
                             </HBox>
-                            <Label text="1.248" styleClass="metric-value">
+                            <Label fx:id="lblTotalSeries" text="—" styleClass="metric-value">
                                 <VBox.margin><Insets top="8.0" /></VBox.margin>
                             </Label>
                         </VBox>
@@ -90,7 +90,7 @@
                                     <Image url="@/icons/trending-up.png" />
                                 </ImageView>
                             </HBox>
-                            <Label text="45.720 kg" styleClass="metric-value">
+                            <Label fx:id="lblVolumeTotal" text="—" styleClass="metric-value">
                                 <VBox.margin><Insets top="8.0" /></VBox.margin>
                             </Label>
                         </VBox>

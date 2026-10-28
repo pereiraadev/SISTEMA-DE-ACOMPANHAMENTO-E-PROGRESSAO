@@ -27,7 +27,7 @@
             <HBox alignment="CENTER_LEFT">
                 <Button text="‹" styleClass="btn-icon-back" onAction="#handleVoltar" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label text="Treino A - Peito e Tríceps" style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                <Label fx:id="txtNomeTreino" text="Treino" style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px; -fx-font-weight: bold;" />
                 <Region HBox.hgrow="ALWAYS" />
                 <Button text="Finalizar" styleClass="btn-finish-workout" onAction="#handleFinalizarTreino" />
             </HBox>
@@ -44,7 +44,7 @@
                     <Image url="@/icons/info.png" />
                 </ImageView>
                 <Label text="Treino Anterior:  " style="-fx-text-fill: #888888; -fx-font-size: 13px;" />
-                <Label text="4×10 - 80kg" style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold;" />
+                <Label fx:id="txtTreinoAnterior" text="—" style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold;" />
             </HBox>
 
             <!-- BANNER DE ALERTA VISUAL NA TELA -->
@@ -64,15 +64,17 @@
                     </padding>
 
                     <!-- Titulo Exercício e Badge de Progresso -->
-                    <HBox alignment="CENTER_LEFT">
-                        <VBox spacing="2.0">
-                            <Label text="Supino Reto" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
-                            <Label text="Peito" style="-fx-text-fill: #888888; -fx-font-size: 13px;" />
+<HBox alignment="CENTER_LEFT">
+                         <Button text="‹" styleClass="btn-icon-back" onAction="#handleExercicioAnterior" />
+                         <VBox spacing="2.0">
+                            <Label fx:id="txtNomeExercicio" text="Exercício" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                            <Label fx:id="txtGrupoMuscular" text="—" style="-fx-text-fill: #888888; -fx-font-size: 13px;" />
                         </VBox>
                         <Region HBox.hgrow="ALWAYS" />
-                        <HBox styleClass="badge-progress" alignment="CENTER">
-                            <Label fx:id="txtProgressoSeries" text="2 de 4 séries" styleClass="badge-text" />
-                        </HBox>
+<HBox styleClass="badge-progress" alignment="CENTER">
+                             <Label fx:id="txtProgressoSeries" text="0 de 0 séries" styleClass="badge-text" />
+                         </HBox>
+                         <Button text="›" styleClass="btn-icon-back" onAction="#handleProximoExercicio" />
                     </HBox>
 
                     <!-- Cabeçalho da Tabela (GridPane com colunas idênticas às séries) -->

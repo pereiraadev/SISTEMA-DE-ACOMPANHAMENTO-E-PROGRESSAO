@@ -12,6 +12,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.springframework.stereotype.Controller;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fittrack.fittrack_frontend.service.ApiClient;
+import com.fittrack.fittrack_frontend.service.WorkoutModels;
+import com.fittrack.fittrack_frontend.service.NavigationService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +23,16 @@ import java.util.List;
 
 @Controller
 public class ExerciseDetailsController {
+    private final ApiClient apiClient;
+    private final NavigationService navigationService;
+    private final com.fittrack.fittrack_frontend.service.ExerciseSelection exerciseSelection;
+
+    public ExerciseDetailsController(ApiClient apiClient, NavigationService navigationService,
+                                     com.fittrack.fittrack_frontend.service.ExerciseSelection exerciseSelection) {
+        this.apiClient = apiClient;
+        this.navigationService = navigationService;
+        this.exerciseSelection = exerciseSelection;
+    }
 
     @FXML private Label lblNomeExercício;
     @FXML private Label lblGrupoMuscular;
@@ -68,10 +82,52 @@ public class ExerciseDetailsController {
     @FXML
     public void initialize() {
         carregarDadosIniciais();
+        carregarDetalhesExercicio();
         renderizarHistorico();
     }
 
+    private void carregarDetalhesExercicio() {
+        Long id = exerciseSelection.obter();
+        if (id == null) return;
+        try {
+            WorkoutModels.ExercicioResposta exercicio = apiClient.get("/api/exercicios/" + id, WorkoutModels.ExercicioResposta.class);
+            lblNomeExercício.setText(exercicio.nome());
+            lblGrupoMuscular.setText(exercicio.grupoMuscular());
+            lblStatus.setText(exercicio.ativo() ? "Ativo" : "Inativo");
+            WorkoutModels.RecordeResposta recorde = apiClient.get("/api/exercicios/" + id + "/recordes", WorkoutModels.RecordeResposta.class);
+            lblMaiorCarga.setText(recorde.maiorCarga() == null ? "—" : recorde.maiorCarga() + " kg");
+            lblMaiorReps.setText(recorde.repeticoesNaMaiorCarga() == null ? "—" : String.valueOf(recorde.repeticoesNaMaiorCarga()));
+            lblMaiorCargaDet.setText(recorde.sessoesRealizadas() + " sessões");
+            lblMaiorRepsDet.setText(recorde.maiorVolumeSessao() == null ? "—" : recorde.maiorVolumeSessao() + " kg de volume");
+        } catch (Exception ignored) {
+        }
+    }
+
     private void carregarDadosIniciais() {
+        try {
+            List<WorkoutModels.TreinoResposta> treinos = apiClient.getList("/api/historico", new TypeReference<>() {});
+            if (!treinos.isEmpty()) {
+                listaHistorico.clear();
+                for (WorkoutModels.TreinoResposta treino : treinos) {
+                    if (treino.itens() == null) continue;
+                    for (WorkoutModels.ItemResposta item : treino.itens()) {
+                        if (item.series() == null || item.series().isEmpty()) continue;
+                        WorkoutModels.SerieResposta serie = item.series().get(0);
+                        double carga = serie.carga() == null ? 0 : serie.carga().doubleValue();
+                        int reps = serie.repeticoes() == null ? 0 : serie.repeticoes();
+                        double volume = item.volume() == null ? 0 : item.volume().doubleValue();
+                        String data = treino.iniciadoEm() == null ? "Sessão" : treino.iniciadoEm().toLocalDate().toString();
+                        listaHistorico.add(new HistoricoEntry(data, carga, reps, volume, "Sessão", "tag-manutencao"));
+                    }
+                }
+                chartEvolucao.getData().clear();
+                XYChart.Series<String, Number> series = new XYChart.Series<>();
+                for (HistoricoEntry entry : listaHistorico) series.getData().add(new XYChart.Data<>(entry.data, entry.carga));
+                chartEvolucao.getData().add(series);
+                return;
+            }
+        } catch (Exception ignored) {
+        }
         // Popula o gráfico de evolução
         chartEvolucao.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -170,6 +226,6 @@ public class ExerciseDetailsController {
 
     @FXML
     private void handleVoltar() {
-        System.out.println("Navegando de volta...");
+        navigationService.navegar("/fxml/metrics_hub_view.fxml");
     }
 }

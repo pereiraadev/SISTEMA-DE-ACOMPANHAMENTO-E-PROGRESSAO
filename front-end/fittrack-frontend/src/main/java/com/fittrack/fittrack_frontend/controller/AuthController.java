@@ -7,6 +7,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.springframework.stereotype.Controller;
+import com.fittrack.fittrack_frontend.service.ApiClient;
+import com.fittrack.fittrack_frontend.service.AuthModels;
 
 @Controller
 public class AuthController {
@@ -24,6 +26,13 @@ public class AuthController {
 
     private boolean modoCadastro = true;
     private boolean senhaVisivel = false;
+    private final ApiClient apiClient;
+    private final com.fittrack.fittrack_frontend.service.NavigationService navigationService;
+
+    public AuthController(ApiClient apiClient, com.fittrack.fittrack_frontend.service.NavigationService navigationService) {
+        this.apiClient = apiClient;
+        this.navigationService = navigationService;
+    }
 
     @FXML
     public void initialize() {
@@ -59,10 +68,26 @@ public class AuthController {
 
     @FXML
     private void handleAcaoPrincipal() {
-        if (modoCadastro) {
-            System.out.println("Cadastrando: " + txtNome.getText() + " | Email: " + txtEmail.getText());
-        } else {
-            System.out.println("Logando com: " + txtEmail.getText());
+        try {
+            String email = txtEmail.getText().trim();
+            String senha = txtSenhaOculta.getText();
+            if (email.isBlank() || senha.isBlank() || (modoCadastro && txtNome.getText().trim().isBlank())) {
+                btnAcaoPrincipal.setText("Preencha os campos");
+                return;
+            }
+            if (modoCadastro) {
+                apiClient.post("/auth/cadastrar", new AuthModels.Cadastro(txtNome.getText().trim(), email, senha), AuthModels.PraticanteResposta.class);
+                modoCadastro = false;
+                atualizarInterface();
+                btnAcaoPrincipal.setText("Conta criada; entre");
+            } else {
+                AuthModels.LoginResposta resposta = apiClient.post("/auth/login", new AuthModels.Login(email, senha), AuthModels.LoginResposta.class);
+                apiClient.autenticar(resposta.token());
+                btnAcaoPrincipal.setText("Login realizado");
+                navigationService.navegar("/fxml/dashboard_home_view.fxml");
+            }
+        } catch (Exception erro) {
+            btnAcaoPrincipal.setText("Falha na operação");
         }
     }
 

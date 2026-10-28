@@ -11,12 +11,22 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.springframework.stereotype.Controller;
+import com.fittrack.fittrack_frontend.service.ApiClient;
+import com.fittrack.fittrack_frontend.service.DashboardModels;
+import com.fittrack.fittrack_frontend.service.NavigationService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class GroupDetailController {
+    private final ApiClient apiClient;
+    private final NavigationService navigationService;
+
+    public GroupDetailController(ApiClient apiClient, NavigationService navigationService) {
+        this.apiClient = apiClient;
+        this.navigationService = navigationService;
+    }
 
     @FXML private Label lblNomeGrupo;
     @FXML private Label lblTagFoco;
@@ -52,8 +62,16 @@ public class GroupDetailController {
 
     @FXML
     public void initialize() {
-        // Dados de teste mockados (Serão substituídos pela chamada da API)
         List<ExercisioVolumeData> exercicios = new ArrayList<>();
+        try {
+            DashboardModels.DashboardResposta dashboard = apiClient.get("/api/dashboard", DashboardModels.DashboardResposta.class);
+            if (dashboard.volumePorGrupo() != null) {
+                dashboard.volumePorGrupo().forEach((grupo, volume) -> exercicios.add(new ExercisioVolumeData(grupo, volume.doubleValue(), "#43D61B")));
+            }
+            carregarEMedirMetricasReais("Volume por grupo", "API", exercicios, List.of());
+            return;
+        } catch (Exception ignored) {
+        }
         exercicios.add(new ExercisioVolumeData("Supino Reto", 3802.5, "#43D61B"));
         exercicios.add(new ExercisioVolumeData("Inclinado", 2112.5, "#2E7D32"));
         exercicios.add(new ExercisioVolumeData("Crucifixo", 1521.0, "#38B6FF"));
@@ -151,6 +169,6 @@ public class GroupDetailController {
 
     @FXML
     private void handleVoltar() {
-        System.out.println("Voltar para Métricas de Grupos...");
+        navigationService.navegar("/fxml/metrics_hub_view.fxml");
     }
 }

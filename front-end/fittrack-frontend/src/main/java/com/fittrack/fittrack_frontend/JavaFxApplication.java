@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import com.fittrack.fittrack_frontend.service.NavigationService;
 
 public class JavaFxApplication extends Application{
     
@@ -32,6 +33,7 @@ public class JavaFxApplication extends Application{
         stage.setTitle("FitTrack");
         stage.setScene(scene);
         stage.setResizable(false);
+        applicationContext.getBean(NavigationService.class).configurar(stage);
         stage.show();
     }
 

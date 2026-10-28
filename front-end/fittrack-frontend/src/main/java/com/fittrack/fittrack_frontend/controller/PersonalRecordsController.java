@@ -10,26 +10,44 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import org.springframework.stereotype.Controller;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fittrack.fittrack_frontend.service.ApiClient;
+import com.fittrack.fittrack_frontend.service.WorkoutModels;
+import com.fittrack.fittrack_frontend.service.NavigationService;
 
 import java.io.InputStream;
+import java.util.List;
 
 @Controller
 public class PersonalRecordsController {
+    private final ApiClient apiClient;
+    private final NavigationService navigationService;
+
+    public PersonalRecordsController(ApiClient apiClient, NavigationService navigationService) {
+        this.apiClient = apiClient;
+        this.navigationService = navigationService;
+    }
 
     @FXML private VBox containerPRsExercício;
 
     @FXML
     public void initialize() {
-        carregarPRsSimulados();
+        carregarPRs();
     }
 
-    private void carregarPRsSimulados() {
+    private void carregarPRs() {
         containerPRsExercício.getChildren().clear();
 
-        // Certifique-se de que estes arquivos existem na pasta src/main/resources/images/
-        adicionarItemPR("/images/Rectangle (4).png", "Supino Reto", "Alcançado em 15 Out 2025", "100 kg", "↑ +5 kg");
-        adicionarItemPR("/images/Rectangle (1).png", "Agachamento Livre", "Alcançado em 15 Out 2025", "180 kg", "↑ +10 kg");
-        adicionarItemPR("/images/Rectangle (5).png", "Levantamento Terra", "Alcançado em 08 Out 2025", "160 kg", "↑ +2 reps");
+        try {
+            List<WorkoutModels.ExercicioResposta> exercicios = apiClient.getList("/api/exercicios", new TypeReference<>() {});
+            for (WorkoutModels.ExercicioResposta exercicio : exercicios) {
+                if (exercicio.recordeCarga() != null) {
+                    adicionarItemPR(null, exercicio.nome(), "Recorde pessoal", exercicio.recordeCarga() + " kg", exercicio.totalVezesRealizado() + " sessões");
+                }
+            }
+        } catch (Exception erro) {
+            adicionarItemPR(null, "Sem dados", "Não foi possível carregar recordes", "—", "");
+        }
     }
 
     private void adicionarItemPR(String imagePath, String titulo, String data, String valorPR, String evolucao) {
@@ -90,6 +108,6 @@ public class PersonalRecordsController {
 
     @FXML
     private void handleVoltar() {
-        System.out.println("Voltar para Métricas do Exercício...");
+        navigationService.navegar("/fxml/metrics_hub_view.fxml");
     }
 }
