@@ -83,19 +83,19 @@ public class ListaDuplaTreinos<T extends TreinoComExercicios> {
     }
 
     public List<T> ordenarPorData() {
-        return ordenar(Comparator.comparing(TreinoHistorico::getDataRealizacao, Comparator.nullsLast(Comparator.naturalOrder())));
+        return ordenar(Comparator.comparing((T t) -> dataRealizacao(t), Comparator.nullsLast(Comparator.<LocalDateTime>naturalOrder())));
     }
 
     public List<T> ordenarPorCarga() {
-        return ordenar(Comparator.comparingDouble(this::maiorCarga).reversed());
+        return ordenar(Comparator.comparingDouble((T t) -> maiorCarga(t)).reversed());
     }
 
     public List<T> ordenarPorRepeticoes() {
-        return ordenar(Comparator.comparingInt(this::maiorNumeroRepeticoes).reversed());
+        return ordenar(Comparator.comparingInt((T t) -> maiorNumeroRepeticoes(t)).reversed());
     }
 
     public List<T> ordenarPorVolume() {
-        return ordenar(Comparator.comparingDouble(this::volumeTotal).reversed());
+        return ordenar(Comparator.comparingDouble((T t) -> volumeTotal(t)).reversed());
     }
 
     public List<T> obterExerciciosComAumentoDeCarga() {
@@ -132,6 +132,9 @@ public class ListaDuplaTreinos<T extends TreinoComExercicios> {
         return resultado;
     }
 
+    private LocalDateTime dataRealizacao(T treino) {
+        return treino instanceof TreinoHistorico historico ? historico.getDataRealizacao() : null;
+    }
     private double maiorCarga(T treino) { return maiorCarga(treino, null); }
     private double maiorCarga(T treino, Long exercicioId) {
         if (!(treino instanceof TreinoComSeries comSeries)) return 0;

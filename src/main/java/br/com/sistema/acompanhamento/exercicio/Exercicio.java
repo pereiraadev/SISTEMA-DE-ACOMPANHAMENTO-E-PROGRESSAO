@@ -18,6 +18,7 @@ public class Exercicio {
     @Column(name = "total_vezes_realizado", nullable = false) private Integer totalVezesRealizado = 0;
     public Long getId() { return id; }
     public String getNome() { return nome; }
+    public String getGrupoMuscular() { return grupoMuscular; }
     public boolean isAtivo() { return ativo; }
     public BigDecimal getRecordeCarga() { return recordeCarga; }
     public Integer getRecordeRepsParaCarga() { return recordeRepsParaCarga; }
