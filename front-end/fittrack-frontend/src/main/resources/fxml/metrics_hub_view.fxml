@@ -11,10 +11,17 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
 
-<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@/styles/metrics_hub.css" 
+<BorderPane prefHeight="720.0" prefWidth="380.0" 
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="com.fittrack.fittrack_frontend.controller.MetricsHubController">
+
+    <!-- IMPORTAÇÃO DOS ESTILOS DA TELA E DA NAVEGAÇÃO COMPARTILHADA -->
+    <stylesheets>
+        <URL value="@../styles/dashboard.css" />
+        <URL value="@../styles/metrics_hub.css" />
+    </stylesheets>
 
     <!-- CABEÇALHO COM MUDANÇA DE ABAS -->
     <top>
@@ -44,7 +51,7 @@
                     <!-- CAMPO DE BUSCA (VISÍVEL APENAS NA ABA EXERCÍCIOS) -->
                     <HBox fx:id="boxBusca" styleClass="search-box" alignment="CENTER_LEFT" spacing="10.0" visible="false" managed="false">
                         <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true">
-                            <Image url="@/icons/info.png" />
+                            <Image url="@../icons/info.png" />
                         </ImageView>
                         <TextField fx:id="inputBusca" promptText="Buscar exercício..." styleClass="search-input" HBox.hgrow="ALWAYS" />
                     </HBox>
@@ -54,7 +61,7 @@
 
                     <!-- LABEL INFORMATIVO NO RODAPÉ DA LISTA DE TREINOS -->
                     <HBox fx:id="boxRodapeTotal" alignment="CENTER" style="-fx-padding: 10px 0;" visible="false" managed="false">
-                        <Label fx:id="lblTotalRealizados" text="Total: 84 treinos realizados" style="-fx-text-fill: #777777; -fx-font-size: 13px;" />
+                        <Label fx:id="lblTotalRealizados" text="Total: 0 treinos realizados" style="-fx-text-fill: #777777; -fx-font-size: 13px;" />
                     </HBox>
 
                 </VBox>
@@ -65,26 +72,41 @@
     <!-- BARRA DE NAVEGAÇÃO INFERIOR FIXA -->
     <bottom>
         <HBox styleClass="bottom-nav" alignment="CENTER">
-            <VBox styleClass="nav-item" alignment="CENTER" spacing="4.0" HBox.hgrow="ALWAYS" onMouseClicked="#handleNavInicio">
-                <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
-                    <Image url="@/icons/info.png" />
-                </ImageView>
-                <Label text="Início" styleClass="nav-label" />
-            </VBox>
+            <!-- Aba Início -->
+            <Button styleClass="nav-button" style="-fx-background-color: transparent; -fx-cursor: hand;" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#handleNavInicio">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4.0">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
+                            <Image url="@../icons/home.png" />
+                        </ImageView>
+                        <Label text="Início" styleClass="nav-item-inactive" />
+                    </VBox>
+                </graphic>
+            </Button>
 
-            <VBox styleClass="nav-item" alignment="CENTER" spacing="4.0" HBox.hgrow="ALWAYS" onMouseClicked="#handleNavTreinos">
-                <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
-                    <Image url="@/icons/Frame.png" />
-                </ImageView>
-                <Label text="Treinos" styleClass="nav-label" />
-            </VBox>
+            <!-- Aba Treinos -->
+            <Button styleClass="nav-button" style="-fx-background-color: transparent; -fx-cursor: hand;" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#handleNavTreinos">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4.0">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
+                            <Image url="@../icons/dumbbell (1).png" />
+                        </ImageView>
+                        <Label text="Treinos" styleClass="nav-item-inactive" />
+                    </VBox>
+                </graphic>
+            </Button>
 
-            <VBox styleClass="nav-item" alignment="CENTER" spacing="4.0" HBox.hgrow="ALWAYS">
-                <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
-                    <Image url="@/icons/trophy.png" />
-                </ImageView>
-                <Label text="Métricas" styleClass="nav-label-active" />
-            </VBox>
+            <!-- Aba Métricas (Ativa) -->
+            <Button styleClass="nav-button" style="-fx-background-color: transparent; -fx-cursor: hand;" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4.0">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
+                            <Image url="@../icons/Vector.png" />
+                        </ImageView>
+                        <Label text="Métricas" styleClass="nav-item-active" />
+                    </VBox>
+                </graphic>
+            </Button>
         </HBox>
     </bottom>
 

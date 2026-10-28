@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@/styles/personal_records.css" 
+<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@../styles/personal_records.css" 
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="com.fittrack.fittrack_frontend.controller.PersonalRecordsController">
 
@@ -30,7 +30,7 @@
                 <Region HBox.hgrow="ALWAYS" />
                 <HBox styleClass="btn-icon-badge">
                     <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
-                        <Image url="@/icons/trophy.png" />
+                        <Image url="@../icons/trophy.png" />
                     </ImageView>
                 </HBox>
             </HBox>
@@ -62,14 +62,14 @@
                     <VBox styleClass="hero-card" spacing="8.0">
                         <HBox alignment="CENTER_LEFT" spacing="8.0">
                             <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
-                                <Image url="@/icons/trophy-large.png" />
+                                <Image url="@../icons/trophy.png" />
                             </ImageView>
                             <Label text="Maior Carga da História" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;" />
                         </HBox>
                         
-                        <Label text="AGACHAMENTO LIVRE" styleClass="hero-subtitle" />
-                        <Label text="180 kg" styleClass="hero-value" />
-                        <Label text="Alcançado em 15 Out 2025" style="-fx-text-fill: #777777; -fx-font-size: 12px;" />
+                        <Label fx:id="lblExercicioDestaque" text="EXERCÍCIO" styleClass="hero-subtitle" />
+                        <Label fx:id="lblMaiorCargaDestaque" text="0 kg" styleClass="hero-value" />
+                        <Label fx:id="lblDataDestaque" text="Recorde Histórico" style="-fx-text-fill: #777777; -fx-font-size: 12px;" />
                     </VBox>
 
                     <!-- GRID DE METRICAS RÁPIDAS (2x2) -->
@@ -83,12 +83,12 @@
                             <VBox styleClass="metric-card" spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                 <HBox alignment="CENTER_LEFT">
                                     <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
-                                        <Image url="@/icons/Frame.png" />
+                                        <Image url="@../icons/Frame.png" />
                                     </ImageView>
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Label text="PR" styleClass="badge-pr-tag" />
                                 </HBox>
-                                <Label text="180 kg" styleClass="metric-value" />
+                                <Label fx:id="lblMaiorCargaAbsoluta" text="0 kg" styleClass="metric-value" />
                                 <Label text="Maior Carga Absoluta" styleClass="metric-label" wrapText="true" />
                             </VBox>
 
@@ -96,12 +96,12 @@
                             <VBox styleClass="metric-card" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                 <HBox alignment="CENTER_LEFT">
                                     <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
-                                        <Image url="@/icons/trophy.png" />
+                                        <Image url="@../icons/trophy.png" />
                                     </ImageView>
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Label text="PR" styleClass="badge-pr-tag" />
                                 </HBox>
-                                <Label text="12.450 kg" styleClass="metric-value" />
+                                <Label fx:id="lblMaiorVolumeTreino" text="0 kg" styleClass="metric-value" />
                                 <Label text="Maior Volume em Treino" styleClass="metric-label" wrapText="true" />
                             </VBox>
 
@@ -109,12 +109,12 @@
                             <VBox styleClass="metric-card" spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                 <HBox alignment="CENTER_LEFT">
                                     <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
-                                        <Image url="@/icons/repeat.png" />
+                                        <Image url="@../icons/repeat-1.png" />
                                     </ImageView>
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Label text="PR" styleClass="badge-pr-tag" />
                                 </HBox>
-                                <Label text="100 kg × 15" styleClass="metric-value" />
+                                <Label fx:id="lblMaiorRepsSobCarga" text="—" styleClass="metric-value" />
                                 <Label text="Maior Reps sob Carga" styleClass="metric-label" wrapText="true" />
                             </VBox>
 
@@ -122,12 +122,12 @@
                             <VBox styleClass="metric-card" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                 <HBox alignment="CENTER_LEFT">
                                     <ImageView fitHeight="18.0" fitWidth="18.0" preserveRatio="true">
-                                        <Image url="@/icons/calendar.png" />
+                                        <Image url="@../icons/trending-up.png" />
                                     </ImageView>
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Label text="PR" styleClass="badge-pr-tag" />
                                 </HBox>
-                                <Label text="8 semanas" styleClass="metric-value" />
+                                <Label fx:id="lblMaiorFrequenciaSemanas" text="0 semanas" styleClass="metric-value" />
                                 <Label text="Maior Frequência Semanal" styleClass="metric-label" wrapText="true" />
                             </VBox>
                         </children>
@@ -138,7 +138,6 @@
                         <HBox alignment="CENTER_LEFT">
                             <Label text="PRs por Exercício" style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px; -fx-font-weight: bold;" />
                             <Region HBox.hgrow="ALWAYS" />
-                            <Label text="Ver todos" styleClass="section-link" />
                         </HBox>
 
                         <VBox fx:id="containerPRsExercício" spacing="10.0" />

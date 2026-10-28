@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@/styles/metrics_hub.css" 
+<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@../styles/metrics_hub.css" 
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="com.fittrack.fittrack_frontend.controller.GroupDetailController">
 
@@ -57,13 +57,13 @@
                                 <Region styleClass="donut-hole" maxWidth="110.0" maxHeight="110.0" />
 
                                 <VBox alignment="CENTER" spacing="0.0">
-                                    <Label fx:id="lblVolumeTotalFormatado" text="8.450" styleClass="donut-center-title" />
+                                    <Label fx:id="lblVolumeTotalFormatado" text="0" styleClass="donut-center-title" />
                                     <Label text="kg total" styleClass="donut-center-subtitle" />
                                 </VBox>
                             </StackPane>
                         </HBox>
 
-                        <!-- Legendas dinamicas geradas pelo Controller -->
+                        <!-- Legendas dinâmicas geradas pelo Controller -->
                         <GridPane fx:id="gridLegenda" hgap="12.0" vgap="8.0">
                             <columnConstraints>
                                 <ColumnConstraints percentWidth="50.0" />
@@ -87,12 +87,12 @@
                         <children>
                             <VBox styleClass="stat-kpi-card" spacing="4.0" GridPane.columnIndex="0">
                                 <Label text="Total de treinos" styleClass="card-subtitle" />
-                                <Label fx:id="lblTotalTreinos" text="18 realizados" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                                <Label fx:id="lblTotalTreinos" text="0 realizados" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
                             </VBox>
 
                             <VBox styleClass="stat-kpi-card" spacing="4.0" GridPane.columnIndex="1">
                                 <Label text="Média semanal" styleClass="card-subtitle" />
-                                <Label fx:id="lblMediaSemanal" text="2.1x frequência" style="-fx-text-fill: #43D61B; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                                <Label fx:id="lblMediaSemanal" text="0.0x frequência" style="-fx-text-fill: #43D61B; -fx-font-size: 18px; -fx-font-weight: bold;" />
                             </VBox>
                         </children>
                     </GridPane>
