@@ -11,11 +11,19 @@ import javafx.stage.Stage;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-
+/**
+ * Coordena o ciclo de vida da janela JavaFX e do contexto Spring Boot.
+ * O FXMLLoader usa o contexto para construir controllers com suas dependências injetadas.
+ */
 public class JavaFxApplication extends Application {
 
+    /** Contexto Spring mantido enquanto a janela principal estiver aberta. */
     private ConfigurableApplicationContext applicationContext;
 
+    /**
+     * Inicializa o contexto Spring antes de iniciar a thread da interface JavaFX.
+     * O NavigationManager recebe o mesmo contexto para carregar controllers nas próximas cenas.
+     */
     @Override
     public void init() {
         // Inicializa o contexto do Spring Boot
@@ -25,6 +33,12 @@ public class JavaFxApplication extends Application {
         NavigationManager.setApplicationContext(applicationContext);
     }
 
+    /**
+     * Carrega o FXML inicial, cria a Scene e configura a janela principal do FitTrack.
+     *
+     * @param stage janela primária fornecida pelo JavaFX
+     * @throws Exception propagada quando o FXML inicial não puder ser carregado
+     */
     @Override
     public void start(Stage stage) throws Exception {
         var resource = getClass().getResource("/fxml/dashboard_home_view.fxml");
@@ -48,6 +62,9 @@ public class JavaFxApplication extends Application {
         stage.show();
     }
 
+    /**
+     * Fecha o contexto Spring e encerra o runtime JavaFX ao terminar a aplicação.
+     */
     @Override
     public void stop() {
         if (this.applicationContext != null) {

@@ -25,47 +25,79 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Controla {@code exercise_details_view.fxml}, mostrando dados, recordes e evolução do exercício.
+ * A tela cria os cartões de histórico e o gráfico dinamicamente a partir do retorno da API.
+ */
 @Controller
 @Scope("prototype")
 public class ExerciseDetailsController {
 
+    /** Nome do exercício selecionado na tela anterior. */
     @FXML private Label lblNomeExercicio;
+    /** Grupo muscular exibido como rótulo localizado. */
     @FXML private Label lblGrupoMuscular;
+    /** Estado de disponibilidade do exercício. */
     @FXML private Label lblStatus;
+    /** Critério de ordenação atualmente aplicado ao histórico. */
     @FXML private Label lblFiltroAtual;
 
+    /** Maior carga registrada para este exercício. */
     @FXML private Label lblMaiorCarga;
+    /** Detalhe auxiliar do recorde de carga. */
     @FXML private Label lblMaiorCargaDet;
+    /** Repetições associadas ao recorde de carga. */
     @FXML private Label lblMaiorReps;
+    /** Detalhe auxiliar do recorde de repetições. */
     @FXML private Label lblMaiorRepsDet;
 
+    /** Gráfico de linha atualizado com a carga histórica em ordem cronológica. */
     @FXML private LineChart<String, Number> chartEvolucao;
+    /** Lista vertical reconstruída com os cartões do histórico filtrado. */
     @FXML private VBox containerHistorico;
 
     // Elementos do Bottom Sheet / Modal de Filtro
+    /** Sobreposição que abre e fecha o seletor de ordenação. */
     @FXML private StackPane modalOverlay;
+    /** Agrupa as opções para garantir uma única ordenação selecionada. */
     @FXML private ToggleGroup ordenacaoGroup;
+    /** Opção para exibir primeiro os registros mais recentes. */
     @FXML private RadioButton optRecentes;
+    /** Opção para exibir primeiro os registros mais antigos. */
     @FXML private RadioButton optAntigos;
+    /** Opção para ordenar pela maior carga. */
     @FXML private RadioButton optMaiorCarga;
+    /** Opção para ordenar pela menor carga. */
     @FXML private RadioButton optMenorCarga;
+    /** Opção para ordenar pela maior quantidade de repetições. */
     @FXML private RadioButton optMaisReps;
+    /** Opção para ordenar pela menor quantidade de repetições. */
     @FXML private RadioButton optMenosReps;
+    /** Opção para ordenar pelo maior volume. */
     @FXML private RadioButton optMaiorVolume;
+    /** Opção para ordenar pelo menor volume. */
     @FXML private RadioButton optMenorVolume;
 
+    /** Cliente REST para carregar o histórico do exercício selecionado. */
     private final PraticanteApiClient praticanteApiClient;
 
+    /** Identificador encaminhado para permitir que outras telas consultem a seleção atual. */
     private Long exercicioId;
     /** Histórico na ordem recebida da API (mais recente primeiro). */
     private final List<HistoricoExercicioItemDTO> historicoOriginal = new ArrayList<>();
     /** Histórico exibido (após ordenação escolhida no filtro). */
     private final List<HistoricoExercicioItemDTO> listaHistorico = new ArrayList<>();
 
+    /**
+     * Cria a tela com o cliente usado para buscar execuções históricas.
+     *
+     * @param praticanteApiClient cliente REST de dados do praticante
+     */
     public ExerciseDetailsController(PraticanteApiClient praticanteApiClient) {
         this.praticanteApiClient = praticanteApiClient;
     }
 
+    /** Limpa elementos dinâmicos e mantém o modal fechado ao carregar uma nova instância da view. */
     @FXML
     public void initialize() {
         if (containerHistorico != null) {
@@ -80,6 +112,8 @@ public class ExerciseDetailsController {
     /**
      * Exibe os dados do exercício (já conhecidos pelo ExercicioDTO) e busca na API o histórico
      * de execuções para a lista e o gráfico de evolução.
+     *
+     * @param exercicio exercício selecionado na navegação de origem
      */
     public void carregarDetalhesExercicio(ExercicioDTO exercicio) {
         if (exercicio == null) return;
@@ -108,6 +142,11 @@ public class ExerciseDetailsController {
                 erro -> FxAsync.exibirErro("Não foi possível carregar o histórico do exercício", erro));
     }
 
+    /**
+     * Substitui o estado local e refaz o gráfico em ordem temporal, mantendo a lista pronta para filtros.
+     *
+     * @param historico dados recebidos da API, ou lista vazia antes do carregamento
+     */
     private void aplicarHistorico(List<HistoricoExercicioItemDTO> historico) {
         historicoOriginal.clear();
         if (historico != null) historicoOriginal.addAll(historico);
@@ -131,6 +170,7 @@ public class ExerciseDetailsController {
         renderizarHistorico();
     }
 
+    /** Cria cards para o filtro atual; remove primeiro os filhos antigos para evitar duplicação. */
     private void renderizarHistorico() {
         if (containerHistorico == null) return;
         containerHistorico.getChildren().clear();
@@ -171,6 +211,7 @@ public class ExerciseDetailsController {
         }
     }
 
+    /** Relaciona o texto de evolução da API às classes CSS conhecidas pela folha de estilos. */
     private String obterCssClassParaStatus(String status) {
         String lower = status.toLowerCase();
         if (lower.contains("aumento") || lower.contains("carga")) {
@@ -185,6 +226,7 @@ public class ExerciseDetailsController {
 
     @FXML
     private void handleAbrirFiltro() {
+        // Evento de clique: marca overlay como visível e gerenciado para ocupar espaço no layout.
         if (modalOverlay != null) {
             modalOverlay.setManaged(true);
             modalOverlay.setVisible(true);
@@ -193,9 +235,11 @@ public class ExerciseDetailsController {
 
     @FXML
     private void handleFecharFiltro() {
+        // Botão/ação de cancelar fecha o bottom sheet sem alterar a ordenação aplicada.
         fecharModalFiltro();
     }
 
+    /** Altera visibilidade e managed em conjunto para não reservar espaço quando o modal está fechado. */
     private void fecharModalFiltro() {
         if (modalOverlay != null) {
             modalOverlay.setVisible(false);
@@ -205,6 +249,7 @@ public class ExerciseDetailsController {
 
     @FXML
     private void handleAplicarFiltro() {
+        // Lê o RadioButton selecionado, ordena uma cópia lógica da lista e atualiza os cards visíveis.
         if (ordenacaoGroup == null) {
             fecharModalFiltro();
             return;
@@ -245,11 +290,17 @@ public class ExerciseDetailsController {
 
     @FXML
     private void handleVoltar() {
+        // Retorna à tela de métricas; o FXML anterior é carregado pelo NavigationManager.
         if (containerHistorico != null) {
             NavigationManager.navegarPara(containerHistorico, "/fxml/metrics_hub_view.fxml");
         }
     }
 
+    /**
+     * Retorna o identificador do exercício atualmente exibido.
+     *
+     * @return chave do exercício ou {@code null} antes de receber os dados de navegação
+     */
     public Long getExercicioId() {
         return exercicioId;
     }

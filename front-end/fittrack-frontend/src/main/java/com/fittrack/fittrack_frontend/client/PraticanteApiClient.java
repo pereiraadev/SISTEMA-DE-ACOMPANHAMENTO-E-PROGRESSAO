@@ -18,19 +18,31 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 /**
- * Cliente HTTP das operações do Praticante: autenticação, estatísticas, catálogo de exercícios,
- * desempenho por grupo muscular e recordes pessoais.
- * Métodos bloqueantes: chame-os fora da JavaFX Application Thread (veja FxAsync).
+ * Cliente HTTP das operações do praticante, conectando as telas à API Spring Boot.
+ * As chamadas são bloqueantes; controllers devem executá-las por meio de {@link com.fittrack.fittrack_frontend.util.FxAsync}
+ * para manter livre a JavaFX Application Thread e apresentar falhas por feedback visual.
  */
 @Component
 public class PraticanteApiClient {
 
+    /** Cliente configurado com URL-base, serialização JSON e autenticação da sessão. */
     private final RestClient restClient;
 
+    /**
+     * Recebe o cliente HTTP configurado pelo contexto Spring.
+     *
+     * @param fitTrackRestClient cliente reutilizado nas operações de praticante
+     */
     public PraticanteApiClient(RestClient fitTrackRestClient) {
         this.restClient = fitTrackRestClient;
     }
 
+    /**
+     * Envia credenciais ao endpoint de login.
+     *
+     * @param dto e-mail e senha preenchidos na tela
+     * @return dados da sessão autenticada
+     */
     public AuthResponseDTO login(LoginDTO dto) {
         return ApiException.chamar(() -> restClient.post()
                 .uri("/api/auth/login")
@@ -40,6 +52,12 @@ public class PraticanteApiClient {
                 .body(AuthResponseDTO.class));
     }
 
+    /**
+     * Cria uma conta e recebe os dados de sessão retornados pela API.
+     *
+     * @param dto nome, e-mail e senha do cadastro
+     * @return dados do praticante autenticado após o cadastro
+     */
     public AuthResponseDTO cadastrar(CadastroDTO dto) {
         return ApiException.chamar(() -> restClient.post()
                 .uri("/api/auth/cadastro")
@@ -49,7 +67,12 @@ public class PraticanteApiClient {
                 .body(AuthResponseDTO.class));
     }
 
-    /** Praticante.consultarEstatisticasGerais(). */
+    /**
+     * Consulta os indicadores gerais exibidos no dashboard.
+     *
+     * @param praticanteId identificador do praticante
+     * @return estatísticas consolidadas
+     */
     public EstatisticasGeraisDTO buscarEstatisticasGerais(Long praticanteId) {
         return ApiException.chamar(() -> restClient.get()
                 .uri("/api/praticantes/{id}/estatisticas", praticanteId)
@@ -57,7 +80,12 @@ public class PraticanteApiClient {
                 .body(EstatisticasGeraisDTO.class));
     }
 
-    /** Praticante.obterExerciciosMaisRealizados(). */
+    /**
+     * Busca exercícios ordenados pela recorrência para os destaques da tela inicial.
+     *
+     * @param praticanteId identificador do praticante
+     * @return exercícios mais realizados
+     */
     public List<ExercicioDTO> listarExerciciosMaisRealizados(Long praticanteId) {
         return ApiException.chamar(() -> restClient.get()
                 .uri("/api/praticantes/{id}/exercicios/mais-realizados", praticanteId)
@@ -65,7 +93,12 @@ public class PraticanteApiClient {
                 .body(new ParameterizedTypeReference<List<ExercicioDTO>>() {}));
     }
 
-    /** Catálogo de exercícios ativos do praticante (aba "Exercícios"). */
+    /**
+     * Carrega o catálogo usado na aba de exercícios e nos filtros de métricas.
+     *
+     * @param praticanteId identificador do praticante
+     * @return exercícios disponíveis no catálogo
+     */
     public List<ExercicioDTO> listarExercicios(Long praticanteId) {
         return ApiException.chamar(() -> restClient.get()
                 .uri("/api/praticantes/{id}/exercicios", praticanteId)
@@ -73,7 +106,13 @@ public class PraticanteApiClient {
                 .body(new ParameterizedTypeReference<List<ExercicioDTO>>() {}));
     }
 
-    /** Exercicio.consultarHistoricoTreinos(): execuções passadas de um exercício. */
+    /**
+     * Obtém as execuções anteriores para compor histórico e gráfico de evolução.
+     *
+     * @param praticanteId identificador do praticante
+     * @param exercicioId identificador do exercício selecionado
+     * @return registros históricos do exercício
+     */
     public List<HistoricoExercicioItemDTO> listarHistoricoExercicio(Long praticanteId, Long exercicioId) {
         return ApiException.chamar(() -> restClient.get()
                 .uri("/api/praticantes/{id}/exercicios/{exercicioId}/historico", praticanteId, exercicioId)
@@ -81,7 +120,12 @@ public class PraticanteApiClient {
                 .body(new ParameterizedTypeReference<List<HistoricoExercicioItemDTO>>() {}));
     }
 
-    /** Aba "Grupos Musculares": um DesempenhoGrupoDTO por GrupoMuscularEnum. */
+    /**
+     * Obtém os indicadores de desempenho de cada grupo muscular.
+     *
+     * @param praticanteId identificador do praticante
+     * @return lista de métricas por grupo
+     */
     public List<DesempenhoGrupoDTO> listarDesempenhoGrupos(Long praticanteId) {
         return ApiException.chamar(() -> restClient.get()
                 .uri("/api/praticantes/{id}/metricas/grupos", praticanteId)
@@ -89,7 +133,13 @@ public class PraticanteApiClient {
                 .body(new ParameterizedTypeReference<List<DesempenhoGrupoDTO>>() {}));
     }
 
-    /** Detalhe de um grupo (PEITO, COSTAS, PERNAS, OMBROS, BRACOS). */
+    /**
+     * Carrega volumes por exercício e frequência mensal para um grupo muscular.
+     *
+     * @param praticanteId identificador do praticante
+     * @param grupoMuscular código do grupo solicitado
+     * @return dados detalhados do grupo
+     */
     public DetalheGrupoDTO buscarDetalheGrupo(Long praticanteId, String grupoMuscular) {
         return ApiException.chamar(() -> restClient.get()
                 .uri("/api/praticantes/{id}/metricas/grupos/{grupo}", praticanteId, grupoMuscular)
@@ -97,7 +147,12 @@ public class PraticanteApiClient {
                 .body(DetalheGrupoDTO.class));
     }
 
-    /** Hall da Fama: recordes pessoais sincronizados com os campos recorde_* de EXERCICIO. */
+    /**
+     * Consulta recordes agregados e recordes individuais para a tela Hall da Fama.
+     *
+     * @param praticanteId identificador do praticante
+     * @return recordes pessoais do praticante
+     */
     public RecordesPessoaisDTO buscarRecordesPessoais(Long praticanteId) {
         return ApiException.chamar(() -> restClient.get()
                 .uri("/api/praticantes/{id}/recordes", praticanteId)

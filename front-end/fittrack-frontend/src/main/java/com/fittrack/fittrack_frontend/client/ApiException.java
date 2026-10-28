@@ -6,14 +6,30 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
-/** Erro de comunicação com a API, com mensagem já pronta para exibir ao usuário. */
+/**
+ * Erro de integração que apresenta uma mensagem compreensível para a interface, preservando a causa.
+ * Centralizar a tradução evita que cada tela tenha de interpretar exceções específicas do cliente HTTP.
+ */
 public class ApiException extends RuntimeException {
 
+    /**
+     * Cria uma falha de API mantendo a exceção original para diagnóstico.
+     *
+     * @param mensagem descrição adequada para exibição ao usuário
+     * @param causa erro de transporte ou resposta que originou a falha
+     */
     public ApiException(String mensagem, Throwable causa) {
         super(mensagem, causa);
     }
 
-    /** Executa a chamada HTTP traduzindo as exceções do RestClient em ApiException. */
+    /**
+     * Executa uma operação REST e converte falhas do RestClient em mensagens uniformes.
+     *
+     * @param chamada operação HTTP a ser executada
+     * @param <T> tipo de resultado retornado pela operação
+     * @return valor devolvido pela chamada HTTP
+     * @throws ApiException quando o servidor retorna erro ou a comunicação falha
+     */
     static <T> T chamar(Supplier<T> chamada) {
         try {
             return chamada.get();

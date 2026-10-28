@@ -29,42 +29,72 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controla o hub de métricas em {@code metrics_hub_view.fxml}, alternando entre grupos,
+ * exercícios e treinos; cada aba recompõe os nós exibidos conforme os dados da API.
+ */
 @Controller
 @Scope("prototype")
 public class MetricsHubController {
 
+    /** Aba que apresenta o desempenho por grupo muscular. */
     @FXML private Button btnTabGrupos;
+    /** Aba que apresenta e permite filtrar o catálogo de exercícios. */
     @FXML private Button btnTabExercicios;
+    /** Aba que apresenta consistência e recorrência das fichas. */
     @FXML private Button btnTabTreinos;
 
+    /** Contêiner de busca exibido somente na aba de exercícios. */
     @FXML private HBox boxBusca;
+    /** Texto cujo binding de mudança dispara o filtro dos cards de exercício. */
     @FXML private TextField inputBusca;
+    /** Área central preenchida dinamicamente com os cards de cada aba. */
     @FXML private VBox containerCards;
+    /** Rodapé de total exibido na aba de treinos. */
     @FXML private HBox boxRodapeTotal;
+    /** Soma das sessões das fichas exibidas. */
     @FXML private Label lblTotalRealizados;
 
+    /** Aba atualmente selecionada, usada para escolher a rotina de renderização. */
     private enum AbaAtiva { GRUPOS, EXERCICIOS, TREINOS }
     private AbaAtiva abaAtivaAtual = AbaAtiva.GRUPOS;
 
+    /** Estado local dos dados de desempenho retornados para grupos. */
     private final List<DesempenhoGrupoDTO> listaGrupos = new ArrayList<>();
+    /** Catálogo local usado para filtrar sem repetir chamadas à API. */
     private final List<ExercicioDTO> listaExercicios = new ArrayList<>();
+    /** Métricas locais de consistência por ficha. */
     private final List<MetricaTreinoDTO> listaTreinos = new ArrayList<>();
 
+    /** Cliente REST para métricas e catálogo do praticante. */
     private final PraticanteApiClient praticanteApiClient;
+    /** Cliente REST para métricas de ficha de treino. */
     private final TreinoApiClient treinoApiClient;
 
+    /**
+     * Injeta os clientes usados para preencher as três abas.
+     *
+     * @param praticanteApiClient cliente de dados de praticante
+     * @param treinoApiClient cliente de dados de treino
+     */
     public MetricsHubController(PraticanteApiClient praticanteApiClient, TreinoApiClient treinoApiClient) {
         this.praticanteApiClient = praticanteApiClient;
         this.treinoApiClient = treinoApiClient;
     }
 
-    /** Dados das três abas, buscados de uma só vez fora da thread da interface. */
-    private record DadosMetricas(List<DesempenhoGrupoDTO> grupos,
-                                 List<ExercicioDTO> exercicios,
-                                 List<MetricaTreinoDTO> treinos) {}
+    /** Resposta agrupada para reduzir a coordenação entre chamadas assíncronas independentes. */
+    private record DadosMetricas(
+            /** Indicadores por grupo muscular. */
+            List<DesempenhoGrupoDTO> grupos,
+            /** Catálogo para a aba de exercícios. */
+            List<ExercicioDTO> exercicios,
+            /** Métricas de consistência de cada ficha. */
+            List<MetricaTreinoDTO> treinos) {}
 
+    /** Prepara a busca reativa e carrega os dados das abas fora da thread da interface. */
     @FXML
     public void initialize() {
+
         if (inputBusca != null) {
             inputBusca.textProperty().addListener((obs, oldVal, newVal) -> {
                 if (abaAtivaAtual == AbaAtiva.EXERCICIOS) {
@@ -75,7 +105,7 @@ public class MetricsHubController {
 
         if (containerCards != null) {
             containerCards.getChildren().clear();
-            exibirMensagemVazia("Carregando métricas...");
+        exibirMensagemVazia("Carregando métricas...");
         }
 
         Long praticanteId = MainController.getUsuarioLogadoId();
@@ -96,13 +126,22 @@ public class MetricsHubController {
                 });
     }
 
-    /** Permite que outras telas abram o hub já na aba desejada. */
+    /**
+     * Seleciona a aba de exercícios, por exemplo após uma ação de navegação do dashboard.
+     */
     public void selecionarAbaExercicios() { handleSelecionarTabExercicios(); }
 
+    /**
+     * Seleciona a aba de treinos, reutilizando a mesma lógica dos botões do FXML.
+     */
     public void selecionarAbaTreinos() { handleSelecionarTabTreinos(); }
 
     /**
-     * Injeta e atualiza os dados dinâmicos de métricas vindos da API Spring Boot.
+     * Substitui os dados locais e renderiza a aba atualmente selecionada.
+     *
+     * @param grupos métricas por grupo muscular
+     * @param exercicios catálogo de exercícios disponíveis
+     * @param treinos métricas de consistência por ficha
      */
     public void carregarMetricas(List<DesempenhoGrupoDTO> grupos,
                                  List<ExercicioDTO> exercicios,
@@ -125,6 +164,7 @@ public class MetricsHubController {
 
     @FXML
     private void handleSelecionarTabGrupos() {
+        // Evento de clique: atualiza o estado da aba e reconstrói os controles visíveis.
         abaAtivaAtual = AbaAtiva.GRUPOS;
         resetTabStyles();
         if (btnTabGrupos != null) btnTabGrupos.getStyleClass().setAll("button", "tab-button-active");
@@ -133,6 +173,7 @@ public class MetricsHubController {
 
     @FXML
     private void handleSelecionarTabExercicios() {
+        // A aba habilita busca por texto e reutiliza a lista em memória para filtrar em cada digitação.
         abaAtivaAtual = AbaAtiva.EXERCICIOS;
         resetTabStyles();
         if (btnTabExercicios != null) btnTabExercicios.getStyleClass().setAll("button", "tab-button-active");
@@ -141,12 +182,14 @@ public class MetricsHubController {
 
     @FXML
     private void handleSelecionarTabTreinos() {
+        // A aba exibe o rodapé com a soma de sessões além dos cartões individuais.
         abaAtivaAtual = AbaAtiva.TREINOS;
         resetTabStyles();
         if (btnTabTreinos != null) btnTabTreinos.getStyleClass().setAll("button", "tab-button-active");
         carregarTabTreinos();
     }
 
+    /** Remove o estilo ativo anterior e oculta controles específicos de outras abas. */
     private void resetTabStyles() {
         for (Button aba : new Button[] { btnTabGrupos, btnTabExercicios, btnTabTreinos }) {
             if (aba != null) aba.getStyleClass().setAll("button", "tab-button");
@@ -162,7 +205,7 @@ public class MetricsHubController {
         }
     }
 
-    // 1. ABA GRUPOS MUSCULARES
+    // Os cards são construídos em tempo de execução para representar apenas os dados da API.
     private void carregarTabGrupos() {
         if (containerCards == null) return;
         containerCards.getChildren().clear();
@@ -187,6 +230,7 @@ public class MetricsHubController {
         }
     }
 
+    /** Monta card clicável de grupo, incluindo ícone, volume semanal e indicação de variação. */
     private void adicionarCardGrupo(String iconPath, String titulo, String sub, String varVol, boolean positivo, Runnable onAction) {
         HBox card = new HBox(12.0);
         card.getStyleClass().add("metric-card-row");
@@ -213,7 +257,7 @@ public class MetricsHubController {
         containerCards.getChildren().add(card);
     }
 
-    // 2. ABA EXERCÍCIOS
+    // A área de busca acompanha a aba ativa e o listener de texto aciona a filtragem.
     private void carregarTabExercicios() {
         if (boxBusca != null) {
             boxBusca.setVisible(true);
@@ -223,6 +267,7 @@ public class MetricsHubController {
         filtrarERenderizarExercicios(termo);
     }
 
+    /** Filtra por nome ou rótulo muscular e substitui os cards visíveis com o resultado. */
     private void filtrarERenderizarExercicios(String termo) {
         if (containerCards == null) return;
         containerCards.getChildren().clear();
@@ -252,6 +297,7 @@ public class MetricsHubController {
         }
     }
 
+    /** Cria um card de exercício e associa seu clique à abertura do respectivo histórico. */
     private void adicionarCardExercicio(String titulo, String sub, String prText, Runnable onAction) {
         HBox card = new HBox(12.0);
         card.getStyleClass().add("metric-card-row");
@@ -276,7 +322,7 @@ public class MetricsHubController {
         containerCards.getChildren().add(card);
     }
 
-    // 3. ABA TREINOS
+    // A aba agrega consistência e número de sessões para fichas já utilizadas.
     private void carregarTabTreinos() {
         if (boxRodapeTotal != null) {
             boxRodapeTotal.setVisible(true);
@@ -311,6 +357,7 @@ public class MetricsHubController {
         }
     }
 
+    /** Monta o card de ficha, desenhando a barra proporcional ao percentual de consistência. */
     private void adicionarCardTreino(String titulo, String sub, String consistencia, int sessoes, Runnable onAction) {
         VBox card = new VBox(10.0);
         card.getStyleClass().add("metric-card-row");
@@ -375,6 +422,7 @@ public class MetricsHubController {
         containerCards.getChildren().add(card);
     }
 
+    /** Carrega um recurso de ícone para o card, dimensionado de forma consistente. */
     private ImageView carregarIconeCircular(String path) {
         ImageView img = new ImageView();
         img.setFitWidth(36.0);
@@ -386,16 +434,19 @@ public class MetricsHubController {
         return img;
     }
 
+    /** Resolve o ícone associado ao grupo ou usa o ícone padrão quando não houver correspondência. */
     private String obterIconeGrupo(String grupo) {
         return GrupoMuscularEnum.from(grupo).map(GrupoMuscularEnum::icone).orElse("/icons/Frame (1).png");
     }
 
+    /** Insere um rótulo de estado vazio no mesmo contêiner usado pelos cartões. */
     private void exibirMensagemVazia(String mensagem) {
         Label lbl = new Label(mensagem);
         lbl.setStyle("-fx-text-fill: #888888; -fx-font-size: 14px;");
         containerCards.getChildren().add(lbl);
     }
 
+    /** Navega para a tela do grupo e entrega o DTO selecionado ao controller recém-criado. */
     private void abrirDetalheGrupo(DesempenhoGrupoDTO grupo) {
         GroupDetailController controller = NavigationManager.navegarComController(containerCards, "/fxml/group_detail_view.fxml");
         if (controller != null && grupo != null) {
@@ -403,6 +454,7 @@ public class MetricsHubController {
         }
     }
 
+    /** Navega ao histórico do exercício e encaminha os dados já disponíveis no card. */
     private void abrirDetalheExercicio(ExercicioDTO ex) {
         ExerciseDetailsController controller = NavigationManager.navegarComController(containerCards, "/fxml/exercise_details_view.fxml");
         if (controller != null && ex != null) {
@@ -412,6 +464,7 @@ public class MetricsHubController {
 
     @FXML 
     private void handleNavInicio() { 
+        // O clique na navegação retorna ao dashboard inicial.
         if (containerCards != null) {
             NavigationManager.navegarPara(containerCards, "/fxml/dashboard_home_view.fxml"); 
         }
@@ -419,6 +472,7 @@ public class MetricsHubController {
 
     @FXML 
     private void handleNavTreinos() { 
+        // Mantém a tela e seleciona a aba Treinos em vez de carregar outra Scene.
         handleSelecionarTabTreinos();
     }
 }

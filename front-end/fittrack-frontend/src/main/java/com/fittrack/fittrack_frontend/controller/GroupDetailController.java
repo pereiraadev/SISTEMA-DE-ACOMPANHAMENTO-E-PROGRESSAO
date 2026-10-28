@@ -25,6 +25,10 @@ import javafx.scene.layout.VBox;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Controla a tela de detalhe de grupo muscular e monta gráficos de volume e frequência mensal.
+ * Os dados são solicitados após a navegação para que os gráficos reflitam o estado atual do praticante.
+ */
 @Controller
 @Scope("prototype")
 public class GroupDetailController {
@@ -33,21 +37,36 @@ public class GroupDetailController {
     private static final List<String> PALETA = List.of(
             "#43D61B", "#2E9BFF", "#FFB020", "#FF5C8A", "#A78BFA", "#22D3EE");
 
+    /** Nome localizado do grupo consultado. */
     @FXML private Label lblNomeGrupo;
+    /** Tag opcional que resume o foco do grupo. */
     @FXML private Label lblTagFoco;
+    /** Gráfico circular com o volume relativo por exercício. */
     @FXML private PieChart chartVolume;
+    /** Volume total acumulado formatado para leitura rápida. */
     @FXML private Label lblVolumeTotalFormatado;
+    /** Legenda de cores criada junto com os dados do gráfico. */
     @FXML private GridPane gridLegenda;
+    /** Contêiner das barras de frequência, construídas em tempo de execução. */
     @FXML private HBox containerBarrasFrequencia;
+    /** Total de treinos no período apresentado. */
     @FXML private Label lblTotalTreinos;
+    /** Frequência média derivada do total e dos meses retornados. */
     @FXML private Label lblMediaSemanal;
 
+    /** Cliente REST que fornece as métricas detalhadas por grupo muscular. */
     private final PraticanteApiClient praticanteApiClient;
 
+    /**
+     * Recebe o cliente que consulta dados de praticante e grupo.
+     *
+     * @param praticanteApiClient cliente REST de métricas
+     */
     public GroupDetailController(PraticanteApiClient praticanteApiClient) {
         this.praticanteApiClient = praticanteApiClient;
     }
 
+    /** Inicializa os gráficos vazios para evitar exibir dados residuais ao carregar a tela. */
     @FXML
     public void initialize() {
         if (chartVolume != null) chartVolume.getData().clear();
@@ -58,6 +77,8 @@ public class GroupDetailController {
     /**
      * Abre o detalhe a partir do card da aba "Grupos Musculares": mostra o nome imediatamente
      * e busca na API o volume por exercício e a frequência mensal.
+     *
+     * @param grupo resumo selecionado no hub de métricas
      */
     public void carregarGrupo(DesempenhoGrupoDTO grupo) {
         if (grupo == null) return;
@@ -74,7 +95,11 @@ public class GroupDetailController {
                 erro -> FxAsync.exibirErro("Não foi possível carregar o grupo muscular", erro));
     }
 
-    /** Calcula e renderiza as métricas do grupo com os dados reais da API. */
+    /**
+     * Atualiza os rótulos e delega a renderização dos dois conjuntos de métricas.
+     *
+     * @param detalhe dados detalhados retornados pela API
+     */
     public void carregarDetalhe(DetalheGrupoDTO detalhe) {
         if (detalhe == null) return;
 
@@ -87,6 +112,7 @@ public class GroupDetailController {
         renderizarFrequencia(detalhe.frequenciaMensal());
     }
 
+    /** Calcula o total e substitui os dados do gráfico/legenda com nós JavaFX criados sob demanda. */
     private void renderizarVolume(List<VolumeExercicioDTO> exercicios) {
         double volumeTotal = 0.0;
         if (exercicios != null) {
@@ -142,6 +168,7 @@ public class GroupDetailController {
         }
     }
 
+    /** Redimensiona cada barra em relação ao maior mês e atualiza os totais textuais. */
     private void renderizarFrequencia(List<FrequenciaMesDTO> frequencias) {
         if (containerBarrasFrequencia != null) containerBarrasFrequencia.getChildren().clear();
 
@@ -187,12 +214,14 @@ public class GroupDetailController {
         }
     }
 
+    /** Interpreta valor ausente como zero para que a soma e o gráfico permaneçam renderizáveis. */
     private static double valor(Double v) {
         return v != null ? v : 0.0;
     }
 
     @FXML
     private void handleVoltar() {
+        // O clique retorna ao hub de métricas, usando um controle injetado para encontrar o Stage.
         if (lblNomeGrupo != null) {
             NavigationManager.navegarPara(lblNomeGrupo, "/fxml/metrics_hub_view.fxml");
         }

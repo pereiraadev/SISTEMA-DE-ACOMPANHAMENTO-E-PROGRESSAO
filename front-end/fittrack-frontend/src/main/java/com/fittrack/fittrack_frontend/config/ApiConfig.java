@@ -9,10 +9,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
-/** Configura o RestClient usado por todos os clientes HTTP do front-end. */
+/**
+ * Configura o cliente HTTP compartilhado pelos clientes REST do front-end.
+ * A configuração centraliza URL, formato JSON e o envio do token da sessão ativa.
+ */
 @Configuration
 public class ApiConfig {
 
+    /**
+     * Cria o RestClient base da integração com a API Spring Boot.
+     *
+     * @param baseUrl URL da API fornecida pela configuração da aplicação
+     * @return cliente configurado para respostas JSON e autenticação Bearer
+     */
     @Bean
     public RestClient fitTrackRestClient(@Value("${fittrack.api.base-url}") String baseUrl) {
         return RestClient.builder()

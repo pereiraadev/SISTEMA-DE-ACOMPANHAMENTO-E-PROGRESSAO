@@ -22,30 +22,54 @@ import javafx.scene.layout.VBox;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Controla o dashboard inicial em {@code dashboard_home_view.fxml}, com resumo do praticante,
+ * exercícios mais realizados e entrada para a sessão de treino do dia.
+ */
 @Controller
 @Scope("prototype")
 public class DashboardHomeController {
 
+    /** Saudação personalizada do praticante autenticado. */
     @FXML private Label lblNomeUsuario;
+    /** Indicador de sessões contabilizadas no histórico. */
     @FXML private Label lblTotalTreinos;
+    /** Indicador de exercícios realizados. */
     @FXML private Label lblTotalExercicios;
+    /** Indicador de séries registradas. */
     @FXML private Label lblTotalSeries;
+    /** Volume acumulado apresentado em quilogramas. */
     @FXML private Label lblVolumeTotal;
 
+    /** Botão de início da sessão do dia; também serve como nó para navegação. */
     @FXML private Button btnIniciarTreino;
+    /** Área horizontal preenchida com cards de exercícios em tempo de execução. */
     @FXML private HBox containerExerciciosMaisRealizados;
 
+    /** Cliente das operações de sessão de treino. */
     private final TreinoApiClient treinoApiClient;
+    /** Cliente das consultas de estatísticas e exercícios. */
     private final PraticanteApiClient praticanteApiClient;
 
+    /**
+     * Injeta os clientes usados pelo dashboard para carregar resumo e sessão diária.
+     *
+     * @param treinoApiClient cliente de sessões de treino
+     * @param praticanteApiClient cliente de dados do praticante
+     */
     public DashboardHomeController(TreinoApiClient treinoApiClient, PraticanteApiClient praticanteApiClient) {
         this.treinoApiClient = treinoApiClient;
         this.praticanteApiClient = praticanteApiClient;
     }
 
-    /** Pacote de dados do dashboard buscado de uma só vez fora da thread da interface. */
-    private record DadosDashboard(EstatisticasGeraisDTO stats, List<ExercicioDTO> maisRealizados) {}
+    /** Dados do dashboard buscados conjuntamente fora da thread da interface. */
+    private record DadosDashboard(
+            /** Indicadores consolidados para os cartões do dashboard. */
+            EstatisticasGeraisDTO stats,
+            /** Exercícios que serão exibidos como destaques. */
+            List<ExercicioDTO> maisRealizados) {}
 
+    /** Limpa os nós antigos e inicia o carregamento assíncrono após o FXMLLoader injetar os componentes. */
     @FXML
     public void initialize() {
         if (containerExerciciosMaisRealizados != null) {
@@ -67,7 +91,13 @@ public class DashboardHomeController {
                 });
     }
 
-    /** Exibe os dados reais recebidos da API Spring Boot. */
+    /**
+     * Atualiza os rótulos e cards com dados retornados pela API.
+     *
+     * @param nomeUsuario nome apresentado na saudação
+     * @param stats estatísticas consolidadas; pode ser nulo em uma falha parcial
+     * @param exerciciosMaisRealizados lista dos exercícios destacados
+     */
     public void carregarDadosDashboard(String nomeUsuario, EstatisticasGeraisDTO stats, List<ExercicioDTO> exerciciosMaisRealizados) {
         if (lblNomeUsuario != null && nomeUsuario != null && !nomeUsuario.isBlank()) {
             lblNomeUsuario.setText("Olá, " + nomeUsuario + " 👋");
@@ -83,6 +113,7 @@ public class DashboardHomeController {
         renderizarExerciciosMaisRealizados(exerciciosMaisRealizados);
     }
 
+    /** Recria os cards JavaFX com os exercícios e instala o evento de clique de cada card. */
     private void renderizarExerciciosMaisRealizados(List<ExercicioDTO> exercicios) {
         if (containerExerciciosMaisRealizados == null) return;
         containerExerciciosMaisRealizados.getChildren().clear();
@@ -115,6 +146,7 @@ public class DashboardHomeController {
 
     @FXML
     private void handleIniciarTreinoDoDia() {
+        // O clique valida a sessão local antes de pedir à API para criar ou retomar o treino.
         Long usuarioLogadoId = MainController.getUsuarioLogadoId();
         if (usuarioLogadoId == null) {
             FxAsync.exibirAviso("Sessão expirada", "Faça login novamente para iniciar o treino.");
@@ -137,6 +169,7 @@ public class DashboardHomeController {
                 });
     }
 
+    /** Valida se há itens executáveis, navega e passa o DTO carregado ao controller de destino. */
     private void abrirTreinoAtivo(Button origem, TreinoAtivoDTO treino) {
         if (treino == null || treino.itens() == null || treino.itens().isEmpty()) {
             FxAsync.exibirAviso("Treino do dia", "Nenhum treino com exercícios foi encontrado para hoje.");
@@ -152,12 +185,14 @@ public class DashboardHomeController {
 
     @FXML
     private void handleVerTodosExercicios() {
+        // Navega para o hub e seleciona a aba correspondente no controller recém-carregado.
         MetricsHubController controller =
                 NavigationManager.navegarComController(getNoReferencia(), "/fxml/metrics_hub_view.fxml");
         if (controller != null) controller.selecionarAbaExercicios();
     }
 
     private void handleVerDetalhesExercicio(ExercicioDTO exercicio) {
+        // O card encaminha o exercício selecionado à tela de histórico, sem nova busca por identidade.
         if (exercicio == null) return;
         ExerciseDetailsController controller =
                 NavigationManager.navegarComController(getNoReferencia(), "/fxml/exercise_details_view.fxml");
@@ -166,11 +201,12 @@ public class DashboardHomeController {
 
     @FXML
     private void handleNavInicio() {
-        // Já se encontra na tela inicial (Home)
+        // A ação de navegação não altera a Scene porque esta já é a tela inicial.
     }
 
     @FXML
     private void handleNavTreinos() {
+        // Abre a aba Treinos do hub, preservando a intenção expressa pelo item da navegação.
         MetricsHubController controller =
                 NavigationManager.navegarComController(getNoReferencia(), "/fxml/metrics_hub_view.fxml");
         if (controller != null) controller.selecionarAbaTreinos();
@@ -178,9 +214,11 @@ public class DashboardHomeController {
 
     @FXML
     private void handleNavMetricas() {
+        // Acessa o hub de métricas com a aba padrão configurada pelo seu controller.
         NavigationManager.navegarPara(getNoReferencia(), "/fxml/metrics_hub_view.fxml");
     }
 
+    /** Fornece um nó da cena atual para a troca de Scene centralizada no NavigationManager. */
     private Button getNoReferencia() {
         return (btnIniciarTreino != null) ? btnIniciarTreino : new Button();
     }

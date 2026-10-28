@@ -20,30 +20,55 @@ import java.util.function.Supplier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Controla as telas de entrada e cadastro definidas em {@code auth_view.fxml}.
+ * Alterna os modos do formulário, valida os campos e delega autenticação à API sem bloquear a UI.
+ */
 @Controller
 @Scope("prototype")
 public class AuthController {
 
+    /** Aba que ativa o formulário de login. */
     @FXML private Button btnTabEntrar;
+    /** Aba que ativa o formulário de criação de conta. */
     @FXML private Button btnTabCadastrar;
+    /** Contêiner do nome, visível apenas durante o cadastro. */
     @FXML private VBox boxNome;
+    /** Campo do nome completo para cadastro. */
     @FXML private TextField txtNome;
+    /** Campo de e-mail usado tanto no login quanto no cadastro. */
     @FXML private TextField txtEmail;
+    /** Campo de senha mascarado. */
     @FXML private PasswordField txtSenhaOculta;
+    /** Campo alternativo de senha em texto para a opção de visualização. */
     @FXML private TextField txtSenhaVisivel;
+    /** Botão que submete o formulário conforme o modo ativo. */
     @FXML private Button btnAcaoPrincipal;
+    /** Texto contextual do rodapé que oferece a troca de modo. */
     @FXML private Text lblRodapeTexto;
+    /** Rótulo clicável do rodapé para alternar login/cadastro. */
     @FXML private Text lblRodapeLink;
 
+    /** Define qual conjunto de campos e qual endpoint serão usados no envio. */
     private boolean modoCadastro = true;
+    /** Controla qual dos campos de senha é apresentado. */
     private boolean senhaVisivel = false;
 
+    /** Cliente responsável pelos endpoints de login e cadastro. */
     private final PraticanteApiClient praticanteApiClient;
 
+    /**
+     * Cria o controller com o cliente de autenticação fornecido pelo Spring.
+     *
+     * @param praticanteApiClient cliente REST de operações do praticante
+     */
     public AuthController(PraticanteApiClient praticanteApiClient) {
         this.praticanteApiClient = praticanteApiClient;
     }
 
+    /**
+     * Configura bindings entre campos de senha e atualiza os rótulos iniciais após o carregamento FXML.
+     */
     @FXML
     public void initialize() {
         if (txtSenhaOculta != null && txtSenhaVisivel != null) {
@@ -55,6 +80,7 @@ public class AuthController {
 
     @FXML
     private void toggleMostrarSenha() {
+        // A troca de visibilidade conserva o valor porque os campos compartilham um binding bidirecional.
         senhaVisivel = !senhaVisivel;
         if (txtSenhaOculta != null) txtSenhaOculta.setVisible(!senhaVisivel);
         if (txtSenhaVisivel != null) txtSenhaVisivel.setVisible(senhaVisivel);
@@ -62,18 +88,21 @@ public class AuthController {
 
     @FXML
     private void handleSwitchToEntrar() {
+        // Evento de clique na aba Entrar: troca o estado e redesenha os elementos vinculados ao modo.
         modoCadastro = false;
         atualizarInterface();
     }
 
     @FXML
     private void handleSwitchToCadastrar() {
+        // Evento de clique na aba Cadastrar: mostra o campo adicional de nome.
         modoCadastro = true;
         atualizarInterface();
     }
 
     @FXML
     private void handleAlternarModo() {
+        // Link de rodapé alterna entre os dois formulários sem descartar os valores digitados.
         modoCadastro = !modoCadastro;
         atualizarInterface();
     }
@@ -81,6 +110,7 @@ public class AuthController {
 
     @FXML
     private void handleAcaoPrincipal() {
+        // Evento de submissão do formulário: valida entradas localmente antes de construir o DTO.
         String email = (txtEmail != null && txtEmail.getText() != null) ? txtEmail.getText().trim() : "";
         String senha = getSenhaDigitada();
 
@@ -89,6 +119,7 @@ public class AuthController {
             return;
         }
 
+        // O modo determina o payload e endpoint; ambos retornam o mesmo formato de sessão.
         Supplier<AuthResponseDTO> chamada;
         if (modoCadastro) {
             String nome = (txtNome != null && txtNome.getText() != null) ? txtNome.getText().trim() : "";
@@ -103,6 +134,7 @@ public class AuthController {
             chamada = () -> praticanteApiClient.login(loginDTO);
         }
 
+        // Evita submissões repetidas enquanto a chamada de rede está em andamento.
         btnAcaoPrincipal.setDisable(true);
         FxAsync.executar(
                 chamada,
@@ -122,6 +154,7 @@ public class AuthController {
                 });
     }
 
+    /** Devolve o conteúdo do campo que está visível, mantendo o formulário independente do modo visual. */
     private String getSenhaDigitada() {
         if (senhaVisivel && txtSenhaVisivel != null && txtSenhaVisivel.getText() != null) {
             return txtSenhaVisivel.getText().trim();
@@ -131,6 +164,10 @@ public class AuthController {
         return "";
     }
 
+    /**
+     * Sincroniza visibilidade, textos e classes CSS com o modo de autenticação atual.
+     * {@code managed} também retira o campo de nome do cálculo de layout quando ele não é aplicável.
+     */
     private void atualizarInterface() {
         if (modoCadastro) {
             if (btnTabCadastrar != null) btnTabCadastrar.getStyleClass().setAll("tab-button-active");
@@ -160,6 +197,7 @@ public class AuthController {
         }
     }
 
+    /** Exibe validações locais em uma caixa modal antes de iniciar uma requisição REST. */
     private void exibirAlerta(String titulo, String mensagem) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(titulo);
@@ -170,6 +208,7 @@ public class AuthController {
 
     @FXML
     private void handleLimparCampos() {
+        // Evento de cancelamento/limpeza: remove dados transitórios do formulário visível e oculto.
         if (txtNome != null) txtNome.clear();
         if (txtEmail != null) txtEmail.clear();
         if (txtSenhaOculta != null) txtSenhaOculta.clear();

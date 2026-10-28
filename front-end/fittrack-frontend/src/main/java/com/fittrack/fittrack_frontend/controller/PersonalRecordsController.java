@@ -21,27 +21,46 @@ import org.springframework.stereotype.Controller;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Controla {@code personal_records_view.fxml}, apresentando recordes agregados e por exercício.
+ * Cada cartão pode encaminhar o exercício selecionado à tela de histórico detalhado.
+ */
 @Controller
 @Scope("prototype")
 public class PersonalRecordsController {
 
+    /** Maior carga usada como destaque principal. */
     @FXML private Label lblMaiorCargaDestaque;
+    /** Nome do exercício associado ao recorde principal. */
     @FXML private Label lblExercicioDestaque;
+    /** Rótulo de data do destaque, se fornecido pela view. */
     @FXML private Label lblDataDestaque;
 
+    /** Maior carga absoluta em qualquer exercício. */
     @FXML private Label lblMaiorCargaAbsoluta;
+    /** Maior volume acumulado em um treino. */
     @FXML private Label lblMaiorVolumeTreino;
+    /** Maior combinação de carga e repetições. */
     @FXML private Label lblMaiorRepsSobCarga;
+    /** Maior sequência de semanas com frequência de treino. */
     @FXML private Label lblMaiorFrequenciaSemanas;
 
+    /** Contêiner preenchido com os cartões de recorde por exercício. */
     @FXML private VBox containerPRsExercicio;
 
+    /** Cliente que consulta os recordes do praticante autenticado. */
     private final PraticanteApiClient praticanteApiClient;
 
+    /**
+     * Cria a tela com acesso às operações de recordes da API.
+     *
+     * @param praticanteApiClient cliente REST do praticante
+     */
     public PersonalRecordsController(PraticanteApiClient praticanteApiClient) {
         this.praticanteApiClient = praticanteApiClient;
     }
 
+    /** Limpa cards antigos e inicia a busca assíncrona de recordes após carregar a view. */
     @FXML
     public void initialize() {
         limparContainers();
@@ -55,12 +74,15 @@ public class PersonalRecordsController {
                 erro -> FxAsync.exibirErro("Não foi possível carregar os recordes pessoais", erro));
     }
 
+    /** Remove nós gerados anteriormente antes de exibir uma nova resposta da API. */
     private void limparContainers() {
         if (containerPRsExercicio != null) containerPRsExercicio.getChildren().clear();
     }
 
     /**
      * Injeta e exibe os dados reais do Hall da Fama / Recordes Pessoais trazidos da API Spring Boot.
+     *
+     * @param recordes recordes agregados e individuais do praticante
      */
     public void carregarRecordesPessoais(RecordesPessoaisDTO recordes) {
         limparContainers();
@@ -100,6 +122,7 @@ public class PersonalRecordsController {
         }
     }
 
+    /** Converte cada recorde por exercício em um cartão interativo JavaFX. */
     private void renderizarListaPRs(List<ExercicioDTO> exercicios) {
         for (ExercicioDTO ex : exercicios) {
             String imagePath = obterCaminhoImagemExercicio(ex.nome());
@@ -112,6 +135,7 @@ public class PersonalRecordsController {
         }
     }
 
+    /** Monta e estiliza o cartão com imagem, título, valor do recorde e atalho para detalhes. */
     private void adicionarItemPR(String imagePath, String titulo, String data, String valorPR, String evolucao, ExercicioDTO exercicio) {
         HBox card = new HBox(12.0);
         card.getStyleClass().add("exercise-pr-card");
@@ -184,6 +208,7 @@ public class PersonalRecordsController {
         }
     }
 
+    /** Escolhe um recurso ilustrativo para o nome do exercício, com imagem padrão para os demais. */
     private String obterCaminhoImagemExercicio(String nomeExercicio) {
         if (nomeExercicio == null) return "/images/Rectangle (4).png";
         
@@ -197,6 +222,7 @@ public class PersonalRecordsController {
         }
     }
 
+    /** Navega para o histórico e fornece ao controller de destino o exercício selecionado. */
     private void abrirDetalheExercicio(ExercicioDTO exercicio) {
         if (containerPRsExercicio != null) {
             ExerciseDetailsController controller = NavigationManager.navegarComController(containerPRsExercicio, "/fxml/exercise_details_view.fxml");
@@ -206,6 +232,7 @@ public class PersonalRecordsController {
         }
     }
 
+    /** Exibe estado vazio quando a API não retorna recordes individuais. */
     private void exibirMensagemVazia() {
         Label lblVazio = new Label("Nenhum recorde pessoal registrado ainda.");
         lblVazio.setStyle("-fx-text-fill: #888888; -fx-font-size: 14px;");
@@ -215,6 +242,7 @@ public class PersonalRecordsController {
 
     @FXML
     private void handleVoltar() {
+        // O evento retorna à área de métricas sem descartar a sessão autenticada.
         if (containerPRsExercicio != null) {
             NavigationManager.navegarPara(containerPRsExercicio, "/fxml/metrics_hub_view.fxml");
         }
