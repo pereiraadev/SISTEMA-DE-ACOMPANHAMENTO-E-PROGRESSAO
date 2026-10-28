@@ -1,7 +1,9 @@
 package com.fittrack.fittrack_frontend.controller;
 
+import com.fittrack.fittrack_frontend.client.PraticanteApiClient;
 import com.fittrack.fittrack_frontend.dto.ExercicioDTO;
 import com.fittrack.fittrack_frontend.dto.RecordesPessoaisDTO;
+import com.fittrack.fittrack_frontend.util.FxAsync;
 import com.fittrack.fittrack_frontend.util.NavigationManager;
 
 import javafx.fxml.FXML;
@@ -13,12 +15,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import java.io.InputStream;
 import java.util.List;
 
 @Controller
+@Scope("prototype")
 public class PersonalRecordsController {
 
     @FXML private Label lblMaiorCargaDestaque;
@@ -30,16 +34,28 @@ public class PersonalRecordsController {
     @FXML private Label lblMaiorRepsSobCarga;
     @FXML private Label lblMaiorFrequenciaSemanas;
 
-    @FXML private VBox containerPRsExercício;
-    @FXML private VBox containerPRsExercicio; // Suporte a variação de ID sem acento no FXML
+    @FXML private VBox containerPRsExercicio;
+
+    private final PraticanteApiClient praticanteApiClient;
+
+    public PersonalRecordsController(PraticanteApiClient praticanteApiClient) {
+        this.praticanteApiClient = praticanteApiClient;
+    }
 
     @FXML
     public void initialize() {
         limparContainers();
+
+        Long praticanteId = MainController.getUsuarioLogadoId();
+        if (praticanteId == null) return;
+
+        FxAsync.executar(
+                () -> praticanteApiClient.buscarRecordesPessoais(praticanteId),
+                this::carregarRecordesPessoais,
+                erro -> FxAsync.exibirErro("Não foi possível carregar os recordes pessoais", erro));
     }
 
     private void limparContainers() {
-        if (containerPRsExercício != null) containerPRsExercício.getChildren().clear();
         if (containerPRsExercicio != null) containerPRsExercicio.getChildren().clear();
     }
 
@@ -163,9 +179,7 @@ public class PersonalRecordsController {
         card.getChildren().addAll(imgView, info, valorBox);
 
         // Adiciona ao container presente no FXML
-        if (containerPRsExercício != null) {
-            containerPRsExercício.getChildren().add(card);
-        } else if (containerPRsExercicio != null) {
+        if (containerPRsExercicio != null) {
             containerPRsExercicio.getChildren().add(card);
         }
     }
@@ -184,11 +198,10 @@ public class PersonalRecordsController {
     }
 
     private void abrirDetalheExercicio(ExercicioDTO exercicio) {
-        VBox refContainer = containerPRsExercício != null ? containerPRsExercício : containerPRsExercicio;
-        if (refContainer != null) {
-            ExerciseDetailsController controller = NavigationManager.navegarComController(refContainer, "/fxml/exercise_details_view.fxml");
+        if (containerPRsExercicio != null) {
+            ExerciseDetailsController controller = NavigationManager.navegarComController(containerPRsExercicio, "/fxml/exercise_details_view.fxml");
             if (controller != null && exercicio != null) {
-                controller.carregarDetalhesExercicio(exercicio, List.of(), null);
+                controller.carregarDetalhesExercicio(exercicio);
             }
         }
     }
@@ -197,15 +210,13 @@ public class PersonalRecordsController {
         Label lblVazio = new Label("Nenhum recorde pessoal registrado ainda.");
         lblVazio.setStyle("-fx-text-fill: #888888; -fx-font-size: 14px;");
         
-        if (containerPRsExercício != null) containerPRsExercício.getChildren().add(lblVazio);
-        else if (containerPRsExercicio != null) containerPRsExercicio.getChildren().add(lblVazio);
+        if (containerPRsExercicio != null) containerPRsExercicio.getChildren().add(lblVazio);
     }
 
     @FXML
     private void handleVoltar() {
-        VBox refContainer = containerPRsExercício != null ? containerPRsExercício : containerPRsExercicio;
-        if (refContainer != null) {
-            NavigationManager.navegarPara(refContainer, "/fxml/metrics_hub_view.fxml");
+        if (containerPRsExercicio != null) {
+            NavigationManager.navegarPara(containerPRsExercicio, "/fxml/metrics_hub_view.fxml");
         }
     }
 }

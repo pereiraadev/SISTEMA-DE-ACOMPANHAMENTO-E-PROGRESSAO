@@ -1,7 +1,10 @@
 package com.fittrack.fittrack_frontend.controller;
 
+import com.fittrack.fittrack_frontend.client.PraticanteApiClient;
 import com.fittrack.fittrack_frontend.dto.ExercicioDTO;
+import com.fittrack.fittrack_frontend.dto.GrupoMuscularEnum;
 import com.fittrack.fittrack_frontend.dto.HistoricoExercicioItemDTO;
+import com.fittrack.fittrack_frontend.util.FxAsync;
 import com.fittrack.fittrack_frontend.util.NavigationManager;
 
 import javafx.fxml.FXML;
@@ -15,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
@@ -22,10 +26,10 @@ import java.util.Collections;
 import java.util.List;
 
 @Controller
+@Scope("prototype")
 public class ExerciseDetailsController {
 
     @FXML private Label lblNomeExercicio;
-    @FXML private Label lblNomeExercício; // Suporte a variação com acento no FXML
     @FXML private Label lblGrupoMuscular;
     @FXML private Label lblStatus;
     @FXML private Label lblFiltroAtual;
@@ -50,8 +54,17 @@ public class ExerciseDetailsController {
     @FXML private RadioButton optMaiorVolume;
     @FXML private RadioButton optMenorVolume;
 
+    private final PraticanteApiClient praticanteApiClient;
+
     private Long exercicioId;
+    /** Histórico na ordem recebida da API (mais recente primeiro). */
+    private final List<HistoricoExercicioItemDTO> historicoOriginal = new ArrayList<>();
+    /** Histórico exibido (após ordenação escolhida no filtro). */
     private final List<HistoricoExercicioItemDTO> listaHistorico = new ArrayList<>();
+
+    public ExerciseDetailsController(PraticanteApiClient praticanteApiClient) {
+        this.praticanteApiClient = praticanteApiClient;
+    }
 
     @FXML
     public void initialize() {
@@ -65,46 +78,54 @@ public class ExerciseDetailsController {
     }
 
     /**
-     * Injeta os dados do exercício e seu histórico temporal de execuções trazidos da API Spring Boot.
+     * Exibe os dados do exercício (já conhecidos pelo ExercicioDTO) e busca na API o histórico
+     * de execuções para a lista e o gráfico de evolução.
      */
-    public void carregarDetalhesExercicio(ExercicioDTO exercicio, List<HistoricoExercicioItemDTO> historico, XYChart.Series<String, Number> dadosGrafico) {
-        if (exercicio != null) {
-            this.exercicioId = exercicio.id();
+    public void carregarDetalhesExercicio(ExercicioDTO exercicio) {
+        if (exercicio == null) return;
+        this.exercicioId = exercicio.id();
 
-            String nome = exercicio.nome();
-            if (lblNomeExercicio != null) lblNomeExercicio.setText(nome);
-            if (lblNomeExercício != null) lblNomeExercício.setText(nome);
+        if (lblNomeExercicio != null) lblNomeExercicio.setText(exercicio.nome());
+        if (lblGrupoMuscular != null) lblGrupoMuscular.setText(GrupoMuscularEnum.rotuloDe(exercicio.grupoMuscular()));
+        if (lblStatus != null) lblStatus.setText(Boolean.FALSE.equals(exercicio.ativo()) ? "Inativo" : "Ativo");
 
-            if (lblGrupoMuscular != null) {
-                lblGrupoMuscular.setText(exercicio.grupoMuscular() != null ? exercicio.grupoMuscular() : "Geral");
-            }
-
-            if (lblStatus != null) {
-                lblStatus.setText(exercicio.ativo() ? "Ativo" : "Inativo");
-            }
-
-            // Mapeamento dos Recordes Pessoais (PRs) do Exercício
-            if (lblMaiorCarga != null && exercicio.recordeCarga() != null) {
-                lblMaiorCarga.setText(String.format("%.0f kg", exercicio.recordeCarga()));
-            }
-
-            if (lblMaiorReps != null && exercicio.recordeRepsParaCarga() != null) {
-                lblMaiorReps.setText(exercicio.recordeRepsParaCarga() + " reps");
-            }
+        // Recordes pessoais (campos recorde_* de EXERCICIO)
+        if (lblMaiorCarga != null && exercicio.recordeCarga() != null) {
+            lblMaiorCarga.setText(String.format("%.0f kg", exercicio.recordeCarga()));
+        }
+        if (lblMaiorReps != null && exercicio.recordeRepsParaCarga() != null) {
+            lblMaiorReps.setText(exercicio.recordeRepsParaCarga() + " reps");
         }
 
-        // Atualização do Gráfico de Evolução
+        aplicarHistorico(List.of());
+
+        Long praticanteId = MainController.getUsuarioLogadoId();
+        if (praticanteId == null || exercicio.id() == null) return;
+
+        FxAsync.executar(
+                () -> praticanteApiClient.listarHistoricoExercicio(praticanteId, exercicio.id()),
+                this::aplicarHistorico,
+                erro -> FxAsync.exibirErro("Não foi possível carregar o histórico do exercício", erro));
+    }
+
+    private void aplicarHistorico(List<HistoricoExercicioItemDTO> historico) {
+        historicoOriginal.clear();
+        if (historico != null) historicoOriginal.addAll(historico);
+
+        listaHistorico.clear();
+        listaHistorico.addAll(historicoOriginal);
+
+        // Gráfico de evolução: carga por data (da mais antiga para a mais recente).
         if (chartEvolucao != null) {
             chartEvolucao.getData().clear();
-            if (dadosGrafico != null) {
-                chartEvolucao.getData().add(dadosGrafico);
+            if (!historicoOriginal.isEmpty()) {
+                XYChart.Series<String, Number> serie = new XYChart.Series<>();
+                for (int i = historicoOriginal.size() - 1; i >= 0; i--) {
+                    HistoricoExercicioItemDTO h = historicoOriginal.get(i);
+                    serie.getData().add(new XYChart.Data<>(h.dataTreino() != null ? h.dataTreino() : "—", h.carga()));
+                }
+                chartEvolucao.getData().add(serie);
             }
-        }
-
-        // Atualização da Lista do Histórico
-        this.listaHistorico.clear();
-        if (historico != null) {
-            this.listaHistorico.addAll(historico);
         }
 
         renderizarHistorico();
@@ -197,8 +218,12 @@ public class ExerciseDetailsController {
 
         if (selected == optRecentes) {
             if (lblFiltroAtual != null) lblFiltroAtual.setText("Data ⤓");
+            listaHistorico.clear();
+            listaHistorico.addAll(historicoOriginal);
         } else if (selected == optAntigos) {
             if (lblFiltroAtual != null) lblFiltroAtual.setText("Data ⤒");
+            listaHistorico.clear();
+            listaHistorico.addAll(historicoOriginal);
             Collections.reverse(listaHistorico);
         } else if (selected == optMaiorCarga) {
             if (lblFiltroAtual != null) lblFiltroAtual.setText("Carga ⤓");

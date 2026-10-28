@@ -1,8 +1,12 @@
 package com.fittrack.fittrack_frontend.controller;
 
+import com.fittrack.fittrack_frontend.client.PraticanteApiClient;
+import com.fittrack.fittrack_frontend.client.TreinoApiClient;
 import com.fittrack.fittrack_frontend.dto.DesempenhoGrupoDTO;
 import com.fittrack.fittrack_frontend.dto.ExercicioDTO;
+import com.fittrack.fittrack_frontend.dto.GrupoMuscularEnum;
 import com.fittrack.fittrack_frontend.dto.MetricaTreinoDTO;
+import com.fittrack.fittrack_frontend.util.FxAsync;
 import com.fittrack.fittrack_frontend.util.NavigationManager;
 
 import javafx.fxml.FXML;
@@ -17,6 +21,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import java.io.InputStream;
@@ -25,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
+@Scope("prototype")
 public class MetricsHubController {
 
     @FXML private Button btnTabGrupos;
@@ -44,6 +50,19 @@ public class MetricsHubController {
     private final List<ExercicioDTO> listaExercicios = new ArrayList<>();
     private final List<MetricaTreinoDTO> listaTreinos = new ArrayList<>();
 
+    private final PraticanteApiClient praticanteApiClient;
+    private final TreinoApiClient treinoApiClient;
+
+    public MetricsHubController(PraticanteApiClient praticanteApiClient, TreinoApiClient treinoApiClient) {
+        this.praticanteApiClient = praticanteApiClient;
+        this.treinoApiClient = treinoApiClient;
+    }
+
+    /** Dados das três abas, buscados de uma só vez fora da thread da interface. */
+    private record DadosMetricas(List<DesempenhoGrupoDTO> grupos,
+                                 List<ExercicioDTO> exercicios,
+                                 List<MetricaTreinoDTO> treinos) {}
+
     @FXML
     public void initialize() {
         if (inputBusca != null) {
@@ -53,8 +72,34 @@ public class MetricsHubController {
                 }
             });
         }
-        carregarTabGrupos();
+
+        if (containerCards != null) {
+            containerCards.getChildren().clear();
+            exibirMensagemVazia("Carregando métricas...");
+        }
+
+        Long praticanteId = MainController.getUsuarioLogadoId();
+        if (praticanteId == null) {
+            carregarMetricas(List.of(), List.of(), List.of());
+            return;
+        }
+
+        FxAsync.executar(
+                () -> new DadosMetricas(
+                        praticanteApiClient.listarDesempenhoGrupos(praticanteId),
+                        praticanteApiClient.listarExercicios(praticanteId),
+                        treinoApiClient.listarMetricasTreinos(praticanteId)),
+                dados -> carregarMetricas(dados.grupos(), dados.exercicios(), dados.treinos()),
+                erro -> {
+                    carregarMetricas(List.of(), List.of(), List.of());
+                    FxAsync.exibirErro("Não foi possível carregar as métricas", erro);
+                });
     }
+
+    /** Permite que outras telas abram o hub já na aba desejada. */
+    public void selecionarAbaExercicios() { handleSelecionarTabExercicios(); }
+
+    public void selecionarAbaTreinos() { handleSelecionarTabTreinos(); }
 
     /**
      * Injeta e atualiza os dados dinâmicos de métricas vindos da API Spring Boot.
@@ -82,7 +127,7 @@ public class MetricsHubController {
     private void handleSelecionarTabGrupos() {
         abaAtivaAtual = AbaAtiva.GRUPOS;
         resetTabStyles();
-        if (btnTabGrupos != null) btnTabGrupos.getStyleClass().add("tab-button-active");
+        if (btnTabGrupos != null) btnTabGrupos.getStyleClass().setAll("button", "tab-button-active");
         carregarTabGrupos();
     }
 
@@ -90,7 +135,7 @@ public class MetricsHubController {
     private void handleSelecionarTabExercicios() {
         abaAtivaAtual = AbaAtiva.EXERCICIOS;
         resetTabStyles();
-        if (btnTabExercicios != null) btnTabExercicios.getStyleClass().add("tab-button-active");
+        if (btnTabExercicios != null) btnTabExercicios.getStyleClass().setAll("button", "tab-button-active");
         carregarTabExercicios();
     }
 
@@ -98,22 +143,13 @@ public class MetricsHubController {
     private void handleSelecionarTabTreinos() {
         abaAtivaAtual = AbaAtiva.TREINOS;
         resetTabStyles();
-        if (btnTabTreinos != null) btnTabTreinos.getStyleClass().add("tab-button-active");
+        if (btnTabTreinos != null) btnTabTreinos.getStyleClass().setAll("button", "tab-button-active");
         carregarTabTreinos();
     }
 
     private void resetTabStyles() {
-        if (btnTabGrupos != null) {
-            btnTabGrupos.getStyleClass().removeAll("tab-button-active");
-            btnTabGrupos.getStyleClass().add("tab-button");
-        }
-        if (btnTabExercicios != null) {
-            btnTabExercicios.getStyleClass().removeAll("tab-button-active");
-            btnTabExercicios.getStyleClass().add("tab-button");
-        }
-        if (btnTabTreinos != null) {
-            btnTabTreinos.getStyleClass().removeAll("tab-button-active");
-            btnTabTreinos.getStyleClass().add("tab-button");
+        for (Button aba : new Button[] { btnTabGrupos, btnTabExercicios, btnTabTreinos }) {
+            if (aba != null) aba.getStyleClass().setAll("button", "tab-button");
         }
 
         if (boxBusca != null) {
@@ -142,7 +178,7 @@ public class MetricsHubController {
             
             adicionarCardGrupo(
                 iconPath,
-                grupo.grupoMuscular(),
+                GrupoMuscularEnum.rotuloDe(grupo.grupoMuscular()),
                 sub,
                 grupo.percentualVariacao() != null ? grupo.percentualVariacao() : "0%",
                 grupo.isAumento(),
@@ -196,7 +232,7 @@ public class MetricsHubController {
             String t = termo.trim().toLowerCase();
             filtrados = listaExercicios.stream()
                     .filter(e -> (e.nome() != null && e.nome().toLowerCase().contains(t)) ||
-                                 (e.grupoMuscular() != null && e.grupoMuscular().toLowerCase().contains(t)))
+                                 GrupoMuscularEnum.rotuloDe(e.grupoMuscular()).toLowerCase().contains(t))
                     .collect(Collectors.toList());
         }
 
@@ -209,7 +245,7 @@ public class MetricsHubController {
             String prText = ex.recordeCarga() != null ? String.format("PR: %.0f kg", ex.recordeCarga()) : "Sem PR";
             adicionarCardExercicio(
                 ex.nome(),
-                ex.grupoMuscular() != null ? ex.grupoMuscular() : "Geral",
+                GrupoMuscularEnum.rotuloDe(ex.grupoMuscular()),
                 prText,
                 () -> abrirDetalheExercicio(ex)
             );
@@ -266,7 +302,7 @@ public class MetricsHubController {
                 sub,
                 consistenciaStr,
                 t.totalSessoes(),
-                () -> abrirHistoricoTreino(t)
+                null // não há tela de histórico por treino no conjunto de FXMLs atual
             );
         }
 
@@ -351,14 +387,7 @@ public class MetricsHubController {
     }
 
     private String obterIconeGrupo(String grupo) {
-        if (grupo == null) return "/icons/Frame (1).png";
-        return switch (grupo.toLowerCase()) {
-            case "peitoral", "peito" -> "/icons/Frame (1).png";
-            case "costas" -> "/icons/Frame (2).png";
-            case "pernas" -> "/icons/Frame (3).png";
-            case "ombros" -> "/icons/Frame (4).png";
-            default -> "/icons/Frame (1).png";
-        };
+        return GrupoMuscularEnum.from(grupo).map(GrupoMuscularEnum::icone).orElse("/icons/Frame (1).png");
     }
 
     private void exibirMensagemVazia(String mensagem) {
@@ -370,21 +399,14 @@ public class MetricsHubController {
     private void abrirDetalheGrupo(DesempenhoGrupoDTO grupo) {
         GroupDetailController controller = NavigationManager.navegarComController(containerCards, "/fxml/group_detail_view.fxml");
         if (controller != null && grupo != null) {
-            controller.carregarEMedirMetricasReais(grupo.grupoMuscular(), "Foco A", List.of(), List.of());
+            controller.carregarGrupo(grupo);
         }
     }
 
     private void abrirDetalheExercicio(ExercicioDTO ex) {
         ExerciseDetailsController controller = NavigationManager.navegarComController(containerCards, "/fxml/exercise_details_view.fxml");
         if (controller != null && ex != null) {
-            controller.carregarDetalhesExercicio(ex, List.of(), null);
-        }
-    }
-
-    private void abrirHistoricoTreino(MetricaTreinoDTO treino) {
-        if (treino != null && containerCards != null) {
-            System.out.println("Navegando para histórico do treino ID: " + treino.treinoId());
-            NavigationManager.navegarPara(containerCards, "/fxml/exercise_details_view.fxml");
+            controller.carregarDetalhesExercicio(ex);
         }
     }
 

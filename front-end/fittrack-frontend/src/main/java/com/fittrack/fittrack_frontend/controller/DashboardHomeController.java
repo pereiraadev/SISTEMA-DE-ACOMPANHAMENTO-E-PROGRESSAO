@@ -1,9 +1,15 @@
 package com.fittrack.fittrack_frontend.controller;
 
+import java.util.List;
+
+import com.fittrack.fittrack_frontend.client.PraticanteApiClient;
+import com.fittrack.fittrack_frontend.client.TreinoApiClient;
+import com.fittrack.fittrack_frontend.dto.AuthResponseDTO;
 import com.fittrack.fittrack_frontend.dto.EstatisticasGeraisDTO;
 import com.fittrack.fittrack_frontend.dto.ExercicioDTO;
-import com.fittrack.fittrack_frontend.dto.ItemTreinoDTO;
+import com.fittrack.fittrack_frontend.dto.GrupoMuscularEnum;
 import com.fittrack.fittrack_frontend.dto.TreinoAtivoDTO;
+import com.fittrack.fittrack_frontend.util.FxAsync;
 import com.fittrack.fittrack_frontend.util.NavigationManager;
 
 import javafx.fxml.FXML;
@@ -12,11 +18,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import java.util.List;
-
 @Controller
+@Scope("prototype")
 public class DashboardHomeController {
 
     @FXML private Label lblNomeUsuario;
@@ -28,16 +35,39 @@ public class DashboardHomeController {
     @FXML private Button btnIniciarTreino;
     @FXML private HBox containerExerciciosMaisRealizados;
 
+    private final TreinoApiClient treinoApiClient;
+    private final PraticanteApiClient praticanteApiClient;
+
+    public DashboardHomeController(TreinoApiClient treinoApiClient, PraticanteApiClient praticanteApiClient) {
+        this.treinoApiClient = treinoApiClient;
+        this.praticanteApiClient = praticanteApiClient;
+    }
+
+    /** Pacote de dados do dashboard buscado de uma só vez fora da thread da interface. */
+    private record DadosDashboard(EstatisticasGeraisDTO stats, List<ExercicioDTO> maisRealizados) {}
+
     @FXML
     public void initialize() {
         if (containerExerciciosMaisRealizados != null) {
             containerExerciciosMaisRealizados.getChildren().clear();
         }
+
+        AuthResponseDTO usuario = MainController.getUsuarioLogado();
+        if (usuario == null || usuario.praticanteId() == null) return;
+
+        Long praticanteId = usuario.praticanteId();
+        FxAsync.executar(
+                () -> new DadosDashboard(
+                        praticanteApiClient.buscarEstatisticasGerais(praticanteId),
+                        praticanteApiClient.listarExerciciosMaisRealizados(praticanteId)),
+                dados -> carregarDadosDashboard(usuario.nome(), dados.stats(), dados.maisRealizados()),
+                erro -> {
+                    carregarDadosDashboard(usuario.nome(), null, List.of());
+                    FxAsync.exibirErro("Não foi possível carregar o dashboard", erro);
+                });
     }
 
-    /**
-     * Injeta e exibe os dados estatísticos reais recebidos da API Spring Boot.
-     */
+    /** Exibe os dados reais recebidos da API Spring Boot. */
     public void carregarDadosDashboard(String nomeUsuario, EstatisticasGeraisDTO stats, List<ExercicioDTO> exerciciosMaisRealizados) {
         if (lblNomeUsuario != null && nomeUsuario != null && !nomeUsuario.isBlank()) {
             lblNomeUsuario.setText("Olá, " + nomeUsuario + " 👋");
@@ -73,11 +103,10 @@ public class DashboardHomeController {
             Label lblNome = new Label(ex.nome());
             lblNome.setStyle("-fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-font-size: 14px;");
 
-            Label lblInfo = new Label(ex.grupoMuscular() != null ? ex.grupoMuscular() : "Geral");
+            Label lblInfo = new Label(GrupoMuscularEnum.rotuloDe(ex.grupoMuscular()));
             lblInfo.setStyle("-fx-text-fill: #A0A0A0; -fx-font-size: 12px;");
 
             card.getChildren().addAll(lblNome, lblInfo);
-
             card.setOnMouseClicked(e -> handleVerDetalhesExercicio(ex));
 
             containerExerciciosMaisRealizados.getChildren().add(card);
@@ -86,35 +115,53 @@ public class DashboardHomeController {
 
     @FXML
     private void handleIniciarTreinoDoDia() {
-        Button btnOrigem = (btnIniciarTreino != null) ? btnIniciarTreino : new Button();
+        Long usuarioLogadoId = MainController.getUsuarioLogadoId();
+        if (usuarioLogadoId == null) {
+            FxAsync.exibirAviso("Sessão expirada", "Faça login novamente para iniciar o treino.");
+            return;
+        }
 
-        // Navega até a tela de Treino Ativo e obtém o Controller de destino para injetar o treino
-        ActiveWorkoutController controller = NavigationManager.navegarComController(btnOrigem, "/fxml/active_workout.fxml");
+        Button origem = getNoReferencia();
+        origem.setDisable(true);
 
+        // Rotina real vinda do banco via API; nada de dados fixos no front-end.
+        FxAsync.executar(
+                () -> treinoApiClient.buscarTreinoDoDia(usuarioLogadoId),
+                treino -> {
+                    origem.setDisable(false);
+                    abrirTreinoAtivo(origem, treino);
+                },
+                erro -> {
+                    origem.setDisable(false);
+                    FxAsync.exibirErro("Não foi possível carregar o treino do dia", erro);
+                });
+    }
+
+    private void abrirTreinoAtivo(Button origem, TreinoAtivoDTO treino) {
+        if (treino == null || treino.itens() == null || treino.itens().isEmpty()) {
+            FxAsync.exibirAviso("Treino do dia", "Nenhum treino com exercícios foi encontrado para hoje.");
+            return;
+        }
+
+        ActiveWorkoutController controller =
+                NavigationManager.navegarComController(origem, "/fxml/active_workout_view.fxml");
         if (controller != null) {
-            // Exemplo de payload inicial de sessão para renderização limpa
-            ItemTreinoDTO primeiroItem = new ItemTreinoDTO(
-                1L, 101L, "Supino Reto", "Peito", 1, 4, 10, 80.0, false, "4×10 - 80kg", List.of()
-            );
-
-            TreinoAtivoDTO treinoAtivo = new TreinoAtivoDTO(
-                100L, 1L, "Treino A - Peito e Tríceps", 0, List.of(primeiroItem)
-            );
-
-            controller.carregarDadosTreino(treinoAtivo, primeiroItem);
+            controller.carregarTreino(treino);
         }
     }
 
     @FXML
     private void handleVerTodosExercicios() {
-        NavigationManager.navegarPara(getNoReferencia(), "/fxml/metrics_hub_view.fxml");
+        MetricsHubController controller =
+                NavigationManager.navegarComController(getNoReferencia(), "/fxml/metrics_hub_view.fxml");
+        if (controller != null) controller.selecionarAbaExercicios();
     }
 
     private void handleVerDetalhesExercicio(ExercicioDTO exercicio) {
-        if (exercicio != null) {
-            System.out.println("Abrindo detalhes do exercício ID: " + exercicio.id());
-            NavigationManager.navegarPara(getNoReferencia(), "/fxml/exercise_details_view.fxml");
-        }
+        if (exercicio == null) return;
+        ExerciseDetailsController controller =
+                NavigationManager.navegarComController(getNoReferencia(), "/fxml/exercise_details_view.fxml");
+        if (controller != null) controller.carregarDetalhesExercicio(exercicio);
     }
 
     @FXML
@@ -124,12 +171,14 @@ public class DashboardHomeController {
 
     @FXML
     private void handleNavTreinos() {
-        NavigationManager.navegarPara(getNoReferencia(), "/fxml/metrics_hub_view.fxml");
+        MetricsHubController controller =
+                NavigationManager.navegarComController(getNoReferencia(), "/fxml/metrics_hub_view.fxml");
+        if (controller != null) controller.selecionarAbaTreinos();
     }
 
     @FXML
     private void handleNavMetricas() {
-        NavigationManager.navegarPara(getNoReferencia(), "/fxml/group_detail_view.fxml");
+        NavigationManager.navegarPara(getNoReferencia(), "/fxml/metrics_hub_view.fxml");
     }
 
     private Button getNoReferencia() {

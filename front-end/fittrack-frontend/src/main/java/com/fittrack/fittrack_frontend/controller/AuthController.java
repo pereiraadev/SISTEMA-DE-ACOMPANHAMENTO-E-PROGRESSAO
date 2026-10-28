@@ -1,9 +1,10 @@
 package com.fittrack.fittrack_frontend.controller;
 
+import com.fittrack.fittrack_frontend.client.PraticanteApiClient;
+import com.fittrack.fittrack_frontend.dto.AuthResponseDTO;
 import com.fittrack.fittrack_frontend.dto.CadastroDTO;
-import com.fittrack.fittrack_frontend.dto.EstatisticasGeraisDTO;
-import com.fittrack.fittrack_frontend.dto.ExercicioDTO;
 import com.fittrack.fittrack_frontend.dto.LoginDTO;
+import com.fittrack.fittrack_frontend.util.FxAsync;
 import com.fittrack.fittrack_frontend.util.NavigationManager;
 
 import javafx.fxml.FXML;
@@ -14,11 +15,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import java.util.List;
+import java.util.function.Supplier;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 @Controller
+@Scope("prototype")
 public class AuthController {
 
     @FXML private Button btnTabEntrar;
@@ -34,6 +37,12 @@ public class AuthController {
 
     private boolean modoCadastro = true;
     private boolean senhaVisivel = false;
+
+    private final PraticanteApiClient praticanteApiClient;
+
+    public AuthController(PraticanteApiClient praticanteApiClient) {
+        this.praticanteApiClient = praticanteApiClient;
+    }
 
     @FXML
     public void initialize() {
@@ -80,84 +89,38 @@ public class AuthController {
             return;
         }
 
-        String nomeExibicao;
-
+        Supplier<AuthResponseDTO> chamada;
         if (modoCadastro) {
             String nome = (txtNome != null && txtNome.getText() != null) ? txtNome.getText().trim() : "";
             if (nome.isEmpty()) {
                 exibirAlerta("Campo Obrigatório", "Por favor, informe seu nome completo.");
                 return;
             }
-            nomeExibicao = nome;
-
-            // Monta DTO para exibição/validação no console
             CadastroDTO cadastroDTO = new CadastroDTO(nome, email, senha);
-            System.out.println("JSON de Cadastro pronto: " + cadastroDTO);
-
+            chamada = () -> praticanteApiClient.cadastrar(cadastroDTO);
         } else {
-            // No modo login, usa a parte do e-mail antes do @ como nome temporário para o teste
-            nomeExibicao = email.contains("@") ? email.split("@")[0] : "Atleta";
-
-            // Monta DTO para exibição/validação no console
             LoginDTO loginDTO = new LoginDTO(email, senha);
-            System.out.println("JSON de Login pronto: " + loginDTO);
+            chamada = () -> praticanteApiClient.login(loginDTO);
         }
 
-        // Navegação com injeção de dados temporários para teste visual do Front-end
-        DashboardHomeController homeController = NavigationManager.navegarComController(btnAcaoPrincipal, "/fxml/dashboard_home_view.fxml");
-
-        if (homeController != null) {
-            EstatisticasGeraisDTO statsMock = new EstatisticasGeraisDTO(47, 312, 1248, 45720.0);
-            List<ExercicioDTO> exerciciosMock = List.of(
-                new ExercicioDTO(1L, "Supino Reto", "Peitoral", "", true, 100.0, 10, null, 12),
-                new ExercicioDTO(2L, "Agachamento Livre", "Pernas", "", true, 180.0, 8, null, 15)
-            );
-
-            homeController.carregarDadosDashboard(nomeExibicao, statsMock, exerciciosMock);
-        }
+        btnAcaoPrincipal.setDisable(true);
+        FxAsync.executar(
+                chamada,
+                resposta -> {
+                    btnAcaoPrincipal.setDisable(false);
+                    if (resposta == null || resposta.praticanteId() == null) {
+                        exibirAlerta("Autenticação", "O servidor não retornou os dados do usuário.");
+                        return;
+                    }
+                    // Sessão global do front-end; o Dashboard busca os próprios dados reais na API.
+                    MainController.setUsuarioLogado(resposta);
+                    NavigationManager.navegarPara(btnAcaoPrincipal, "/fxml/dashboard_home_view.fxml");
+                },
+                erro -> {
+                    btnAcaoPrincipal.setDisable(false);
+                    FxAsync.exibirErro(modoCadastro ? "Falha no cadastro" : "Falha no login", erro);
+                });
     }
-
-/*     @FXML
-    private void handleAcaoPrincipal() {
-        String email = (txtEmail != null && txtEmail.getText() != null) ? txtEmail.getText().trim() : "";
-        String senha = getSenhaDigitada();
-
-        if (email.isEmpty() || senha.isEmpty()) {
-            exibirAlerta("Campos Obrigatórios", "Por favor, preencha e-mail e senha para prosseguir.");
-            return;
-        }
-
-        if (modoCadastro) {
-            String nome = (txtNome != null && txtNome.getText() != null) ? txtNome.getText().trim() : "";
-            if (nome.isEmpty()) {
-                exibirAlerta("Campo Obrigatório", "Por favor, informe seu nome completo.");
-                return;
-            }
-
-            // Instancia o DTO de Cadastro do front-end
-            CadastroDTO cadastroDTO = new CadastroDTO(nome, email, senha);
-            
-            // Prepara o DTO para integração com a API via HttpClient
-            if (cadastroDTO.email() != null) {
-                System.out.println("DTO de Cadastro montado para: " + cadastroDTO.email());
-            }
-
-            // Realiza a navegação para a Home após criar a conta
-            NavigationManager.navegarPara(btnAcaoPrincipal, "/fxml/dashboard-home.fxml");
-
-        } else {
-            // Instancia o DTO de Login do front-end
-            LoginDTO loginDTO = new LoginDTO(email, senha);
-
-            // Prepara o DTO para integração com a API via HttpClient
-            if (loginDTO.email() != null) {
-                System.out.println("DTO de Login montado para: " + loginDTO.email());
-            }
-
-            // Realiza a navegação para a Home após autenticação bem-sucedida
-            NavigationManager.navegarPara(btnAcaoPrincipal, "/fxml/dashboard-home.fxml");
-        }
-    } */
 
     private String getSenhaDigitada() {
         if (senhaVisivel && txtSenhaVisivel != null && txtSenhaVisivel.getText() != null) {
