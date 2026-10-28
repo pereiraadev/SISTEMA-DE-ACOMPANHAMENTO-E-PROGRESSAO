@@ -6,7 +6,7 @@ public record RecordesPessoaisDTO(
     Double maiorCargaAbsoluta,
     String exercicioMaiorCarga,
     Double maiorVolumeTreino,
-    String maiorRepsSobCarga, // Ex: "100 kg × 15"[cite: 17]
+    String maiorRepsSobCarga, // Ex: "100 kg × 15"
     Integer maiorFrequenciaSemanas,
     List<ExercicioDTO> prsPorExercicio
 ) {}

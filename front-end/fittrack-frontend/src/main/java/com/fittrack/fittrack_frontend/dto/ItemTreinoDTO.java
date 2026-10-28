@@ -2,16 +2,14 @@ package com.fittrack.fittrack_frontend.dto;
 
 import java.util.List;
 
+/** Tabela ITEM_TREINO (com o Exercicio associado e as séries já executadas). */
 public record ItemTreinoDTO(
     Long id,
-    Long exercicioId,
-    String nomeExercicio,
-    String grupoMuscular,
-    int ordem,
-    int seriesPrevistas,
-    int repsPrevistas,
-    double cargaPrevista,
-    boolean concluido,
-    String referenciaTreinoAnterior, // Ex: "4×10 - 80kg"[cite: 19]
+    Integer ordem,
+    Integer seriesPrevistas,
+    Integer repsPrevistas,
+    Double cargaPrevista,
+    Boolean concluido,
+    ExercicioDTO exercicio,
     List<SerieExecutadaDTO> seriesRealizadas
 ) {}
