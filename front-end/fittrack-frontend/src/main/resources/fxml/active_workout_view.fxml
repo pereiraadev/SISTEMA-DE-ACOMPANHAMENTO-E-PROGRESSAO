@@ -35,7 +35,7 @@
             <!-- Cronômetro -->
             <VBox alignment="CENTER" spacing="2.0">
                 <Label text="TEMPO DECORRIDO" styleClass="timer-label" />
-                <Label fx:id="txtCronometro" text="12:34" styleClass="timer-value" />
+                <Label fx:id="txtCronometro" text="00:00" styleClass="timer-value" />
             </VBox>
 
             <!-- Banner Informativo -->
@@ -106,7 +106,7 @@
                         <HBox alignment="CENTER_LEFT">
                             <Label text="Volume do exercício" styleClass="volume-label" />
                             <Region HBox.hgrow="ALWAYS" />
-                            <Label fx:id="txtVolumeExercício" text="1.460 kg" styleClass="volume-value" />
+                            <Label fx:id="txtVolumeExercício" text="0 kg" styleClass="volume-value" />
                         </HBox>
                     </VBox>
 

@@ -72,18 +72,7 @@ public class GroupDetailController {
             return;
         } catch (Exception ignored) {
         }
-        exercicios.add(new ExercisioVolumeData("Supino Reto", 3802.5, "#43D61B"));
-        exercicios.add(new ExercisioVolumeData("Inclinado", 2112.5, "#2E7D32"));
-        exercicios.add(new ExercisioVolumeData("Crucifixo", 1521.0, "#38B6FF"));
-        exercicios.add(new ExercisioVolumeData("Crossover", 1014.0, "#888888"));
-
-        List<FrequenciaMesData> frequencias = new ArrayList<>();
-        frequencias.add(new FrequenciaMesData("Jun", 12));
-        frequencias.add(new FrequenciaMesData("Jul", 15));
-        frequencias.add(new FrequenciaMesData("Ago", 18));
-        frequencias.add(new FrequenciaMesData("Set", 21));
-
-        carregarEMedirMetricasReais("Peitoral", "Foco A", exercicios, frequencias);
+        carregarEMedirMetricasReais("Grupo muscular", "Sem dados", exercicios, List.of());
     }
 
     public void carregarEMedirMetricasReais(String nomeGrupo, String tagFoco, 

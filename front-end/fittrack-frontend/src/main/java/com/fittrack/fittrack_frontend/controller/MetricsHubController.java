@@ -4,6 +4,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import java.util.Optional;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,12 +29,15 @@ public class MetricsHubController {
     private final ApiClient apiClient;
     private final NavigationService navigationService;
     private final com.fittrack.fittrack_frontend.service.ExerciseSelection exerciseSelection;
+    private final com.fittrack.fittrack_frontend.service.WorkoutSession workoutSession;
 
     public MetricsHubController(ApiClient apiClient, NavigationService navigationService,
-                                com.fittrack.fittrack_frontend.service.ExerciseSelection exerciseSelection) {
+                                 com.fittrack.fittrack_frontend.service.ExerciseSelection exerciseSelection,
+                                 com.fittrack.fittrack_frontend.service.WorkoutSession workoutSession) {
         this.apiClient = apiClient;
         this.navigationService = navigationService;
         this.exerciseSelection = exerciseSelection;
+        this.workoutSession = workoutSession;
     }
 
     @FXML private Button btnTabGrupos;
@@ -85,14 +91,26 @@ public class MetricsHubController {
         boxRodapeTotal.setManaged(false);
     }
 
-    // 1. ABA GRUPOS MUSCULARES
     private void carregarTabGrupos() {
         containerCards.getChildren().clear();
+        try {
+            var dashboard = apiClient.get("/api/dashboard", com.fittrack.fittrack_frontend.service.DashboardModels.DashboardResposta.class);
+            if (dashboard.volumePorGrupo() == null || dashboard.volumePorGrupo().isEmpty()) {
+                adicionarEstadoVazio("Nenhum grupo muscular com dados.");
+                return;
+            }
+            dashboard.volumePorGrupo().forEach((grupo, volume) -> adicionarCardGrupo(null, grupo,
+                    String.format("Volume registrado: %,.0f kg", volume), "", true,
+                    () -> navigationService.navegar("/fxml/group_detail_view.fxml")));
+        } catch (Exception erro) {
+            adicionarEstadoVazio("Não foi possível carregar as métricas.");
+        }
+    }
 
-        adicionarCardGrupo("/icons/Frame (1).png", "Peitoral", "Volume semanal: 8.450 kg", "+12% vol", true, () -> abrirDetalhePeitoral()); //[cite: 37, 41]
-        adicionarCardGrupo("/icons/Frame (2).png", "Costas", "Volume semanal: 7.210 kg", "+8% vol", true, null); //[cite: 36, 41]
-        adicionarCardGrupo("/icons/Frame (3).png", "Pernas", "Volume semanal: 12.300 kg", "-3% vol", false, null); //[cite: 35, 41]
-        adicionarCardGrupo("/icons/Frame (4).png", "Ombros", "Volume semanal: 4.120 kg", "+5% vol", true, null); //[cite: 34, 41]
+    private void adicionarEstadoVazio(String texto) {
+        Label estado = new Label(texto);
+        estado.getStyleClass().add("card-subtitle");
+        containerCards.getChildren().add(estado);
     }
 
     private void adicionarCardGrupo(String iconPath, String titulo, String sub, String varVol, boolean positivo, Runnable onAction) {
@@ -134,8 +152,9 @@ public class MetricsHubController {
                         () -> abrirExercicioEspecífico(String.valueOf(exercicio.id())));
             }
         } catch (Exception erro) {
-            adicionarCardExercicio("Não foi possível carregar", "Verifique o backend", "", null);
+            adicionarEstadoVazio("Não foi possível carregar os exercícios.");
         }
+        if (containerCards.getChildren().isEmpty()) adicionarEstadoVazio("Nenhum exercício encontrado.");
     }
 
     private void adicionarCardExercicio(String titulo, String sub, String prText, Runnable onAction) {
@@ -168,10 +187,17 @@ public class MetricsHubController {
         boxRodapeTotal.setManaged(true);
         containerCards.getChildren().clear();
 
-        adicionarCardTreino("Treino A — Peito e Tríceps", "Último: 18 Set 2025", "85%", 24, null); //[cite: 38]
-        adicionarCardTreino("Treino B — Costas e Bíceps", "Último: 17 Set 2025", "78%", 22, null); //[cite: 38]
-        adicionarCardTreino("Treino C — Pernas e Ombros", "Último: 16 Set 2025", "92%", 26, null); //[cite: 38]
-        adicionarCardTreino("Treino D — Full Body", "Último: 14 Set 2025", "65%", 12, null); //[cite: 38]
+        try {
+            List<WorkoutModels.TreinoResposta> treinos = apiClient.getList("/api/modelos", new TypeReference<>() {});
+            for (WorkoutModels.TreinoResposta treino : treinos) {
+                adicionarCardTreino(treino.identificacao(), "Modelo de treino", "—", 0,
+                        () -> iniciarTreino(treino.id()));
+            }
+            lblTotalRealizados.setText(treinos.size() + " modelos disponíveis");
+            if (treinos.isEmpty()) adicionarEstadoVazio("Nenhum modelo de treino disponível.");
+        } catch (Exception erro) {
+            adicionarEstadoVazio("Não foi possível carregar os treinos.");
+        }
     }
 
     private void adicionarCardTreino(String titulo, String sub, String consistencia, int sessoes, Runnable onAction) {
@@ -247,8 +273,14 @@ public class MetricsHubController {
         return img;
     }
 
-    private void abrirDetalhePeitoral() {
-        System.out.println("Navegando para o Detalhe do Peitoral...");
+    private void iniciarTreino(Long modeloId) {
+        try {
+            var execucao = apiClient.post("/api/modelos/" + modeloId + "/iniciar", null, WorkoutModels.TreinoResposta.class);
+            workoutSession.definir(execucao);
+            navigationService.navegar("/fxml/active_workout_view.fxml");
+        } catch (Exception erro) {
+            adicionarEstadoVazio("Não foi possível iniciar o treino.");
+        }
     }
 
     private void abrirExercicioEspecífico(String id) {

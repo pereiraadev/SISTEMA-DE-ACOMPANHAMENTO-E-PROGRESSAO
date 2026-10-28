@@ -47,7 +47,6 @@ public class ExerciseDetailsController {
     @FXML private LineChart<String, Number> chartEvolucao;
     @FXML private VBox containerHistorico;
 
-    // Elementos do Bottom Sheet de Filtro
     @FXML private StackPane modalOverlay;
     @FXML private ToggleGroup ordenacaoGroup;
     @FXML private RadioButton optRecentes;
@@ -128,23 +127,8 @@ public class ExerciseDetailsController {
             }
         } catch (Exception ignored) {
         }
-        // Popula o gráfico de evolução
         chartEvolucao.getData().clear();
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.getData().add(new XYChart.Data<>("Jan", 68));
-        series.getData().add(new XYChart.Data<>("Fev", 76));
-        series.getData().add(new XYChart.Data<>("Mar", 73));
-        series.getData().add(new XYChart.Data<>("Abr", 85));
-        series.getData().add(new XYChart.Data<>("Mai", 83));
-        series.getData().add(new XYChart.Data<>("Jun", 98));
-        chartEvolucao.getData().add(series);
-
-        // Popula lista base do histórico
         listaHistorico.clear();
-        listaHistorico.add(new HistoricoEntry("18 Set 2025", 85.0, 10, 3400.0, "Aumento de carga ↑", "tag-aumento"));
-        listaHistorico.add(new HistoricoEntry("11 Set 2025", 80.0, 12, 3840.0, "Evolução por reps ↑", "tag-reps"));
-        listaHistorico.add(new HistoricoEntry("04 Set 2025", 80.0, 10, 3200.0, "Manutenção =", "tag-manutencao"));
-        listaHistorico.add(new HistoricoEntry("28 Ago 2025", 80.0, 8, 2560.0, "Redução ↓", "tag-reducao"));
     }
 
     private void renderizarHistorico() {

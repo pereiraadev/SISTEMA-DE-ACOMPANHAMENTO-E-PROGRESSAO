@@ -27,7 +27,7 @@ public final class ApiDtos {
                                @NotNull @Min(1) Integer repeticoes) { }
     public record SerieResposta(Long id, Integer numeroSerie, BigDecimal carga, Integer repeticoes,
                                 BigDecimal volume) { }
-    public record ItemResposta(Long id, Long exercicioId, String exercicioNome, Integer ordem,
+    public record ItemResposta(Long id, Long exercicioId, String exercicioNome, String grupoMuscular, Integer ordem,
                                Integer seriesPrevistas, Integer repsPrevistas, BigDecimal cargaPrevista,
                                boolean concluido, List<SerieResposta> series, BigDecimal volume) { }
     public record TreinoResposta(Long id, Long modeloOrigemId, String identificacao, boolean modelo,

@@ -235,7 +235,7 @@ public class TreinoWorkflowService {
             for (ApiDtos.SerieResposta s : feitas) volumeItem = volumeItem.add(s.volume());
             total = total.add(volumeItem);
             itens.add(new ApiDtos.ItemResposta(i.getId(), i.getExercicio().getId(), i.getExercicio().getNome(),
-                    i.getOrdem(), i.getSeriesPrevistas(), i.getRepsPrevistas(), i.getCargaPrevista(), i.isConcluido(), feitas, volumeItem));
+                    i.getExercicio().getGrupoMuscular(), i.getOrdem(), i.getSeriesPrevistas(), i.getRepsPrevistas(), i.getCargaPrevista(), i.isConcluido(), feitas, volumeItem));
         }
         return new ApiDtos.TreinoResposta(t.getId(), t.getTreinoOrigem() == null ? null : t.getTreinoOrigem().getId(),
                 t.getIdentificacao(), t.isModelo(), t.getStatus(), t.getIniciadoEm(), t.getFinalizadoEm(), itens, total);

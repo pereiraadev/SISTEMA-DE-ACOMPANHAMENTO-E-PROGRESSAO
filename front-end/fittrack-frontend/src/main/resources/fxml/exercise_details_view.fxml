@@ -32,12 +32,12 @@
                 </padding>
                 <Button text="‹" styleClass="btn-icon-back" onAction="#handleVoltar" />
                 <VBox spacing="2.0">
-                    <Label fx:id="lblNomeExercício" text="Supino Reto" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
-                    <Label fx:id="lblGrupoMuscular" text="Peito (Peitoral Maior)" style="-fx-text-fill: #888888; -fx-font-size: 12px;" />
+                    <Label fx:id="lblNomeExercício" text="Exercício" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                    <Label fx:id="lblGrupoMuscular" text="—" style="-fx-text-fill: #888888; -fx-font-size: 12px;" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
                 <HBox styleClass="badge-active" alignment="CENTER">
-                    <Label fx:id="lblStatus" text="Ativo" styleClass="badge-active-text" />
+                    <Label fx:id="lblStatus" text="—" styleClass="badge-active-text" />
                 </HBox>
             </HBox>
         </top>
@@ -67,14 +67,14 @@
                                 <children>
                                     <VBox styleClass="pr-card" spacing="4.0" GridPane.columnIndex="0">
                                         <Label text="Maior Carga" styleClass="pr-title" />
-                                        <Label fx:id="lblMaiorCarga" text="100 kg" styleClass="pr-value" />
-                                        <Label fx:id="lblMaiorCargaDet" text="10 reps • 15 Mar 2025" styleClass="pr-subtitle" />
+                                        <Label fx:id="lblMaiorCarga" text="—" styleClass="pr-value" />
+                                        <Label fx:id="lblMaiorCargaDet" text="Sem dados" styleClass="pr-subtitle" />
                                     </VBox>
 
                                     <VBox styleClass="pr-card" spacing="4.0" GridPane.columnIndex="1">
                                         <Label text="Maior Reps por Carga" styleClass="pr-title" />
-                                        <Label fx:id="lblMaiorReps" text="12 reps" styleClass="pr-value" />
-                                        <Label fx:id="lblMaiorRepsDet" text="80 kg • 22 Fev 2025" styleClass="pr-subtitle" />
+                                        <Label fx:id="lblMaiorReps" text="—" styleClass="pr-value" />
+                                        <Label fx:id="lblMaiorRepsDet" text="Sem dados" styleClass="pr-subtitle" />
                                     </VBox>
                                 </children>
                             </GridPane>

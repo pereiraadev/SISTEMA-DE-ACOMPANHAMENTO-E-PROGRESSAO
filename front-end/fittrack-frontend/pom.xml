@@ -85,6 +85,14 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>com.fittrack.fittrack_frontend.JavaFxApplication</mainClass>
+                </configuration>
+            </plugin>
 
         </plugins>
     </build>

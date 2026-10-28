@@ -2,6 +2,8 @@ package com.fittrack.fittrack_frontend.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.ChoiceDialog;
+import java.util.List;
 import org.springframework.stereotype.Controller;
 import com.fittrack.fittrack_frontend.service.ApiClient;
 import com.fittrack.fittrack_frontend.service.NavigationService;
@@ -43,11 +45,18 @@ public class DashboardHomeController {
         try {
             java.util.List<WorkoutModels.TreinoResposta> modelos = apiClient.getList("/api/modelos", new com.fasterxml.jackson.core.type.TypeReference<>() {});
             if (modelos.isEmpty()) return;
-            WorkoutModels.TreinoResposta execucao = apiClient.post("/api/modelos/" + modelos.get(0).id() + "/iniciar", null, WorkoutModels.TreinoResposta.class);
+            List<String> opcoes = modelos.stream().map(WorkoutModels.TreinoResposta::identificacao).toList();
+            ChoiceDialog<String> dialog = new ChoiceDialog<>(opcoes.get(0), opcoes);
+            dialog.setTitle("Selecionar treino");
+            dialog.setHeaderText("Escolha o treino para iniciar");
+            var escolha = dialog.showAndWait();
+            if (escolha.isEmpty()) return;
+            WorkoutModels.TreinoResposta modelo = modelos.get(opcoes.indexOf(escolha.get()));
+            WorkoutModels.TreinoResposta execucao = apiClient.post("/api/modelos/" + modelo.id() + "/iniciar", null, WorkoutModels.TreinoResposta.class);
             workoutSession.definir(execucao);
             navigationService.navegar("/fxml/active_workout_view.fxml");
         } catch (Exception erro) {
-            navigationService.navegar("/fxml/active_workout_view.fxml");
+            return;
         }
     }
 
@@ -63,7 +72,7 @@ public class DashboardHomeController {
 
     @FXML
     private void handleNavTreinos() {
-        navigationService.navegar("/fxml/active_workout_view.fxml");
+        if (workoutSession.obter() != null) navigationService.navegar("/fxml/active_workout_view.fxml");
     }
 
     @FXML

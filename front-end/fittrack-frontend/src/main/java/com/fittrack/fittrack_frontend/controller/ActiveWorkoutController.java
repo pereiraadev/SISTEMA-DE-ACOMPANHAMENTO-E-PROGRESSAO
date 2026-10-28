@@ -42,7 +42,8 @@ public class ActiveWorkoutController {
     @FXML private HBox boxNotificacao;
     @FXML private Label lblNotificacaoTexto;
 
-    private int segundosDecorridos = 754;
+    private int segundosDecorridos;
+    private boolean finalizado;
     private Timeline timeline;
     
     private int serieAtualIndex;
@@ -79,29 +80,32 @@ public class ActiveWorkoutController {
 
     @FXML
     public void initialize() {
-        iniciarCronometro();
-
         WorkoutModels.TreinoResposta treino = workoutSession.obter();
-        if (treino != null && treino.id() != null && treino.itens() != null && !treino.itens().isEmpty()) {
+        if (treino == null || treino.id() == null || treino.itens() == null || treino.itens().isEmpty()) {
+            navigationService.navegar("/fxml/dashboard_home_view.fxml");
+            return;
+        }
+        segundosDecorridos = treino.iniciadoEm() == null ? 0 : Math.max(0, (int) java.time.Duration.between(treino.iniciadoEm(), java.time.OffsetDateTime.now()).getSeconds());
+        iniciarCronometro();
+        if (treino.id() != null && treino.itens() != null && !treino.itens().isEmpty()) {
             execucaoId = treino.id();
             WorkoutModels.ItemResposta item = treino.itens().get(itemIndex);
             itemId = item.id();
             txtNomeTreino.setText(treino.identificacao() == null ? "Treino" : treino.identificacao());
             txtNomeExercicio.setText(item.exercicioNome() == null ? "Exercício" : item.exercicioNome());
-            txtGrupoMuscular.setText("Exercício selecionado");
+            txtGrupoMuscular.setText(item.grupoMuscular() == null ? "—" : item.grupoMuscular());
             txtTreinoAnterior.setText(item.cargaPrevista() == null ? "—" : item.cargaPrevista() + " kg");
             listaSeries.clear();
             int previstas = item.seriesPrevistas() == null ? 4 : item.seriesPrevistas();
             for (int i = 0; i < previstas; i++) listaSeries.add(new SerieData(0.0, 0, false));
         } else {
             listaSeries.clear();
-            listaSeries.add(new SerieData(80.0, 10, true));
-            listaSeries.add(new SerieData(82.5, 8, true));
-            listaSeries.add(new SerieData(0.0, 0, false));
-            listaSeries.add(new SerieData(0.0, 0, false));
+            txtNomeTreino.setText("Nenhum treino ativo");
+            txtNomeExercicio.setText("—");
+            txtGrupoMuscular.setText("—");
+            txtTreinoAnterior.setText("—");
+            txtCronometro.setText("00:00");
         }
-        if (listaSeries.isEmpty()) listaSeries.add(new SerieData(0.0, 0, false));
-
         renderizarSeries();
     }
 
@@ -312,6 +316,7 @@ public class ActiveWorkoutController {
         WorkoutModels.ItemResposta item = treino.itens().get(itemIndex);
         itemId = item.id();
         txtNomeExercicio.setText(item.exercicioNome() == null ? "Exercício" : item.exercicioNome());
+        txtGrupoMuscular.setText(item.grupoMuscular() == null ? "—" : item.grupoMuscular());
         txtTreinoAnterior.setText(item.cargaPrevista() == null ? "—" : item.cargaPrevista() + " kg");
         listaSeries.clear();
         int previstas = item.seriesPrevistas() == null ? 1 : item.seriesPrevistas();
@@ -322,8 +327,7 @@ public class ActiveWorkoutController {
                 listaSeries.add(new SerieData(serie.carga().doubleValue(), serie.repeticoes(), true));
             } else listaSeries.add(new SerieData(0, 0, false));
         }
-        serieAtualIndex = salvas.size();
-        serieAtualIndex = 0;
+        serieAtualIndex = Math.min(salvas.size(), listaSeries.size());
         renderizarSeries();
     }
 
@@ -345,6 +349,9 @@ public class ActiveWorkoutController {
                 try {
                     if (execucaoId != null) apiClient.post("/api/execucoes/" + execucaoId + "/finalizar", null, WorkoutModels.TreinoResposta.class);
                     if (timeline != null) timeline.stop();
+                    finalizado = true;
+                    workoutSession.limpar();
+                    containerSeries.setDisable(true);
                     exibirNotificacaoNaTela("Treino Finalizado com Sucesso!");
                 } catch (Exception erro) {
                     exibirNotificacaoNaTela("Não foi possível salvar o treino.");
