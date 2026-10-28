@@ -6,25 +6,69 @@
       "nome": "Cadastro",
       "metodo": "POST",
       "url": "/auth/cadastrar",
-      "headers": { "Content-Type": "application/json" },
-      "corpo": { "nome": "Ana Souza", "email": "ana@email.com", "senha": "segredo1" },
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "corpo": {
+        "nome": "Ana Souza",
+        "email": "ana@email.com",
+        "senha": "segredo1"
+      },
       "regras": "nome obrigatorio (ate 120), email valido (ate 254), senha de 6 a 72 caracteres",
-      "sucesso": { "status": 201, "corpo": { "id": 1, "nome": "Ana Souza", "email": "ana@email.com" } },
+      "sucesso": {
+        "status": 201,
+        "corpo": {
+          "id": 1,
+          "nome": "Ana Souza",
+          "email": "ana@email.com"
+        }
+      },
       "erros": [
-        { "status": 400, "corpo": { "erro": "E-mail inválido." } },
-        { "status": 409, "corpo": { "erro": "E-mail já cadastrado." } }
+        {
+          "status": 400,
+          "corpo": {
+            "erro": "E-mail inválido."
+          }
+        },
+        {
+          "status": 409,
+          "corpo": {
+            "erro": "E-mail já cadastrado."
+          }
+        }
       ]
     },
     {
       "nome": "Login",
       "metodo": "POST",
       "url": "/auth/login",
-      "headers": { "Content-Type": "application/json" },
-      "corpo": { "email": "ana@email.com", "senha": "segredo1" },
-      "sucesso": { "status": 200, "corpo": { "token": "<jwt>", "tipo": "Bearer" } },
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "corpo": {
+        "email": "ana@email.com",
+        "senha": "segredo1"
+      },
+      "sucesso": {
+        "status": 200,
+        "corpo": {
+          "token": "<jwt>",
+          "tipo": "Bearer"
+        }
+      },
       "erros": [
-        { "status": 400, "corpo": { "erro": "A senha é obrigatória." } },
-        { "status": 401, "corpo": { "erro": "E-mail ou senha inválidos." } }
+        {
+          "status": 400,
+          "corpo": {
+            "erro": "A senha é obrigatória."
+          }
+        },
+        {
+          "status": 401,
+          "corpo": {
+            "erro": "E-mail ou senha inválidos."
+          }
+        }
       ]
     },
     {
@@ -43,51 +87,94 @@
           "direcao": "desc",
           "total": 2,
           "registros": [
-            { "treinoId": 12, "dataTreino": "2026-10-15", "exercicioId": 3, "exercicio": "Supino Reto",
-              "numeroSerie": 1, "cargaUtilizada": 82.50, "repeticoesRealizadas": 6, "volumeCalculado": 495.00 },
-            { "treinoId": 10, "dataTreino": "2026-10-01", "exercicioId": 3, "exercicio": "Supino Reto",
-              "numeroSerie": 1, "cargaUtilizada": 80.00, "repeticoesRealizadas": 8, "volumeCalculado": 640.00 }
+            {
+              "treinoId": 12,
+              "dataTreino": "2026-10-15",
+              "exercicioId": 3,
+              "exercicio": "Supino Reto",
+              "numeroSerie": 1,
+              "cargaUtilizada": 82.5,
+              "repeticoesRealizadas": 6,
+              "volumeCalculado": 495.0
+            },
+            {
+              "treinoId": 10,
+              "dataTreino": "2026-10-01",
+              "exercicioId": 3,
+              "exercicio": "Supino Reto",
+              "numeroSerie": 1,
+              "cargaUtilizada": 80.0,
+              "repeticoesRealizadas": 8,
+              "volumeCalculado": 640.0
+            }
           ]
         }
       },
       "observacao": "se o exercicio nao tem registros volta 200 com total 0 e registros []",
       "erros": [
-        { "status": 400, "corpo": { "erro": "ordenarPor inválido. Use: data, carga, repeticoes ou volume." } }
+        {
+          "status": 400,
+          "corpo": {
+            "erro": "ordenarPor inválido. Use: data, carga, repeticoes ou volume."
+          }
+        }
       ]
     },
     {
       "nome": "Comparativo com a sessao anterior",
       "metodo": "GET",
       "url": "/api/treinos/{id}/comparativo/{exercicioId}",
-      "descricao": "compara o exercicio no treino {id} com a sessao anterior que tambem fez esse exercicio. Se o treino ainda esta em andamento, compara com o ultimo treino concluido",
+      "descricao": "compara o exercicio no treino {id} com a sessao anterior que tambem fez esse exercicio. Se o treino ainda esta em andamento, compara com o ultimo treino concluido. A comparacao usa a classe ComparativoDesempenho (melhor serie de cada treino)",
       "sucesso": {
         "status": 200,
         "corpo": {
           "treinoId": 12,
           "exercicioId": 3,
           "exercicio": "Supino Reto",
-          "atual": { "treinoId": 12, "dataTreino": "2026-10-15", "maiorCarga": 82.50, "totalRepeticoes": 24, "totalSeries": 3, "volumeTotal": 1980.00 },
-          "anterior": { "treinoId": 10, "dataTreino": "2026-10-01", "maiorCarga": 80.00, "totalRepeticoes": 24, "totalSeries": 3, "volumeTotal": 1920.00 },
-          "variacao": {
-            "carga": "AUMENTO",
-            "repeticoes": "MANUTENCAO",
-            "volume": "AUMENTO",
-            "diferencaCarga": 2.50,
-            "diferencaRepeticoes": 0,
-            "diferencaVolume": 60.00,
-            "evoluiuPorRepeticoes": false
-          }
+          "resultado": "AUMENTO_CARGA",
+          "atual": {
+            "treinoId": 12,
+            "dataTreino": "2026-10-15",
+            "maiorCarga": 82.5,
+            "totalRepeticoes": 24,
+            "totalSeries": 3,
+            "volumeTotal": 1980.0
+          },
+          "anterior": {
+            "treinoId": 10,
+            "dataTreino": "2026-10-01",
+            "maiorCarga": 80.0,
+            "totalRepeticoes": 24,
+            "totalSeries": 3,
+            "volumeTotal": 1920.0
+          },
+          "diferencaVolume": 60.0
         }
       },
       "observacoes": [
-        "variacao pode ser AUMENTO, REDUCAO ou MANUTENCAO",
-        "evoluiuPorRepeticoes e true quando a carga ficou igual mas as repeticoes subiram",
-        "na primeira vez que o exercicio aparece, anterior e variacao vem null"
+        "resultado pode ser AUMENTO_CARGA, REDUCAO_CARGA, AUMENTO_REPETICOES, REDUCAO_REPETICOES, MANUTENCAO ou SEM_DADOS",
+        "AUMENTO_REPETICOES quer dizer que a carga ficou igual e as repeticoes subiram",
+        "na primeira vez que o exercicio aparece o resultado e SEM_DADOS e anterior e diferencaVolume vem null"
       ],
       "erros": [
-        { "status": 400, "corpo": { "erro": "Treino modelo não tem execução para comparar." } },
-        { "status": 404, "corpo": { "erro": "Treino não encontrado." } },
-        { "status": 404, "corpo": { "erro": "Esse exercício não faz parte do treino." } }
+        {
+          "status": 400,
+          "corpo": {
+            "erro": "Treino modelo não tem execução para comparar."
+          }
+        },
+        {
+          "status": 404,
+          "corpo": {
+            "erro": "Treino não encontrado."
+          }
+        },
+        {
+          "status": 404,
+          "corpo": {
+            "erro": "Esse exercício não faz parte do treino."
+          }
+        }
       ]
     },
     {
@@ -98,19 +185,45 @@
         "status": 200,
         "corpo": {
           "kpis": {
-            "totalTreinos": 4, "totalExercicios": 2, "totalSeries": 5, "volumeAcumulado": 3120.00,
-            "treinosNaSemana": 2, "treinosNoMes": 4, "maiorFrequenciaSemanal": 2
+            "totalTreinos": 4,
+            "totalExercicios": 2,
+            "totalSeries": 5,
+            "volumeAcumulado": 3120.0,
+            "treinosNaSemana": 2,
+            "treinosNoMes": 4,
+            "maiorFrequenciaSemanal": 2
           },
           "gruposMusculares": [
-            { "grupoMuscular": "PEITO", "execucoes": 3, "series": 4, "volume": 2620.00 },
-            { "grupoMuscular": "PERNAS", "execucoes": 1, "series": 1, "volume": 500.00 }
+            {
+              "grupoMuscular": "PEITO",
+              "execucoes": 3,
+              "series": 4,
+              "volume": 2620.0
+            },
+            {
+              "grupoMuscular": "PERNAS",
+              "execucoes": 1,
+              "series": 1,
+              "volume": 500.0
+            }
           ],
           "exerciciosMaisRealizados": [
-            { "exercicioId": 1, "exercicio": "Supino", "sessoes": 3 }
+            {
+              "exercicioId": 1,
+              "exercicio": "Supino",
+              "sessoes": 3
+            }
           ],
           "estagnacao": [
-            { "exercicioId": 1, "exercicio": "Supino", "sessoes": 3, "cargaInicial": 80.00, "cargaAtual": 80.00,
-              "tendencia": "MANUTENCAO", "estagnado": true }
+            {
+              "exercicioId": 1,
+              "exercicio": "Supino",
+              "sessoes": 3,
+              "cargaInicial": 80.0,
+              "cargaAtual": 80.0,
+              "tendencia": "MANUTENCAO",
+              "estagnado": true
+            }
           ]
         }
       },
@@ -119,13 +232,32 @@
         "exerciciosMaisRealizados traz no maximo 5",
         "estagnacao so inclui exercicios com 3 sessoes ou mais, os estagnados vem primeiro",
         "estagnado = nas ultimas 3 sessoes nem a carga nem o volume passaram da primeira delas",
-        "a semana comeca na segunda-feira"
+        "a semana comeca na segunda-feira",
+        "tendencia usa o mesmo texto do comparativo: AUMENTO_CARGA, REDUCAO_CARGA ou MANUTENCAO"
       ]
     }
   ],
   "errosGerais": [
-    { "status": 401, "quando": "sem token, token invalido ou expirado (precisa ligar o RespostaJsonSeguranca no SecurityConfig pra vir em json)", "corpo": { "erro": "Não autenticado. Envie o header Authorization: Bearer <token>." } },
-    { "status": 404, "quando": "o praticante do token nao existe mais", "corpo": { "erro": "Praticante não encontrado." } },
-    { "status": 500, "quando": "erro inesperado no servidor", "corpo": { "erro": "Erro interno. Tente novamente mais tarde." } }
+    {
+      "status": 401,
+      "quando": "sem token, token invalido ou expirado (precisa ligar o RespostaJsonSeguranca no SecurityConfig pra vir em json)",
+      "corpo": {
+        "erro": "Não autenticado. Envie o header Authorization: Bearer <token>."
+      }
+    },
+    {
+      "status": 404,
+      "quando": "o praticante do token nao existe mais",
+      "corpo": {
+        "erro": "Praticante não encontrado."
+      }
+    },
+    {
+      "status": 500,
+      "quando": "erro inesperado no servidor",
+      "corpo": {
+        "erro": "Erro interno. Tente novamente mais tarde."
+      }
+    }
   ]
 }
