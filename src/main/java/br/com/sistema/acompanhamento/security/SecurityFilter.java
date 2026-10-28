@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
+// Intercepta cada requisição e transforma um Bearer Token válido em autenticação Spring.
 public class SecurityFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
 

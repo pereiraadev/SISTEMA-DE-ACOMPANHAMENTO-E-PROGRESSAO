@@ -1,3 +1,5 @@
+-- Armazena os praticantes e garante que cada e-mail seja utilizado uma única vez.
+-- A senha deve ser persistida já codificada com BCrypt pela aplicação Spring Security.
 CREATE TABLE praticante (
     id BIGSERIAL PRIMARY KEY,
     nome VARCHAR(120) NOT NULL,
@@ -7,6 +9,7 @@ CREATE TABLE praticante (
     CONSTRAINT uk_praticante_email UNIQUE (email)
 );
 
+-- Mantém os exercícios e os melhores resultados registrados para cada um.
 CREATE TABLE exercicio (
     id BIGSERIAL PRIMARY KEY,
     praticante_id BIGINT REFERENCES praticante(id),
@@ -20,6 +23,8 @@ CREATE TABLE exercicio (
     total_vezes_realizado INTEGER NOT NULL DEFAULT 0
 );
 
+-- Um treino pode ser um modelo reutilizável ou uma execução realizada pelo praticante.
+-- treino_origem_id permite relacionar uma execução ao modelo ou treino que a originou.
 CREATE TABLE treino (
     id BIGSERIAL PRIMARY KEY,
     praticante_id BIGINT NOT NULL REFERENCES praticante(id),
@@ -32,6 +37,7 @@ CREATE TABLE treino (
     finalizado_em TIMESTAMPTZ
 );
 
+-- Representa um exercício dentro de um treino, preservando sua ordem e metas previstas.
 CREATE TABLE item_treino (
     id BIGSERIAL PRIMARY KEY,
     treino_id BIGINT NOT NULL REFERENCES treino(id),
@@ -44,6 +50,7 @@ CREATE TABLE item_treino (
     CONSTRAINT uk_item_treino_ordem UNIQUE (treino_id, ordem)
 );
 
+-- Registra cada série realizada e calcula automaticamente seu volume.
 CREATE TABLE serie_executada (
     id BIGSERIAL PRIMARY KEY,
     item_treino_id BIGINT NOT NULL REFERENCES item_treino(id),

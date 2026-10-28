@@ -16,6 +16,8 @@ public class SerieExecutada {
     @Column(name = "carga_utilizada", nullable = false, precision = 10, scale = 2) private BigDecimal cargaUtilizada;
     @Column(name = "repeticoes_realizadas", nullable = false) private Integer repeticoesRealizadas;
     @Column(name = "horario_conclusao") private OffsetDateTime horarioConclusao;
+    // O PostgreSQL calcula este valor a partir da carga e das repetições.
+    // Como a coluna é GENERATED STORED, o JPA apenas lê o resultado do banco.
     @Column(name = "volume_calculado", precision = 12, scale = 2, insertable = false, updatable = false)
     private BigDecimal volumeCalculado;
 

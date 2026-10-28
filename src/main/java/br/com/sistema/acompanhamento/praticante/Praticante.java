@@ -3,7 +3,9 @@ package br.com.sistema.acompanhamento.praticante;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 
+// Entidade que representa o usuário do sistema e seus dados de autenticação.
 @Entity
+// A constraint impede o cadastro de dois praticantes com o mesmo e-mail.
 @Table(name = "praticante", uniqueConstraints = @UniqueConstraint(name = "uk_praticante_email", columnNames = "email"))
 public class Praticante {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

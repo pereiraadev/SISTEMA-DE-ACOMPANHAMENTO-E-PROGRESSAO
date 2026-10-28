@@ -15,10 +15,12 @@ public class Treino {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "praticante_id", nullable = false)
     private Praticante praticante;
+    // Permite rastrear se este treino foi criado a partir de outro treino ou modelo.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "treino_origem_id")
     private Treino treinoOrigem;
     @Column(nullable = false, length = 120) private String identificacao;
+    // Diferencia um modelo reutilizável de uma execução concreta de treino.
     @Column(name = "is_modelo", nullable = false) private boolean modelo;
     @Column(name = "data_treino") private LocalDate dataTreino;
     @Column(nullable = false, length = 30) private String status;
