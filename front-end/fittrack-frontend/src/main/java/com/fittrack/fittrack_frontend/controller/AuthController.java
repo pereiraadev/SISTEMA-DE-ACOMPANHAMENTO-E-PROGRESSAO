@@ -30,10 +30,13 @@ public class AuthController {
     private boolean senhaVisivel = false;
     private final ApiClient apiClient;
     private final com.fittrack.fittrack_frontend.service.NavigationService navigationService;
+    private final com.fittrack.fittrack_frontend.service.PractitionerSession practitionerSession;
 
-    public AuthController(ApiClient apiClient, com.fittrack.fittrack_frontend.service.NavigationService navigationService) {
+    public AuthController(ApiClient apiClient, com.fittrack.fittrack_frontend.service.NavigationService navigationService,
+                           com.fittrack.fittrack_frontend.service.PractitionerSession practitionerSession) {
         this.apiClient = apiClient;
         this.navigationService = navigationService;
+        this.practitionerSession = practitionerSession;
     }
 
     @FXML
@@ -88,6 +91,7 @@ public class AuthController {
             } else {
                 AuthModels.LoginResposta resposta = apiClient.post("/auth/login", new AuthModels.Login(email, senha), AuthModels.LoginResposta.class);
                 apiClient.autenticar(resposta.token());
+                practitionerSession.definir(resposta.praticante().nome());
                 btnAcaoPrincipal.setText("Login realizado");
                 navigationService.navegar("/fxml/dashboard_home_view.fxml");
             }

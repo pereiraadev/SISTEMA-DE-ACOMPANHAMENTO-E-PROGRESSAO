@@ -289,5 +289,5 @@ public class MetricsHubController {
     }
 
     @FXML private void handleNavInicio() { navigationService.navegar("/fxml/dashboard_home_view.fxml"); }
-    @FXML private void handleNavTreinos() { navigationService.navegar("/fxml/active_workout_view.fxml"); }
+    @FXML private void handleNavTreinos() { navigationService.navegar("/fxml/workout_models_view.fxml"); }
 }

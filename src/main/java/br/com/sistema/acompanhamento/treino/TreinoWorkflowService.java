@@ -381,10 +381,17 @@ public class TreinoWorkflowService {
         for (var entry : lista.obterVolumePorGrupoMuscularDecimal().entrySet())
             grupos.put(entry.getKey().name(), entry.getValue());
         BigDecimal total = BigDecimal.ZERO;
-        for (Treino t : ts) for (ItemTreino i : t.getItens()) for (SerieExecutada s : mapa.getOrDefault(i.getId(), List.of())) {
-            BigDecimal v = s.getCargaUtilizada().multiply(BigDecimal.valueOf(s.getRepeticoesRealizadas()));
-            total = total.add(v);
+        int totalExercicios = 0;
+        int totalSeries = 0;
+        for (Treino t : ts) for (ItemTreino i : t.getItens()) {
+            List<SerieExecutada> series = mapa.getOrDefault(i.getId(), List.of());
+            if (!series.isEmpty()) totalExercicios++;
+            totalSeries += series.size();
+            for (SerieExecutada s : series) {
+                BigDecimal v = s.getCargaUtilizada().multiply(BigDecimal.valueOf(s.getRepeticoesRealizadas()));
+                total = total.add(v);
+            }
         }
-        return new ApiDtos.DashboardResposta(lista.getTamanho(), total, grupos);
+        return new ApiDtos.DashboardResposta(lista.getTamanho(), totalExercicios, totalSeries, total, grupos);
     }
 }

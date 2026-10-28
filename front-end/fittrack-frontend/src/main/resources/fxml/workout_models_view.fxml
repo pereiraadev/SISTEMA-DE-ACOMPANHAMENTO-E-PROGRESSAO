@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane prefHeight="720.0" prefWidth="380.0" stylesheets="@/styles/metrics_hub.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fittrack.fittrack_frontend.controller.WorkoutModelsController">
+    <top><VBox spacing="12" style="-fx-background-color: #121212;" padding="24 20 14 20"><Label text="Modelos de treino" styleClass="metrics-header-title"/><HBox spacing="8"><TextField fx:id="inputIdentificacao" promptText="Nome do novo modelo" HBox.hgrow="ALWAYS"/><Button text="Criar" onAction="#handleCriarModelo"/><Button text="Continuar treino" onAction="#handleContinuarTreino"/></HBox><Label fx:id="lblErro" styleClass="card-subtitle"/></VBox></top>
+    <center><ScrollPane fitToWidth="true" hbarPolicy="NEVER"><content><VBox fx:id="containerModelos" spacing="12" padding="20"/></content></ScrollPane></center>
+    <bottom><HBox styleClass="bottom-nav" alignment="CENTER"><Button text="Início" onAction="#handleNavInicio" HBox.hgrow="ALWAYS" maxWidth="Infinity"/><Button text="Métricas" onAction="#handleNavMetricas" HBox.hgrow="ALWAYS" maxWidth="Infinity"/></HBox></bottom>
+</BorderPane>

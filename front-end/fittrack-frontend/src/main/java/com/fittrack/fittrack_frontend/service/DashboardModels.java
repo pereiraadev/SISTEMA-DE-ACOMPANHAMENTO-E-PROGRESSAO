@@ -5,5 +5,5 @@ import java.util.Map;
 
 public final class DashboardModels {
     private DashboardModels() { }
-    public record DashboardResposta(int sessoesConcluidas, BigDecimal volumeTotal, Map<String, BigDecimal> volumePorGrupo) { }
+    public record DashboardResposta(int sessoesConcluidas, int totalExercicios, int totalSeries, BigDecimal volumeTotal, Map<String, BigDecimal> volumePorGrupo) { }
 }

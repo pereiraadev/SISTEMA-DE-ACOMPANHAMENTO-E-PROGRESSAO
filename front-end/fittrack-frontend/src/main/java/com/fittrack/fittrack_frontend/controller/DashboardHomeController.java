@@ -16,27 +16,35 @@ public class DashboardHomeController {
     @FXML private Label lblTotalExercicios;
     @FXML private Label lblTotalSeries;
     @FXML private Label lblVolumeTotal;
+    @FXML private javafx.scene.text.Text txtSaudacao;
+    private final com.fittrack.fittrack_frontend.service.PractitionerSession practitionerSession;
     private final ApiClient apiClient;
     private final NavigationService navigationService;
     private final com.fittrack.fittrack_frontend.service.WorkoutSession workoutSession;
 
     public DashboardHomeController(ApiClient apiClient, NavigationService navigationService,
-                                   com.fittrack.fittrack_frontend.service.WorkoutSession workoutSession) {
+                                   com.fittrack.fittrack_frontend.service.WorkoutSession workoutSession,
+                                   com.fittrack.fittrack_frontend.service.PractitionerSession practitionerSession) {
         this.apiClient = apiClient;
         this.navigationService = navigationService;
         this.workoutSession = workoutSession;
+        this.practitionerSession = practitionerSession;
     }
 
     @FXML
     private void initialize() {
+        txtSaudacao.setText("Olá, " + practitionerSession.obterNome());
         try {
             DashboardModels.DashboardResposta dashboard = apiClient.get("/api/dashboard", DashboardModels.DashboardResposta.class);
             lblTotalTreinos.setText(String.valueOf(dashboard.sessoesConcluidas()));
             lblVolumeTotal.setText(String.format("%,.0f kg", dashboard.volumeTotal()));
-            int exercicios = dashboard.volumePorGrupo() == null ? 0 : dashboard.volumePorGrupo().size();
-            lblTotalExercicios.setText(String.valueOf(exercicios));
+            lblTotalExercicios.setText(String.valueOf(dashboard.totalExercicios()));
+            lblTotalSeries.setText(String.valueOf(dashboard.totalSeries()));
+        } catch (Exception erro) {
+            lblTotalTreinos.setText("—");
+            lblTotalExercicios.setText("—");
             lblTotalSeries.setText("—");
-        } catch (Exception ignored) {
+            lblVolumeTotal.setText("Erro ao carregar");
         }
     }
 
@@ -44,7 +52,10 @@ public class DashboardHomeController {
     private void handleIniciarTreinoDoDia() {
         try {
             java.util.List<WorkoutModels.TreinoResposta> modelos = apiClient.getList("/api/modelos", new com.fasterxml.jackson.core.type.TypeReference<>() {});
-            if (modelos.isEmpty()) return;
+            if (modelos.isEmpty()) {
+                mostrarAviso("Nenhum modelo de treino disponível.");
+                return;
+            }
             List<String> opcoes = modelos.stream().map(WorkoutModels.TreinoResposta::identificacao).toList();
             ChoiceDialog<String> dialog = new ChoiceDialog<>(opcoes.get(0), opcoes);
             dialog.setTitle("Selecionar treino");
@@ -56,8 +67,12 @@ public class DashboardHomeController {
             workoutSession.definir(execucao);
             navigationService.navegar("/fxml/active_workout_view.fxml");
         } catch (Exception erro) {
-            return;
+            mostrarAviso("Não foi possível iniciar o treino.");
         }
+    }
+
+    private void mostrarAviso(String mensagem) {
+        new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION, mensagem).showAndWait();
     }
 
     @FXML
@@ -72,7 +87,7 @@ public class DashboardHomeController {
 
     @FXML
     private void handleNavTreinos() {
-        if (workoutSession.obter() != null) navigationService.navegar("/fxml/active_workout_view.fxml");
+        navigationService.navegar("/fxml/workout_models_view.fxml");
     }
 
     @FXML

@@ -36,8 +36,8 @@ public final class ApiDtos {
     public record ComparacaoResposta(Long sessao1Id, Long sessao2Id, Long exercicioId,
                                      BigDecimal volumeSessao1, BigDecimal volumeSessao2,
                                      BigDecimal diferenca, String desempenho) { }
-    public record DashboardResposta(int sessoesConcluidas, BigDecimal volumeTotal,
-                                    Map<String, BigDecimal> volumePorGrupo) { }
+public record DashboardResposta(int sessoesConcluidas, int totalExercicios, int totalSeries,
+                                     BigDecimal volumeTotal, Map<String, BigDecimal> volumePorGrupo) { }
     public record MaiorRepsResposta(Long exercicioId, BigDecimal carga, Integer repeticoes) { }
     public record RecordeResposta(Long exercicioId, BigDecimal maiorCarga, Integer repeticoesNaMaiorCarga,
                                  BigDecimal maiorVolumeSessao, int sessoesRealizadas) { }
