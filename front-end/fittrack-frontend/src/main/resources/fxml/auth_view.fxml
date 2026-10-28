@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<VBox alignment="TOP_CENTER" spacing="16.0" prefWidth="380.0" prefHeight="720.0" 
+      stylesheets="@../styles/auth.css" xmlns="http://javafx.com/javafx/21" 
+      xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.fittrack.fittrack_frontend.controller.AuthController">
+
+    <padding>
+        <Insets top="30.0" right="24.0" bottom="24.0" left="24.0"/>
+    </padding>
+
+    <!-- Logo / Cabeçalho -->
+    <VBox alignment="CENTER" spacing="4.0">
+        <ImageView fitWidth="220.0" preserveRatio="true">
+            <image>
+                <Image url="@../icons/logo.png" />
+            </image>
+        </ImageView>
+    </VBox>
+
+    <!-- Chaveador: Entrar / Cadastrar -->
+    <HBox styleClass="tab-container" alignment="CENTER" maxWidth="320.0" prefHeight="45.0" spacing="4.0">
+        <Button fx:id="btnTabEntrar" text="Entrar" styleClass="tab-button-inactive" 
+                alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="155.0" prefHeight="38.0" 
+                onAction="#handleSwitchToEntrar" />
+                
+        <Button fx:id="btnTabCadastrar" text="Cadastrar" styleClass="tab-button-active" 
+                alignment="CENTER" HBox.hgrow="ALWAYS" maxWidth="155.0" prefHeight="38.0" 
+                onAction="#handleSwitchToCadastrar" />
+    </HBox>
+
+    <!-- Campo: Nome Completo (Com ícone de Usuário) -->
+    <VBox fx:id="boxNome" spacing="6.0" alignment="CENTER_LEFT">
+        <Label text="Nome completo" styleClass="input-label" />
+        <HBox styleClass="input-box" prefHeight="48.0" alignment="CENTER_LEFT" spacing="10.0">
+            <ImageView fitWidth="20.0" fitHeight="20.0" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/user.png" />
+                </image>
+            </ImageView>
+            <TextField fx:id="txtNome" promptText="Rafael Silva" styleClass="text-field-custom" HBox.hgrow="ALWAYS" />
+        </HBox>
+    </VBox>
+
+    <!-- Campo: E-mail (Com ícone de Carta) -->
+    <VBox spacing="6.0" alignment="CENTER_LEFT">
+        <Label text="E-mail" styleClass="input-label" />
+        <HBox styleClass="input-box" prefHeight="48.0" alignment="CENTER_LEFT" spacing="10.0">
+            <ImageView fitWidth="20.0" fitHeight="20.0" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/mail.png" />
+                </image>
+            </ImageView>
+            <TextField fx:id="txtEmail" promptText="rafael@exemplo.com" styleClass="text-field-custom" HBox.hgrow="ALWAYS" />
+        </HBox>
+    </VBox>
+
+    <!-- Campo: Senha (Com ícone de Cadeado e Olho para alternar visibilidade) -->
+    <VBox spacing="6.0" alignment="CENTER_LEFT">
+        <Label text="Senha" styleClass="input-label" />
+        <HBox styleClass="input-box" prefHeight="48.0" alignment="CENTER_LEFT" spacing="10.0">
+            <ImageView fitWidth="20.0" fitHeight="20.0" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/lock.png" />
+                </image>
+            </ImageView>
+
+            <!-- Alterna entre PasswordField (oculto) e TextField (visível) -->
+            <StackPane HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
+                <PasswordField fx:id="txtSenhaOculta" promptText="••••••••••••" styleClass="text-field-custom" />
+                <TextField fx:id="txtSenhaVisivel" promptText="••••••••••••" styleClass="text-field-custom" visible="false" />
+            </StackPane>
+
+            <!-- Botão com ícone do Olho -->
+            <Button style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;" onAction="#toggleMostrarSenha">
+                <graphic>
+                    <ImageView fitWidth="20.0" fitHeight="20.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../icons/eye.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+    </VBox>
+
+    <!-- Botão de Ação Principal -->
+    <Button fx:id="btnAcaoPrincipal" text="Criar conta" styleClass="primary-button" maxWidth="Infinity" prefHeight="50.0" onAction="#handleAcaoPrincipal">
+        <VBox.margin>
+            <Insets top="6.0" />
+        </VBox.margin>
+    </Button>
+
+    <!-- Divisória "Ou continue com" -->
+    <HBox alignment="CENTER" spacing="10.0">
+        <VBox.margin>
+            <Insets top="6.0" bottom="6.0" />
+        </VBox.margin>
+        <Line startX="0" endX="80" styleClass="divider-line" />
+        <Text text="Ou continue com" styleClass="divider-text" />
+        <Line startX="0" endX="80" styleClass="divider-line" />
+    </HBox>
+
+    <!-- Botão Login Social / Cancelar -->
+    <Button style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;">
+        <graphic>
+            <ImageView fitWidth="48.0" fitHeight="48.0" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/cancelAuth.png" />
+                </image>
+            </ImageView>
+        </graphic>
+    </Button>
+
+    <!-- Alternador inferior (Já tem uma conta? / Não tem conta?) -->
+    <TextFlow textAlignment="CENTER">
+        <Text fx:id="lblRodapeTexto" text="Já tem uma conta? " styleClass="footer-text" />
+        <Text fx:id="lblRodapeLink" text="Entrar" styleClass="footer-link" onMouseClicked="#handleAlternarModo" />
+    </TextFlow>
+
+</VBox>

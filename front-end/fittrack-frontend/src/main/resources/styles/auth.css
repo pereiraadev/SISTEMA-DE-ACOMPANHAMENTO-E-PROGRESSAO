@@ -1,0 +1,111 @@
+/* Fundo da tela */
+.root {
+    -fx-background-color: #121212;
+    -fx-font-family: 'System', 'Segoe UI', sans-serif;
+}
+
+/* Título e Subtítulo */
+.title-text {
+    -fx-fill: #FFFFFF;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.subtitle-text {
+    -fx-fill: #A0A0A0;
+    -fx-font-size: 13px;
+}
+
+/* Seletor Aba Entrar / Cadastrar */
+.tab-container {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 25px;
+    -fx-padding: 4px;
+}
+
+.tab-button-inactive {
+    -fx-background-color: transparent;
+    -fx-text-fill: #888888;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER; 
+}
+
+.tab-button-active {
+    -fx-background-color: #43D61B;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-alignment: CENTER; 
+}
+
+/* Labels dos campos */
+.input-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/* Campos de entrada com container escuro e borda arredondada */
+.input-box {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 12px;
+    -fx-padding: 10px 14px;
+    -fx-alignment: center-left;
+}
+
+.text-field-custom {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #666666;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Botão principal (Criar conta / Entrar) */
+.primary-button {
+    -fx-background-color: #43D61B;
+    -fx-text-fill: #000000;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 25px;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #3bc217;
+}
+
+/* Linha divisória */
+.divider-line {
+    -fx-stroke: #2A2A2A;
+}
+
+.divider-text {
+    -fx-fill: #777777;
+    -fx-font-size: 12px;
+}
+
+/* Botão de login social */
+.social-button {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 50%;
+    -fx-min-width: 50px;
+    -fx-min-height: 50px;
+    -fx-cursor: hand;
+}
+
+/* Link de alternância inferior */
+.footer-text {
+    -fx-fill: #888888;
+    -fx-font-size: 13px;
+}
+
+.footer-link {
+    -fx-fill: #43D61B;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
