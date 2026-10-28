@@ -44,6 +44,7 @@ public class ActiveWorkoutController {
 
     private int segundosDecorridos;
     private boolean finalizado;
+    private boolean salvandoSerie;
     private Timeline timeline;
     
     private int serieAtualIndex;
@@ -226,7 +227,8 @@ public class ActiveWorkoutController {
 
     @FXML
     private void handleConfirmarSerie() {
-            if (serieAtualIndex >= listaSeries.size()) {
+        if (salvandoSerie) return;
+        if (serieAtualIndex >= listaSeries.size()) {
             exibirNotificacaoNaTela("Todas as séries deste exercício já foram concluídas!");
             return;
         }
@@ -244,18 +246,29 @@ public class ActiveWorkoutController {
         try {
             double carga = Double.parseDouble(cargaStr);
             int reps = Integer.parseInt(repsStr);
+            if (!Double.isFinite(carga) || carga <= 0 || reps <= 0) {
+                exibirNotificacaoNaTela("Carga e repetições devem ser maiores que zero.");
+                return;
+            }
 
+            salvandoSerie = true;
             if (execucaoId != null && itemId != null) {
                 try {
                     WorkoutModels.SerieResposta resposta = apiClient.post("/api/execucoes/" + execucaoId + "/itens/" + itemId + "/series",
                             new WorkoutModels.SerieEntrada(serieAtualIndex + 1, BigDecimal.valueOf(carga), reps),
                             WorkoutModels.SerieResposta.class);
                     workoutSession.registrarSerie(itemId, resposta);
-                } catch (Exception erro) {
-                    exibirNotificacaoNaTela("Não foi possível salvar a série.");
+                } catch (ApiClient.ApiClientException erro) {
+                    exibirNotificacaoNaTela("Erro ao salvar série (" + erro.getStatus() + "): " + mensagemErro(erro));
                     return;
+                } catch (Exception erro) {
+                    exibirNotificacaoNaTela("Erro de comunicação ao salvar série: " + mensagemErro(erro));
+                    return;
+                } finally {
+                    salvandoSerie = false;
                 }
             }
+            salvandoSerie = false;
 
             SerieData serieAtual = listaSeries.get(serieAtualIndex);
             serieAtual.carga = carga;
@@ -275,8 +288,14 @@ public class ActiveWorkoutController {
             }
 
         } catch (NumberFormatException e) {
+            salvandoSerie = false;
             exibirNotificacaoNaTela("Valores numéricos inválidos para Carga/Reps.");
         }
+    }
+
+    private String mensagemErro(Exception erro) {
+        String mensagem = erro.getMessage();
+        return mensagem == null || mensagem.isBlank() ? "tente novamente" : mensagem;
     }
 
     private void exibirNotificacaoNaTela(String mensagem) {

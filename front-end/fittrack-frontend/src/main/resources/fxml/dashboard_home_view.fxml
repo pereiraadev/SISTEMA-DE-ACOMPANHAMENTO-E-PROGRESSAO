@@ -31,7 +31,7 @@
                     <!-- Cabeçalho de Perfil -->
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                         <VBox alignment="CENTER_LEFT" spacing="2.0">
-                            <Text text="Olá, Rafael 👋" styleClass="user-greeting" />
+                            <Text fx:id="txtSaudacao" text="Olá" styleClass="user-greeting" />
                             <Text text="Vamos treinar hoje?" styleClass="user-subtitle" />
                         </VBox>
                     </HBox>
@@ -118,8 +118,8 @@
                                         </ImageView>
                                         <VBox spacing="2.0">
                                             <padding><Insets top="8.0" right="10.0" bottom="10.0" left="10.0"/></padding>
-                                            <Text text="Supino Reto" styleClass="exercise-title" />
-                                            <Text text="4 séries x 10 reps" styleClass="exercise-subtitle" />
+                                            <Text text="—" styleClass="exercise-title" />
+                                            <Text text="—" styleClass="exercise-subtitle" />
                                         </VBox>
                                     </VBox>
 
@@ -133,8 +133,8 @@
                                         </ImageView>
                                         <VBox spacing="2.0">
                                             <padding><Insets top="8.0" right="10.0" bottom="10.0" left="10.0"/></padding>
-                                            <Text text="Agachamento" styleClass="exercise-title" />
-                                            <Text text="4 séries x 8 reps" styleClass="exercise-subtitle" />
+                                            <Text text="—" styleClass="exercise-title" />
+                                            <Text text="—" styleClass="exercise-subtitle" />
                                         </VBox>
                                     </VBox>
 
@@ -148,8 +148,8 @@
                                         </ImageView>
                                         <VBox spacing="2.0">
                                             <padding><Insets top="8.0" right="10.0" bottom="10.0" left="10.0"/></padding>
-                                            <Text text="Rosca Direta" styleClass="exercise-title" />
-                                            <Text text="3 séries x 12 reps" styleClass="exercise-subtitle" />
+                                            <Text text="—" styleClass="exercise-title" />
+                                            <Text text="—" styleClass="exercise-subtitle" />
                                         </VBox>
                                     </VBox>
                                 </HBox>

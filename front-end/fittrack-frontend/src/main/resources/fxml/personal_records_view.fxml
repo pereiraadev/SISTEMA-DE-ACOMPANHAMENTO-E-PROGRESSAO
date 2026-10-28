@@ -67,9 +67,9 @@
                             <Label text="Maior Carga da História" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;" />
                         </HBox>
                         
-                        <Label text="AGACHAMENTO LIVRE" styleClass="hero-subtitle" />
-                        <Label text="180 kg" styleClass="hero-value" />
-                        <Label text="Alcançado em 15 Out 2025" style="-fx-text-fill: #777777; -fx-font-size: 12px;" />
+                        <Label text="—" styleClass="hero-subtitle" />
+                        <Label text="—" styleClass="hero-value" />
+                        <Label text="—" style="-fx-text-fill: #777777; -fx-font-size: 12px;" />
                     </VBox>
 
                     <!-- GRID DE METRICAS RÁPIDAS (2x2) -->
@@ -88,7 +88,7 @@
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Label text="PR" styleClass="badge-pr-tag" />
                                 </HBox>
-                                <Label text="180 kg" styleClass="metric-value" />
+                                <Label text="—" styleClass="metric-value" />
                                 <Label text="Maior Carga Absoluta" styleClass="metric-label" wrapText="true" />
                             </VBox>
 
@@ -101,7 +101,7 @@
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Label text="PR" styleClass="badge-pr-tag" />
                                 </HBox>
-                                <Label text="12.450 kg" styleClass="metric-value" />
+                                <Label text="—" styleClass="metric-value" />
                                 <Label text="Maior Volume em Treino" styleClass="metric-label" wrapText="true" />
                             </VBox>
 
@@ -114,7 +114,7 @@
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Label text="PR" styleClass="badge-pr-tag" />
                                 </HBox>
-                                <Label text="100 kg × 15" styleClass="metric-value" />
+                                <Label text="—" styleClass="metric-value" />
                                 <Label text="Maior Reps sob Carga" styleClass="metric-label" wrapText="true" />
                             </VBox>
 
@@ -127,7 +127,7 @@
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Label text="PR" styleClass="badge-pr-tag" />
                                 </HBox>
-                                <Label text="8 semanas" styleClass="metric-value" />
+                                <Label text="—" styleClass="metric-value" />
                                 <Label text="Maior Frequência Semanal" styleClass="metric-label" wrapText="true" />
                             </VBox>
                         </children>

@@ -2,6 +2,7 @@ package com.fittrack.fittrack_frontend.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -21,6 +22,7 @@ public class AuthController {
     @FXML private PasswordField txtSenhaOculta;
     @FXML private TextField txtSenhaVisivel;
     @FXML private Button btnAcaoPrincipal;
+    @FXML private Label lblErro;
     @FXML private Text lblRodapeTexto;
     @FXML private Text lblRodapeLink;
 
@@ -68,11 +70,14 @@ public class AuthController {
 
     @FXML
     private void handleAcaoPrincipal() {
+        lblErro.setText("");
+        lblErro.setVisible(false);
+        lblErro.setManaged(false);
         try {
             String email = txtEmail.getText().trim();
             String senha = txtSenhaOculta.getText();
             if (email.isBlank() || senha.isBlank() || (modoCadastro && txtNome.getText().trim().isBlank())) {
-                btnAcaoPrincipal.setText("Preencha os campos");
+                mostrarErro("Preencha todos os campos.");
                 return;
             }
             if (modoCadastro) {
@@ -86,9 +91,25 @@ public class AuthController {
                 btnAcaoPrincipal.setText("Login realizado");
                 navigationService.navegar("/fxml/dashboard_home_view.fxml");
             }
+        } catch (ApiClient.ApiClientException erro) {
+            String mensagem = switch (erro.getStatus()) {
+                case 400 -> "Confira os dados informados.";
+                case 401 -> "E-mail ou senha inválidos.";
+                case 409 -> "Este e-mail já está cadastrado.";
+                default -> "Não foi possível concluir a operação. Tente novamente.";
+            };
+            mostrarErro(mensagem);
+        } catch (java.net.ConnectException | java.net.http.HttpTimeoutException erro) {
+            mostrarErro("Não foi possível conectar ao servidor.");
         } catch (Exception erro) {
-            btnAcaoPrincipal.setText("Falha na operação");
+            mostrarErro("Não foi possível concluir a operação.");
         }
+    }
+
+    private void mostrarErro(String mensagem) {
+        lblErro.setText(mensagem);
+        lblErro.setVisible(true);
+        lblErro.setManaged(true);
     }
 
     private void atualizarInterface() {

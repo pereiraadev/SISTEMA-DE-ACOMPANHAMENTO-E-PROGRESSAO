@@ -25,12 +25,12 @@
             </padding>
             <Button text="‹" styleClass="btn-icon-back" onAction="#handleVoltar" />
             <VBox spacing="2.0">
-                <Label fx:id="lblNomeGrupo" text="Peitoral" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                <Label fx:id="lblNomeGrupo" text="—" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
                 <Label text="Grupo Muscular" style="-fx-text-fill: #888888; -fx-font-size: 12px;" />
             </VBox>
             <Region HBox.hgrow="ALWAYS" />
             <HBox styleClass="badge-vol-positive" alignment="CENTER">
-                <Label fx:id="lblTagFoco" text="Foco A" style="-fx-text-fill: #43D61B; -fx-font-weight: bold; -fx-font-size: 12px;" />
+                <Label fx:id="lblTagFoco" text="—" style="-fx-text-fill: #43D61B; -fx-font-weight: bold; -fx-font-size: 12px;" />
             </HBox>
         </HBox>
     </top>
@@ -57,7 +57,7 @@
                                 <Region styleClass="donut-hole" maxWidth="110.0" maxHeight="110.0" />
 
                                 <VBox alignment="CENTER" spacing="0.0">
-                                    <Label fx:id="lblVolumeTotalFormatado" text="8.450" styleClass="donut-center-title" />
+                                    <Label fx:id="lblVolumeTotalFormatado" text="—" styleClass="donut-center-title" />
                                     <Label text="kg total" styleClass="donut-center-subtitle" />
                                 </VBox>
                             </StackPane>
@@ -87,12 +87,12 @@
                         <children>
                             <VBox styleClass="stat-kpi-card" spacing="4.0" GridPane.columnIndex="0">
                                 <Label text="Total de treinos" styleClass="card-subtitle" />
-                                <Label fx:id="lblTotalTreinos" text="18 realizados" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                                <Label fx:id="lblTotalTreinos" text="—" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
                             </VBox>
 
                             <VBox styleClass="stat-kpi-card" spacing="4.0" GridPane.columnIndex="1">
                                 <Label text="Média semanal" styleClass="card-subtitle" />
-                                <Label fx:id="lblMediaSemanal" text="2.1x frequência" style="-fx-text-fill: #43D61B; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                                <Label fx:id="lblMediaSemanal" text="—" style="-fx-text-fill: #43D61B; -fx-font-size: 18px; -fx-font-weight: bold;" />
                             </VBox>
                         </children>
                     </GridPane>

@@ -98,6 +98,8 @@
         </HBox>
     </VBox>
 
+    <Label fx:id="lblErro" visible="false" managed="false" wrapText="true" style="-fx-text-fill: #c0392b; -fx-font-size: 13px;" />
+
     <!-- Botão de Ação Principal -->
     <Button fx:id="btnAcaoPrincipal" text="Criar conta" styleClass="primary-button" maxWidth="Infinity" prefHeight="50.0" onAction="#handleAcaoPrincipal">
         <VBox.margin>
