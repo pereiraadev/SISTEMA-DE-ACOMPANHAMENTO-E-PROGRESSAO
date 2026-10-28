@@ -1,0 +1,206 @@
+.root {
+    -fx-background-color: #121212;
+    -fx-font-family: 'System', 'Segoe UI', sans-serif;
+}
+
+.scroll-pane {
+    -fx-background-color: #121212;
+    -fx-background: #121212;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: #121212;
+}
+
+/* Título e Abas Superiores */
+.metrics-header-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.tab-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #888888;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0 0 6px 0;
+}
+
+.tab-button-active {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0 0 6px 0;
+    -fx-border-color: #43D61B;
+    -fx-border-width: 0 0 3px 0;
+}
+
+/* Campo de Busca */
+.search-box {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 20px;
+    -fx-padding: 8px 14px;
+}
+
+.search-input {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #666666;
+    -fx-font-size: 13px;
+}
+
+/* Cards Genéricos */
+.metric-card-row {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 16px;
+    -fx-padding: 14px 18px;
+    -fx-cursor: hand;
+}
+
+.card-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.card-subtitle {
+    -fx-text-fill: #888888;
+    -fx-font-size: 12px;
+}
+
+/* Badges de Variação (+12% vol, -3% vol) */
+.badge-vol-positive {
+    -fx-background-color: #1A3812;
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12px;
+    -fx-padding: 4px 10px;
+}
+
+.badge-vol-negative {
+    -fx-background-color: #3A1414;
+    -fx-text-fill: #FF4D4D;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12px;
+    -fx-padding: 4px 10px;
+}
+
+/* Badge de PR */
+.badge-pr-highlight {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/* Barra de Progresso do Treino */
+.progress-bar-bg {
+    -fx-background-color: #2A2A2A;
+    -fx-background-radius: 4px;
+    -fx-min-height: 6px;
+    -fx-max-height: 6px;
+}
+
+.progress-bar-fill {
+    -fx-background-color: #43D61B;
+    -fx-background-radius: 4px;
+    -fx-min-height: 6px;
+    -fx-max-height: 6px;
+}
+
+/* Barra de Navegação Inferior */
+.bottom-nav {
+    -fx-background-color: #121212;
+    -fx-border-color: #222222;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 10px 0;
+}
+
+.nav-item {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.nav-label {
+    -fx-text-fill: #666666;
+    -fx-font-size: 11px;
+}
+
+.nav-label-active {
+    -fx-text-fill: #43D61B;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* Estilos de Detalhe de Grupo (Peitoral) */
+.donut-center-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.donut-center-subtitle {
+    -fx-text-fill: #888888;
+    -fx-font-size: 11px;
+}
+
+.legend-dot {
+    -fx-min-width: 8px;
+    -fx-max-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-height: 8px;
+    -fx-background-radius: 50%;
+}
+
+.stat-kpi-card {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 16px;
+    -fx-padding: 14px 16px;
+}
+
+.chart-bar-rect {
+    -fx-background-color: #43D61B;
+    -fx-background-radius: 6px 6px 0 0;
+}
+
+/* Efeito Donut no PieChart */
+.donut-hole {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 50%;
+}
+
+.chart-pie-label {
+    -fx-fill: transparent;
+}
+
+/* Botão de Voltar Circular estilo Mobile */
+.btn-icon-back {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 50%;
+    -fx-min-width: 36px;
+    -fx-max-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-height: 36px;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+    -fx-padding: 0 0 2px 0; /* Alinhamento óptico do símbolo '‹' */
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+.btn-icon-back:hover {
+    -fx-background-color: #2A2A2A;
+}
+
+/* Cores das Fatias do Donut (Paleta do Design) */
+.data0.default-color0 { -fx-pie-color: #43D61B; } /* Supino Reto */
+.data1.default-color1 { -fx-pie-color: #2E7D32; } /* Inclinado */
+.data2.default-color2 { -fx-pie-color: #38B6FF; } /* Crucifixo */
+.data3.default-color3 { -fx-pie-color: #888888; } /* Crossover */

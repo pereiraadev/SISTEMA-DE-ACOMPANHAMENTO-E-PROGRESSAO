@@ -21,7 +21,7 @@ public class CarregadorHistorico<T extends TreinoHistorico> {
         Set<Long> ids = new HashSet<>();
         for (T treino : treinos) {
             Long id = treino instanceof TreinoComSeries comSeries ? comSeries.getId() : null;
-            if (treino != null && !treino.isModelo() && !vistos.containsKey(treino)
+            if (treino != null && !treino.isModelo() && treino.getDataRealizacao() != null && !vistos.containsKey(treino)
                     && (id == null || !ids.contains(id))) {
                 realizados.add(treino);
                 vistos.put(treino, true);

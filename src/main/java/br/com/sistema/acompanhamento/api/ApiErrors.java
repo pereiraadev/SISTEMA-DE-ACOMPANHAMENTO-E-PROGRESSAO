@@ -10,6 +10,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class ApiErrors {
@@ -29,6 +30,12 @@ public class ApiErrors {
             MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class})
     ResponseEntity<ApiDtos.Erro> entradaInvalida(Exception erro) {
         return ResponseEntity.badRequest().body(new ApiDtos.Erro("DADOS_INVALIDOS", "Verifique os campos enviados"));
+    }
+    @ExceptionHandler(ResponseStatusException.class)
+    ResponseEntity<ApiDtos.Erro> statusExplicito(ResponseStatusException erro) {
+        String codigo = erro.getStatusCode().value() == 400 ? "DADOS_INVALIDOS" : "ACESSO_NEGADO";
+        return ResponseEntity.status(erro.getStatusCode())
+                .body(new ApiDtos.Erro(codigo, erro.getReason()));
     }
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiDtos.Erro> falhaInesperada(Exception erro) {

@@ -16,6 +16,7 @@ public class Exercicio {
     @Column(name = "grupo_muscular", length = 20, nullable = false) private String grupoMuscular;
     @Column(length = 500) private String descricao;
     @Column(nullable = false) private boolean ativo = true;
+    // Recordes mantidos para permitir consultas rápidas de desempenho.
     @Column(name = "recorde_carga", precision = 10, scale = 2) private BigDecimal recordeCarga;
     @Column(name = "recorde_reps_para_carga") private Integer recordeRepsParaCarga;
     @Column(name = "recorde_volume_sessao", precision = 12, scale = 2) private BigDecimal recordeVolumeSessao;
@@ -39,4 +40,20 @@ public class Exercicio {
     public void setRecordeVolumeSessao(BigDecimal valor) { this.recordeVolumeSessao = valor; }
     public Integer getTotalVezesRealizado() { return totalVezesRealizado; }
     public void setTotalVezesRealizado(Integer valor) { this.totalVezesRealizado = valor; }
+
+    public void atualizarRecordes(BigDecimal carga, Integer repeticoes, BigDecimal volume) {
+        if (carga != null && repeticoes != null) {
+            if (recordeCarga == null || carga.compareTo(recordeCarga) > 0) {
+                recordeCarga = carga;
+                recordeRepsParaCarga = repeticoes;
+            } else if (carga.compareTo(recordeCarga) == 0
+                    && (recordeRepsParaCarga == null || repeticoes > recordeRepsParaCarga)) {
+                recordeRepsParaCarga = repeticoes;
+            }
+        }
+        if (volume != null && (recordeVolumeSessao == null || volume.compareTo(recordeVolumeSessao) > 0)) {
+            recordeVolumeSessao = volume;
+        }
+        totalVezesRealizado = totalVezesRealizado == null ? 1 : totalVezesRealizado + 1;
+    }
 }

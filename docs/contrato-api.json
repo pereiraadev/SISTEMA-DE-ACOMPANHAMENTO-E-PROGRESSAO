@@ -1129,9 +1129,50 @@
         }
       }
     },
+    "/treinos/historico": {
+      "get": {
+        "summary": "Lista execuções concluídas com finalizadoEm, ordenação selecionável e desempate por ID",
+        "description": "Somente execuções CONCLUIDO com finalizadoEm preenchido. ordem=data usa o instante de finalização em UTC, crescente, com desempate por ID crescente; as demais ordens preservam a classificação por métrica. Execuções legadas sem finalizadoEm não entram no histórico até regularização explícita.",
+        "parameters": [
+          {
+            "name": "ordem",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["data", "carga", "repeticoes", "volume"], "default": "data" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Treinos concluídos do praticante autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer", "format": "int64" },
+                      "identificacao": { "type": "string" },
+                      "dataRealizacao": { "type": "string", "format": "date-time", "description": "finalizadoEm convertido para UTC" },
+                      "totalSeries": { "type": "integer" },
+                      "maiorCarga": { "type": "number", "format": "double" },
+                      "maiorRepeticoes": { "type": "integer" },
+                      "volumeTotal": { "type": "number", "format": "double" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Critério de ordenação inválido" },
+          "401": { "description": "Token ausente, inválido ou praticante inexistente" }
+        }
+      }
+    },
     "/api/historico": {
       "get": {
-        "summary": "Lista execuções concluídas em ordem cronológica",
+        "summary": "Lista execuções concluídas por finalizadoEm crescente, com desempate por ID",
+        "description": "Execuções CONCLUIDO sem finalizadoEm não aparecem; nenhuma data é inferida de iniciadoEm ou dataTreino.",
         "parameters": [],
         "responses": {
           "200": {
@@ -1615,7 +1656,8 @@
           },
           "recordeRepsParaCarga": {
             "type": "integer",
-            "nullable": true
+            "nullable": true,
+            "description": "Maior número de repetições entre as séries realizadas com recordeCarga; não é o recorde independente de repetições"
           },
           "recordeVolumeSessao": {
             "type": "number",

@@ -8,12 +8,14 @@ Para iniciar o backend, configure `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE
 
 1. Cadastre o praticante com `POST /auth/cadastrar`. O cadastro devolve ID, nome e e-mail; nunca devolve a senha.
 2. Faça login com `POST /auth/login`. Guarde o campo `token` apenas durante a sessão da aplicação.
-3. Envie `Authorization: Bearer <token>` em todas as rotas `/api/...`. Token ausente ou inválido recebe HTTP 401. Novo login é necessário após a expiração.
+3. Envie `Authorization: Bearer <token>` em todas as rotas `/api/...` e `/treinos/historico`. Token ausente ou inválido recebe HTTP 401. Novo login é necessário após a expiração.
 4. Consulte `GET /api/exercicios` ou cadastre um exercício próprio com `POST /api/exercicios`. Crie um modelo em `POST /api/modelos` ou consulte `GET /api/modelos`.
 5. Inicie o modelo em `POST /api/modelos/{id}/iniciar`. Guarde o ID da execução retornada e os IDs dos itens.
 6. Consulte `GET /api/execucoes/{id}`. Registre cada série com `POST /api/execucoes/{id}/itens/{itemId}/series`, numerando de 1 até o total previsto. Enquanto a execução estiver em andamento, `PUT` na rota da série corrige carga e repetições, mantendo o número.
 7. Finalize com `POST /api/execucoes/{id}/finalizar`. É necessário registrar ao menos uma série. Uma segunda finalização recebe HTTP 409.
 8. Consulte `GET /api/historico`, `GET /api/historico/{id}/anterior?exercicioId=7`, `GET /api/historico/comparar`, `GET /api/exercicios/{id}/recordes`, `GET /api/exercicios/{id}/volume`, `GET /api/exercicios/{id}/maior-reps?carga=40.5` e `GET /api/dashboard`.
+
+Para um resumo ordenável das mesmas execuções, use `GET /treinos/historico?ordem=data|carga|repeticoes|volume`. O padrão é `data`. Essa rota devolve `HistoricoTreinoDTO`, enquanto `/api/historico` devolve os treinos com itens e séries.
 
 ## Exemplos
 
@@ -32,5 +34,7 @@ Erros de negócio e validação usam `{"codigo":"ESTADO_INVALIDO","mensagem":"..
 ## Regras importantes
 
 `MODELO` é uma ficha. `EM_ANDAMENTO` é uma execução editável. `CONCLUIDO` é uma execução fechada e aparece no histórico. O backend calcula volumes com carga e repetições executadas. Recordes pessoais consultados em `/recordes` são derivados apenas das execuções concluídas do praticante. A interface não deve considerar o retorno do cadastro como login; obtenha o JWT na rota de login.
+
+Os dois endpoints de histórico incluem somente execuções concluídas com `finalizadoEm` preenchido. A ordem cronológica usa o instante de finalização em UTC, do mais antigo ao mais recente, e desempata pelo ID crescente. Treinos legados concluídos sem `finalizadoEm` ficam fora do histórico e das métricas derivadas até uma regularização explícita dos dados; o backend não infere essa data do início ou da data do treino.
 
 `repeticoesNaMaiorCarga` indica o maior número de repetições entre as séries feitas com a maior carga registrada. Para exercícios próprios, os campos de recorde da entidade são atualizados na finalização; para exercícios globais, o backend calcula os recordes por praticante na consulta e não grava marcas pessoais no registro compartilhado. O `volume_calculado` do banco é somente leitura e gerado pelo PostgreSQL.

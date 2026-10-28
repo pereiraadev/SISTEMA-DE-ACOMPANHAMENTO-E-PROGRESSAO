@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 @EnableWebSecurity
 public class SecurityConfig {
     @Bean
+    // BCrypt gera um hash com salt; a senha original nunca é armazenada.
     PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
     @Bean

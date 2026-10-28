@@ -21,7 +21,7 @@ public class JavaFxApplication extends Application{
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/active_workout_view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/auth_view.fxml"));
         
         // Conecta o FXML ao Injetor de Dependências do Spring
         loader.setControllerFactory(applicationContext::getBean);

@@ -6,6 +6,6 @@ public interface TreinoHistorico extends TreinoComExercicios {
     // Informa se o treino é apenas uma ficha modelo
     boolean isModelo();
 
-    // Data da sessão, usada para ordenar o histórico.
+    // Instante de finalizacao em UTC, sem substitutos, usado para ordenar o historico.
     java.time.LocalDateTime getDataRealizacao();
 }

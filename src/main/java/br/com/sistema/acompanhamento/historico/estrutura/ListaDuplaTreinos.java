@@ -1,9 +1,15 @@
 package br.com.sistema.acompanhamento.historico.estrutura;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.math.BigDecimal;
+import java.util.Set;
 
 // Guarda os treinos em uma lista duplamente encadeada
 public class ListaDuplaTreinos<T extends TreinoComExercicios> {
@@ -75,6 +81,85 @@ public class ListaDuplaTreinos<T extends TreinoComExercicios> {
 
         // Não encontrou um treino anterior com esse exercício
         return null;
+    }
+
+    public List<T> ordenarPorData() {
+        return ordenar(Comparator.comparing((T t) -> dataRealizacao(t), Comparator.nullsLast(Comparator.<LocalDateTime>naturalOrder()))
+                .thenComparing(t -> t instanceof TreinoComSeries s ? s.getId() : null,
+                        Comparator.nullsLast(Comparator.naturalOrder())));
+    }
+
+    public List<T> ordenarPorCarga() {
+        return ordenar(Comparator.comparingDouble((T t) -> maiorCarga(t)).reversed());
+    }
+
+    public List<T> ordenarPorRepeticoes() {
+        return ordenar(Comparator.comparingInt((T t) -> maiorNumeroRepeticoes(t)).reversed());
+    }
+
+    public List<T> ordenarPorVolume() {
+        return ordenar(Comparator.comparingDouble((T t) -> volumeTotal(t)).reversed());
+    }
+
+    public List<T> obterExerciciosComAumentoDeCarga() {
+        Set<Long> encontrados = new LinkedHashSet<>();
+        NoTreino<T> atual = inicio;
+        while (atual != null) {
+            T anterior = obterTreinoAnteriorPorExercicio(atual.getTreino(), primeiroExercicio(atual.getTreino()));
+            if (anterior != null) {
+                Long exercicioId = primeiroExercicio(atual.getTreino());
+                if (maiorCarga(atual.getTreino(), exercicioId) > maiorCarga(anterior, exercicioId)) encontrados.add(exercicioId);
+            }
+            atual = atual.getProximo();
+        }
+        return filtrarTreinosComExercicios(encontrados);
+    }
+
+    public List<T> obterExerciciosComCargaEstavelOuReduzida() {
+        Set<Long> encontrados = new LinkedHashSet<>();
+        NoTreino<T> atual = inicio;
+        while (atual != null) {
+            Long exercicioId = primeiroExercicio(atual.getTreino());
+            T anterior = obterTreinoAnteriorPorExercicio(atual.getTreino(), exercicioId);
+            if (anterior != null && maiorCarga(atual.getTreino(), exercicioId) <= maiorCarga(anterior, exercicioId)) encontrados.add(exercicioId);
+            atual = atual.getProximo();
+        }
+        return filtrarTreinosComExercicios(encontrados);
+    }
+
+    private List<T> ordenar(Comparator<T> comparator) {
+        List<T> resultado = new ArrayList<>();
+        NoTreino<T> atual = inicio;
+        while (atual != null) { resultado.add(atual.getTreino()); atual = atual.getProximo(); }
+        resultado.sort(comparator);
+        return resultado;
+    }
+
+    private LocalDateTime dataRealizacao(T treino) {
+        return treino instanceof TreinoHistorico historico ? historico.getDataRealizacao() : null;
+    }
+    private double maiorCarga(T treino) { return maiorCarga(treino, null); }
+    private double maiorCarga(T treino, Long exercicioId) {
+        if (!(treino instanceof TreinoComSeries comSeries)) return 0;
+        return comSeries.getSeriesExecutadas().stream().filter(s -> exercicioId == null || Objects.equals(exercicioId, s.getExercicioId())).mapToDouble(SerieHistorico::getCarga).max().orElse(0);
+    }
+    private int maiorNumeroRepeticoes(T treino) {
+        if (!(treino instanceof TreinoComSeries comSeries)) return 0;
+        return comSeries.getSeriesExecutadas().stream().mapToInt(SerieHistorico::getRepeticoes).max().orElse(0);
+    }
+    private double volumeTotal(T treino) {
+        if (!(treino instanceof TreinoComSeries comSeries)) return 0;
+        return comSeries.getSeriesExecutadas().stream().mapToDouble(s -> s.getCarga() * s.getRepeticoes()).sum();
+    }
+    private Long primeiroExercicio(T treino) {
+        if (!(treino instanceof TreinoComSeries comSeries)) return null;
+        return comSeries.getSeriesExecutadas().stream().map(SerieHistorico::getExercicioId).filter(Objects::nonNull).findFirst().orElse(null);
+    }
+    private List<T> filtrarTreinosComExercicios(Set<Long> ids) {
+        List<T> resultado = new ArrayList<>();
+        NoTreino<T> atual = inicio;
+        while (atual != null) { if (ids.stream().anyMatch(atual.getTreino()::possuiExercicio)) resultado.add(atual.getTreino()); atual = atual.getProximo(); }
+        return resultado;
     }
 
     // Retorna null quando nenhuma série corresponde à carga e ao exercício.

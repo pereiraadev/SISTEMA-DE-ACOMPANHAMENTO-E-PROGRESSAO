@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+// Garante que a posição de cada exercício seja única dentro do treino.
 @Table(name = "item_treino", uniqueConstraints = @UniqueConstraint(name = "uk_item_treino_ordem", columnNames = {"treino_id", "ordem"}))
 public class ItemTreino {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
