@@ -109,14 +109,13 @@
     -fx-padding: 8px 0px 10px 0px;
 }
 
-/* Reseta completamente os efeitos nativos do JavaFX em todos os estados de botão */
-.nav-button,
-.nav-button:focused,
-.nav-button:hover,
-.nav-button:armed,
-.nav-button:pressed {
+/* Reseta completamente os efeitos nativos do JavaFX em todos os estados de botão
+   (evita a marcação cinza de foco/hover/seleção na navegação inferior) */
+.nav-button, .nav-button:focused, .nav-button:hover, .nav-button:armed, .nav-button:pressed {
     -fx-background-color: transparent !important;
     -fx-background-insets: 0 !important;
+    -fx-background-radius: 0 !important;
+    -fx-border-color: transparent !important;
     -fx-focus-color: transparent !important;
     -fx-faint-focus-color: transparent !important;
     -fx-padding: 2px 0;

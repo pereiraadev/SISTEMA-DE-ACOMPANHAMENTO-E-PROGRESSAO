@@ -32,7 +32,7 @@
                 </padding>
                 <Button text="‹" styleClass="btn-icon-back" onAction="#handleVoltar" />
                 <VBox spacing="2.0">
-                    <Label fx:id="lblNomeExercício" text="Supino Reto" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                    <Label fx:id="lblNomeExercicio" text="Supino Reto" style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold;" />
                     <Label fx:id="lblGrupoMuscular" text="Peito" style="-fx-text-fill: #888888; -fx-font-size: 12px;" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />

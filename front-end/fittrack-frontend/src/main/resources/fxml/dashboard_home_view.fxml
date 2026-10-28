@@ -139,7 +139,7 @@
             <Button styleClass="nav-button" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#handleNavInicio">
                 <graphic>
                     <VBox alignment="CENTER" spacing="4.0">
-                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true" styleClass="nav-icon-active">
                             <Image url="@../icons/home.png" />
                         </ImageView>
                         <Label text="Início" styleClass="nav-item-active" />
@@ -151,7 +151,7 @@
             <Button styleClass="nav-button" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#handleNavTreinos">
                 <graphic>
                     <VBox alignment="CENTER" spacing="4.0">
-                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true" styleClass="nav-icon-inactive">
                             <Image url="@../icons/dumbbell (1).png" />
                         </ImageView>
                         <Label text="Treinos" styleClass="nav-item-inactive" />
@@ -163,7 +163,7 @@
             <Button styleClass="nav-button" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#handleNavMetricas">
                 <graphic>
                     <VBox alignment="CENTER" spacing="4.0">
-                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true" styleClass="nav-icon-inactive">
                             <Image url="@../icons/Vector.png" />
                         </ImageView>
                         <Label text="Métricas" styleClass="nav-item-inactive" />

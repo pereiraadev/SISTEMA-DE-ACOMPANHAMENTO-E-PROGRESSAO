@@ -140,7 +140,7 @@
                             <Region HBox.hgrow="ALWAYS" />
                         </HBox>
 
-                        <VBox fx:id="containerPRsExercício" spacing="10.0" />
+                        <VBox fx:id="containerPRsExercicio" spacing="10.0" />
                     </VBox>
 
                 </VBox>
